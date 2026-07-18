@@ -84,18 +84,6 @@ function convertToOpenAI(req: AnthropicRequest): { model: string; messages: Open
 
 // ---- OpenAI → Anthropic conversion ----
 
-interface OpenAIChoice {
-  message?: {
-    content?: string | null;
-    tool_calls?: Array<{
-      id: string;
-      type: "function";
-      function: { name: string; arguments: string };
-    }>;
-  };
-  finish_reason?: string;
-}
-
 function convertToAnthropic(data: any, model: string): any {
   const choice = data.choices?.[0];
   const content = choice?.message?.content || "";
@@ -132,7 +120,7 @@ function convertToAnthropic(data: any, model: string): any {
 
 // ---- Streaming conversion ----
 
-function convertStreamChunk(chunk: any, model: string): string[] {
+function convertStreamChunk(chunk: any, _model: string): string[] {
   const events: string[] = [];
   const delta = chunk.choices?.[0]?.delta;
 

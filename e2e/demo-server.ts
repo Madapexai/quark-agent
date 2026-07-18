@@ -901,6 +901,7 @@ function getLLMConfig() {
   // Priority 2: model-proxy (Anthropic Messages API)
   const modelProxyUrl = process.env.MODEL_PROXY_URL || "http://127.0.0.1:43191";
   const modelProxyKey = process.env.MODEL_PROXY_KEY || process.env.ZAI_ANTHROPIC_AUTH_TOKEN || "";
+  const modelProxyModel = process.env.MODEL_PROXY_MODEL || "GLM-4.5-Air";
 
   // Priority 3: Direct OpenAI-compatible API
   const apiKey = process.env.OPENAI_API_KEY || process.env.DEEPSEEK_API_KEY;
@@ -924,7 +925,7 @@ function getLLMConfig() {
     baseUrl: useArk ? arkBaseUrl : baseUrl,
     model: useArk ? arkModel : model,
     useArk, useModelProxy, useDirectApi,
-    modelProxyUrl, modelProxyKey,
+    modelProxyUrl, modelProxyKey, modelProxyModel,
   };
 }
 
@@ -934,6 +935,7 @@ function isModelProxyAvailable(): boolean {
   // Will be checked asynchronously; default to trying
   return true;
 }
+void isModelProxyAvailable; // retained for future availability probing
 
 // ---- Anthropic Messages API helpers (for model-proxy) ----
 
@@ -982,7 +984,7 @@ async function callLLMStreamViaModelProxy(
   _writer: SSEWriter,
   send: (type: string, content: string, meta?: Record<string, any>) => void,
 ): Promise<LLMResponse> {
-  const { modelProxyUrl, modelProxyAvailable } = getLLMConfig();
+  const { modelProxyUrl } = getLLMConfig();
   const model = process.env.MODEL_PROXY_MODEL || "GLM-4.5-Air";
 
   // Convert OpenAI format → Anthropic format
@@ -1041,7 +1043,7 @@ async function callLLMStreamViaModelProxy(
     type: "function";
     function: { name: string; arguments: string };
   }> = [];
-  const toolCallMap = new Map<string, { name: string; arguments: string }>();
+  const toolCallMap = new Map<string, { id: string; type: "function"; function: { name: string; arguments: string } }>();
 
   while (true) {
     const { done, value } = await reader.read();
@@ -1363,7 +1365,7 @@ Key behaviors:
   send("done", "");
 }
 
-async function runAgentPipelineFallback(userMsg: string, w: SSEWriter, send: (type: Step["type"], content: string, meta?: Record<string, any>) => void) {
+async function runAgentPipelineFallback(userMsg: string, _w: SSEWriter, send: (type: Step["type"], content: string, meta?: Record<string, any>) => void) {
   const intent = detectIntent(userMsg);
 
   // Thinking step
@@ -1511,6 +1513,21 @@ async function runAgentPipeline(userMsg: string, w: SSEWriter) {
     sseEvent(w, "step", { type, content, meta, ts: Date.now() });
   };
 
+  // Check for workflow directives: /goal /loop /team
+  // Workflow runs even without LLM (mock-mode) so the Codex-aligned control flow
+  // (continuation / completion audit / budget / block threshold) is exercised.
+  const isWorkflow = /^\s*\/(goal|loop|team)\b/i.test(userMsg);
+  if (isWorkflow) {
+    const config = getLLMConfig();
+    const hasLLM = config.useArk || config.useModelProxy || config.useDirectApi;
+    try {
+      await runWorkflowPipeline(userMsg, w, send, config, hasLLM);
+      return;
+    } catch (e: any) {
+      send("error", `Workflow error: ${e.message}`);
+    }
+  }
+
   const config = getLLMConfig();
   const hasLLM = config.useArk || config.useModelProxy || config.useDirectApi;
 
@@ -1529,10 +1546,180 @@ async function runAgentPipeline(userMsg: string, w: SSEWriter) {
   await runAgentPipelineFallback(userMsg, w, send);
 }
 
+/**
+ * Workflow pipeline: /goal /loop /team dynamic workflows
+ * - /goal <desc>       → Plan/Act auto-switch mode
+ * - /goal <desc> /loop → Goal/Loop dynamic mode
+ * - /team <desc>       → Agent Team collaboration mode
+ */
+async function runWorkflowPipeline(
+  userMsg: string,
+  w: SSEWriter,
+  send: (type: Step["type"], content: string, meta?: Record<string, any>) => void,
+  config: ReturnType<typeof getLLMConfig>,
+  hasLLM: boolean,
+) {
+  // Mock-mode provider: when no LLM is configured, synthesize replies that
+  // exercise the Codex-aligned control flow (continuation, completion audit,
+  // budget, block threshold). This lets /goal run end-to-end in any environment.
+  const workflowProvider = {
+    name: hasLLM ? "workflow-llm" : "workflow-mock",
+    async chat(req: { messages: any[]; model?: string; temperature?: number }): Promise<{ content: string }> {
+      if (!hasLLM) {
+        const sys = (req.messages[0]?.content ?? "").toString();
+        const user = (req.messages[1]?.content ?? "").toString();
+        // Mock planner: synthesize 2-3 steps based on the objective
+        if (/planner/i.test(sys)) {
+          const obj = (user.match(/Objective:\s*([^\n]+)/) || [])[1] || "task";
+          return {
+            content: `Read context for: ${obj.slice(0, 80)} | read_file\nProduce the deliverable | run_code\nReport the outcome`,
+          };
+        }
+        // Mock auditor / judge: pass when reply mentions evidence, fail otherwise
+        if (/auditor|audit|judge|decide.*achieved|achieved/i.test(sys)) {
+          const hasEvidence = /evidence|test\s*(passed|run)|file|output|exit_code/i.test(user);
+          return {
+            content: JSON.stringify({
+              passed: hasEvidence,
+              reason: hasEvidence ? "mock audit: evidence keyword detected" : "mock audit: no evidence keyword",
+            }),
+          };
+        }
+        // Mock summarizer / generic: short canned reply
+        return { content: "Mock workflow reply: step executed using rule engine." };
+      }
+      const messages = req.messages.map((m) => ({ role: m.role, content: m.content }));
+      const baseUrl = config.useArk
+        ? config.baseUrl
+        : config.useModelProxy
+          ? config.modelProxyUrl + "/v1"
+          : config.baseUrl;
+      const apiKey = config.useArk ? config.apiKey : config.useModelProxy ? config.modelProxyKey : config.apiKey;
+      const model = config.useArk ? config.model : config.useModelProxy ? config.modelProxyModel : config.model;
+
+      const resp = await fetch(`${baseUrl}/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
+        },
+        body: JSON.stringify({
+          model,
+          messages,
+          temperature: req.temperature ?? 0.3,
+          max_tokens: 2000,
+        }),
+      });
+      if (!resp.ok) throw new Error(`Workflow LLM HTTP ${resp.status}`);
+      const data = await resp.json() as any;
+      return { content: data.choices?.[0]?.message?.content ?? "" };
+    },
+  };
+
+  // Build a lightweight agent that wraps the existing ReAct pipeline
+  const workflowAgent = {
+    run: async (prompt: string): Promise<{ reply: string; rounds: number; toolCalls: number }> => {
+      // Mock-mode agent: when no LLM is configured, return a canned reply that
+      // signals GOAL_COMPLETE with mock evidence. This drives the Codex-aligned
+      // continuation loop + completion audit through real control-flow paths.
+      if (!hasLLM) {
+        const evidence = `Mock evidence: prompt length=${prompt.length}, tools available=${toolDefinitions.length}`;
+        return {
+          reply: `GOAL_COMPLETE\nEvidence: ${evidence}\nStep executed in mock mode (no LLM configured).`,
+          rounds: 1,
+          toolCalls: 0,
+        };
+      }
+
+      // Delegate to the existing LLM pipeline for actual tool execution
+      let reply = "";
+      let toolCalls = 0;
+      const steps: any[] = [];
+
+      // Use a simplified inline ReAct loop
+      const systemPrompt = `You are a workflow step executor. Complete the given task using available tools. Be thorough.`;
+      const messages: LLMMessage[] = [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: prompt },
+      ];
+
+      for (let round = 0; round < 5; round++) {
+        const response = await callLLMStream(messages, toolDefinitions, w, (type: string, content: string) => {
+          if (type === "text_delta") {
+            steps.push({ type, content });
+          }
+        });
+        toolCalls += response.tool_calls?.length || 0;
+
+        if (response.tool_calls && response.tool_calls.length > 0) {
+          messages.push({ role: "assistant", content: response.content || null, tool_calls: response.tool_calls });
+          for (const tc of response.tool_calls) {
+            const args = JSON.parse(tc.function.arguments || "{}");
+            send("tool_call", `[workflow] ${tc.function.name}(${JSON.stringify(args)})`, { tool: tc.function.name, args });
+            const result = await executeTool(tc.function.name, args);
+            const resultStr = typeof result === "string" ? result : JSON.stringify(result);
+            send("tool_result", resultStr, { tool: tc.function.name });
+            messages.push({ role: "tool", tool_call_id: tc.id, content: resultStr });
+          }
+        } else {
+          reply = response.content || "";
+          break;
+        }
+      }
+      reply = reply || steps.filter((s) => s.type === "text_delta").map((s) => s.content).join("");
+      return { reply, rounds: 1, toolCalls };
+    },
+  };
+
+  const { DynamicWorkflow, DEFAULT_TEAM } = await import("../src/core/workflows.js");
+
+  const workflow = new DynamicWorkflow({
+    agent: workflowAgent as any,
+    provider: workflowProvider as any,
+    model: config.model,
+    tools: toolDefinitions as any,
+    maxIterations: 8,
+    maxReplans: 3,
+    teamMembers: DEFAULT_TEAM,
+  });
+
+  await workflow.run(userMsg, (event) => {
+    const typeMap: Record<string, Step["type"]> = {
+      text: "thinking",
+      mode_switch: "thinking",
+      plan_created: "thinking",
+      step_start: "tool_call",
+      step_done: "tool_result",
+      step_failed: "error",
+      replan: "thinking",
+      loop_iteration: "thinking",
+      continuation: "thinking",
+      budget_warning: "thinking",
+      budget_limit: "error",
+      block_detected: "error",
+      evaluation: "thinking",
+      completion_audit: "thinking",
+      team_dispatch: "tool_call",
+      team_result: "tool_result",
+      goal_achieved: "text",
+      workflow_complete: "text",
+      workflow_failed: "error",
+    };
+    const stepType = typeMap[event.type] || "thinking";
+    const prefix = event.mode ? `[${event.mode.toUpperCase()}] ` : "";
+    send(stepType, `${prefix}${event.content}`, {
+      workflowEvent: event.type,
+      step: event.step,
+      result: event.result,
+    });
+  });
+
+  send("done", "");
+}
+
 function sleep(ms: number) { return new Promise(r => setTimeout(r, ms)); }
 
 function extractImagePrompt(msg: string): string {
-  const m = msg.toLowerCase();
   // Chinese prompt extraction - remove action verbs and measure words
   const cleaned = msg
     .replace(/^(请|帮我|帮我|能不能|可不可以|可以)?(画|绘制|生成|创作|做)[一隻只个张幅下]*/u, "")
@@ -1560,7 +1747,7 @@ function formatTravelReply(bj: any, wq: any): string {
   return `## Xinjiang 6-Day, 5-Night Travel Plan\n**For 2 people | Budget: \u00a515,000**\n\n### Weather Conditions\n- **Beijing (departure):** ${bjTemp}\n- **Urumqi (destination):** ${wqTemp}${wqAdvice}\n\n### Itinerary Overview\n\n| Day | Destination | Highlights |\n|-----|-------------|------------|\n| 1 | Urumqi | Arrive, Grand Bazaar, Hong Shan Park |\n| 2 | Tianshan Tianchi | Alpine lake, snow peaks |\n| 3 | Burqin / Kanas | Kanas Lake, Moon Bay |\n| 4 | Hemu Village | Traditional Tuva village, sunrise |\n| 5 | Sayram Lake | Last tear of the Atlantic |\n| 6 | Return | Urumqi city tour, depart |\n\n### Budget Allocation\n\n| Category | Budget (CNY) | Details |\n|----------|-------------|----------|\n| Flights | \u00a55,000\u20137,000 | Beijing\u2194Urumqi round-trip x2 (off-peak / advance booking) |\n| Accommodation | \u00a52,000\u20133,000 | 5 nights x \u00a5400\u2013600 (3-star / boutique homestay) |\n| Dining | \u00a51,500\u20132,400 | 6 days x \u00a5250\u2013400/day (2 people) |\n| Attractions | \u00a51,000\u20131,600 | Tianshan, Kanas, Hemu, Sayram Lake |\n| Local Transport | \u00a52,500\u20133,500 | 6-day car charter / SUV + fuel |\n| Shopping / Misc | \u00a51,000\u20131,500 | Local specialties, souvenirs, emergency |\n| **Total** | **\u00a513,000\u201319,000** | \u00a515,000 feasible in off-peak with early booking |\n\n### Recommendations\n1. **Best time to visit:** June\u2013September (avoid sandstorm season)\n2. **Transport:** Chartering a car with driver is strongly recommended for Xinjiang due to long distances between sites\n3. **Packing:** Sunscreen (UV is strong), layers (temperature varies greatly day/night), ID card (frequent checkpoints)\n4. **Local food:** Roast lamb skewers, pilaf, big-plate chicken, naan bread, milk tea\n5. **Shopping:** Raisins, walnuts, dried fruit from the Grand Bazaar\n\n*Note: This plan is based on real weather data and common travel knowledge. For live flight/hotel pricing, configure an LLM API key (OpenAI/DeepSeek) to enable autonomous web search and booking integration.*`;
 }
 
-function formatGenericTravelReply(bj: any, dest: any, userMsg: string): string {
+function formatGenericTravelReply(bj: any, dest: any, _userMsg: string): string {
   const bjTemp = !("error" in bj) ? `${bj.temperature_C}\u00b0C, ${bj.weather}` : "unavailable";
   const destTemp = !("error" in dest) ? `${dest.temperature_C}\u00b0C, ${dest.weather}` : "unavailable";
   const destCity = !("error" in dest) ? dest.city : "destination";
@@ -1588,7 +1775,7 @@ function createStatusHandler() {
   });
   return {
     matches(req: any) { return req.url === "/api/status"; },
-    async handle(req: any, res: ServerResponse) {
+    async handle(_req: any, res: ServerResponse) {
       res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-cache", "Access-Control-Allow-Origin": "*" });
       res.end(body);
     },
@@ -1733,7 +1920,7 @@ async function main() {
   function makeSimpleProvider() {
     return {
       name: "simple",
-      async chat(req: any) {
+      async chat(_req: any) {
         return { content: "Use /api/chat/stream for streaming agent responses.", model: "simple", finishReason: "stop" };
       },
     };
@@ -1885,9 +2072,14 @@ async function main() {
 
   await new Promise<void>((resolve) => server.listen(PORT, "0.0.0.0", resolve));
   const addr = server.address() as { port: number };
-  const llmStatus = (process.env.LLM_API_KEY || process.env.OPENAI_API_KEY || process.env.DEEPSEEK_API_KEY)
-    ? "enabled (direct API mode)"
-    : `enabled via model-proxy (${process.env.MODEL_PROXY_MODEL || "GLM-4.5-Air"})`;
+  const cfg = getLLMConfig();
+  const llmStatus = cfg.useArk
+    ? `enabled (Ark · ${cfg.model})`
+    : cfg.useModelProxy
+      ? `enabled via model-proxy (${cfg.modelProxyModel})`
+      : cfg.useDirectApi
+        ? `enabled (direct · ${cfg.model})`
+        : "disabled (rule-engine fallback; /goal runs in mock-mode)";
   console.log(`\n[micro-agent] Professional Agent Server running on http://localhost:${addr.port}`);
   console.log(`  Chat (streaming): POST /api/chat/stream (SSE)`);
   console.log(`  Web UI:            http://localhost:${addr.port}`);

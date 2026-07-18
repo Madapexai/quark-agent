@@ -658,27 +658,51 @@ body {
       <div class="welcome-screen" id="welcome">
         <svg class="welcome-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         <div class="welcome-title">How can I help you today?</div>
-        <div class="welcome-subtitle">16 tools: file ops, search, shell, web, code, image, weather, tasks, memory</div>
+        <div class="welcome-subtitle">16 tools · 3 dynamic workflow modes · plan/act · goal/loop · agent team</div>
         <div id="llmNotice" style="display:none;margin-bottom:20px;padding:10px 16px;border:1px solid var(--orange);border-radius:var(--radius-md);background:var(--orange-bg);font-size:12px;color:var(--orange);max-width:560px;text-align:left;">
           <strong>Rule Engine Mode</strong> — Set <code>LLM_API_KEY</code> or <code>ZAI_ANTHROPIC_AUTH_TOKEN</code> env var to enable AI-powered reasoning.
         </div>
-        <div class="suggestion-grid">
-          <button class="suggestion-card" onclick="send('What\'s the weather in Beijing?')">
-            <div class="suggestion-title">Weather Query</div>
-            <div class="suggestion-desc">Real-time weather data for any city</div>
-          </button>
-          <button class="suggestion-card" onclick="send('Read the package.json file in the workspace')">
-            <div class="suggestion-title">File Operations</div>
-            <div class="suggestion-desc">Read, write, edit, and list files</div>
-          </button>
-          <button class="suggestion-card" onclick="send('Generate a beautiful portrait image')">
-            <div class="suggestion-title">Image Generation</div>
-            <div class="suggestion-desc">Create images from text descriptions</div>
-          </button>
-          <button class="suggestion-card" onclick="send('Search for all TypeScript files in the workspace')">
-            <div class="suggestion-title">Search & Explore</div>
-            <div class="suggestion-desc">Find files, grep content, shell commands</div>
-          </button>
+        <div style="max-width:560px;width:100%;margin-bottom:10px;text-align:left;">
+          <div style="font-size:11px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;padding-left:2px;">Dynamic Workflows</div>
+          <div class="suggestion-grid">
+            <button class="suggestion-card" onclick="send('/goal Read package.json and summarize what this project does')">
+              <div class="suggestion-title">/goal · Plan→Act</div>
+              <div class="suggestion-desc">Auto-switch: plan decompose, act execute, replan on failure</div>
+            </button>
+            <button class="suggestion-card" onclick="send('/goal Build a hello-world HTML page /loop')">
+              <div class="suggestion-title">/goal ... /loop</div>
+              <div class="suggestion-desc">Goal-driven loop: execute, evaluate, dynamically adjust</div>
+            </button>
+            <button class="suggestion-card" onclick="send('/team Research the latest TS features and write a demo')">
+              <div class="suggestion-title">/team · Agent Team</div>
+              <div class="suggestion-desc">planner + coder + researcher + reviewer collaborate</div>
+            </button>
+            <button class="suggestion-card" onclick="send('/goal List files in workspace and count TypeScript files /loop')">
+              <div class="suggestion-title">/goal + tools</div>
+              <div class="suggestion-desc">Combine workflow mode with 16 built-in tools</div>
+            </button>
+          </div>
+        </div>
+        <div style="max-width:560px;width:100%;text-align:left;">
+          <div style="font-size:11px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.06em;margin:20px 0 8px;padding-left:2px;">Single Tools</div>
+          <div class="suggestion-grid">
+            <button class="suggestion-card" onclick="send('What\'s the weather in Beijing?')">
+              <div class="suggestion-title">Weather Query</div>
+              <div class="suggestion-desc">Real-time weather data for any city</div>
+            </button>
+            <button class="suggestion-card" onclick="send('Read the package.json file in the workspace')">
+              <div class="suggestion-title">File Operations</div>
+              <div class="suggestion-desc">Read, write, edit, and list files</div>
+            </button>
+            <button class="suggestion-card" onclick="send('Generate a beautiful portrait image')">
+              <div class="suggestion-title">Image Generation</div>
+              <div class="suggestion-desc">Create images from text descriptions</div>
+            </button>
+            <button class="suggestion-card" onclick="send('Search for all TypeScript files in the workspace')">
+              <div class="suggestion-title">Search & Explore</div>
+              <div class="suggestion-desc">Find files, grep content, shell commands</div>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -691,7 +715,7 @@ body {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           </button>
         </div>
-        <div class="input-footer">16 real-time tools: files, search, shell, web, code, image, weather, tasks, memory. Press Enter to send.</div>
+        <div class="input-footer">16 tools · workflows: <code style="font-family:var(--font-mono);background:var(--bg-tertiary);padding:1px 5px;border-radius:3px;font-size:11px;">/goal</code> <code style="font-family:var(--font-mono);background:var(--bg-tertiary);padding:1px 5px;border-radius:3px;font-size:11px;">/loop</code> <code style="font-family:var(--font-mono);background:var(--bg-tertiary);padding:1px 5px;border-radius:3px;font-size:11px;">/team</code> · Enter to send</div>
       </div>
     </div>
   </main>

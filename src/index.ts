@@ -144,6 +144,23 @@ export type { ImitateSession } from "./core/imitate.js";
 export { SelfHealer, diagnoseError } from "./core/healer.js";
 export type { ErrorKind, HealResult } from "./core/healer.js";
 
+// dynamic workflows: Codex-aligned /goal + Claude Code plan/act + Agent Team
+export { DynamicWorkflow, DEFAULT_TEAM } from "./core/workflows.js";
+export type {
+  WorkflowMode,
+  WorkflowState,
+  GoalStatus,
+  GoalSpec,
+  GoalContext,
+  TurnRecord,
+  PlanStep as WorkflowPlanStep,
+  StepResult,
+  TeamMember,
+  WorkflowEvent,
+  WorkflowCallback,
+  DynamicWorkflowOptions,
+} from "./core/workflows.js";
+
 // slash commands
 export { handleSlash, registerSlash, listSlash } from "./channel/slash.js";
 export type { SlashContext, SlashHandler } from "./channel/slash.js";
