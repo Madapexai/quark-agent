@@ -79,9 +79,42 @@
 ```bash
 git clone https://github.com/Madapexai/quark-agent.git
 cd quark-agent && npm install
-cp e2e/.env.example e2e/.env   # 填上你的 API Key
+cp e2e/.env.example e2e/.env   # 然后填入一个 API Key（见下方）
 npx tsx e2e/demo-server.ts
 # → http://localhost:3456
+```
+
+> **⚠️ 需要自备大模型 API Key。** Quark Agent 是模型无关的（讲 OpenAI 兼容协议），但**不内置**模型。2 分钟拿一个免费 Key,见下方[获取免费 API Key](#-获取免费-api-key)。
+
+### 🔑 获取免费 API Key
+
+Quark Agent 启动时会探测每个 provider,选第一个健康的当主用,失败自动降级。你只需在 `e2e/.env` 里填**其中一个**:
+
+| Provider | 模型 | 费用 | 哪里拿 Key |
+|---|---|---|---|
+| **GLM / 智谱** | `glm-4-flash` | 🆓 免费 | https://open.bigmodel.cn/ — 注册后拿 API Key |
+| **Agnes AI** | `agnes-2.0-flash` | 🆓 免费（$0/百万 tokens） | https://wiki.agnes-ai.com/ |
+| **火山引擎 Ark** | `doubao-seed-code` | 💰 付费（便宜） | https://www.volcengine.com/product/ark |
+
+**或任何 OpenAI 兼容端点：**
+
+| Provider | 要填的环境变量 |
+|---|---|
+| OpenAI | `OPENAI_API_KEY=sk-...` |
+| Ollama（本地，无需 Key） | `OPENAI_API_KEY=ollama` · `OPENAI_BASE_URL=http://localhost:11434/v1` · `OPENAI_MODEL=llama3.2` |
+| DeepSeek | `DEEPSEEK_API_KEY=...` |
+| Together / Groq / OpenRouter / vLLM | `OPENAI_API_KEY=...` · `OPENAI_BASE_URL=...` · `OPENAI_MODEL=...` |
+
+**最简路径（免费,2 分钟）：**
+
+```bash
+# 1. 打开 https://open.bigmodel.cn/ → 注册 → 拿 API Key
+# 2. 填到 e2e/.env：
+GLM_API_KEY=你的_key
+GLM_BASE_URL=https://open.bigmodel.cn/api/paas/v4
+GLM_MODEL=glm-4-flash
+# 3. 启动
+npx tsx e2e/demo-server.ts
 ```
 
 三行代码创建一个 Agent：
@@ -90,7 +123,7 @@ npx tsx e2e/demo-server.ts
 import { createAgent } from "quark-agent";
 
 const { agent } = await createAgent({
-  apiKey: process.env.ARK_API_KEY!,
+  apiKey: process.env.GLM_API_KEY!,
   profile: "coding",          // 只要编码类工具
   extraCategories: ["web"],   // 再加一组 Web 工具
 });
@@ -113,7 +146,7 @@ node e2e/e2e-browser-test.mjs
 </details>
 
 <details>
-<summary><b>配置说明</b></summary>
+<summary><b>完整配置参考</b></summary>
 
 ```bash
 cp e2e/.env.example e2e/.env
@@ -125,13 +158,27 @@ ARK_API_KEY=
 ARK_BASE_URL=https://ark.cn-beijing.volces.com/api/coding/v3
 ARK_MODEL=doubao-seed-code
 
-# 优先级 2：Model Proxy（Anthropic 格式）
+# 优先级 2：Agnes AI（免费，OpenAI 兼容）
+AGNES_API_KEY=
+AGNES_BASE_URL=https://apihub.agnes-ai.com/v1
+AGNES_MODEL=agnes-2.0-flash
+
+# 优先级 3：GLM / 智谱（免费，OpenAI 兼容）
+GLM_API_KEY=
+GLM_BASE_URL=https://open.bigmodel.cn/api/paas/v4
+GLM_MODEL=glm-4-flash
+
+# 优先级 4：Model Proxy（Anthropic 格式，本地）
 MODEL_PROXY_URL=http://127.0.0.1:43191
 MODEL_PROXY_KEY=
+MODEL_PROXY_MODEL=GLM-4.5-Air
 
-# 优先级 3：直连 OpenAI 兼容 API
+# 优先级 5：直连 OpenAI 兼容 API
 OPENAI_API_KEY=
+DEEPSEEK_API_KEY=
 ```
+
+启动时每个 provider 都会被探测,选第一个健康的当主用。如果主用 provider 在运行中失败,请求会自动降级到下一个。
 
 </details>
 

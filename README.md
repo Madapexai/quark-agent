@@ -79,18 +79,51 @@ Evaluated on the industry-standard **AgentBench (THUDM)** and **GAIA (Meta/HF)**
 ```bash
 git clone https://github.com/Madapexai/quark-agent.git
 cd quark-agent && npm install
-cp e2e/.env.example e2e/.env   # fill in your API key
+cp e2e/.env.example e2e/.env   # then fill in ONE API key (see below)
 npx tsx e2e/demo-server.ts
 # → http://localhost:3456
 ```
 
-Spin up an agent in three lines:
+> **⚠️ You need to bring your own LLM API key.** Quark Agent is model-agnostic (speaks the OpenAI-compatible API) but does **not** ship with a built-in model. Grab a free key in 2 minutes — see [Get a Free API Key](#-get-a-free-api-key) below.
+
+### 🔑 Get a Free API Key
+
+Quark Agent probes each provider at startup and picks the first healthy one, with automatic fallback. You only need to fill in **one** of these in `e2e/.env`:
+
+| Provider | Model | Cost | Where to get a key |
+|---|---|---|---|
+| **GLM / ZhipuAI** | `glm-4-flash` | 🆓 Free | https://open.bigmodel.cn/ — register, grab API key |
+| **Agnes AI** | `agnes-2.0-flash` | 🆓 Free ($0/1M tokens) | https://wiki.agnes-ai.com/ |
+| **Volcengine Ark** | `doubao-seed-code` | 💰 Paid (cheap) | https://www.volcengine.com/product/ark |
+
+**Or use any OpenAI-compatible endpoint:**
+
+| Provider | Env vars to set |
+|---|---|
+| OpenAI | `OPENAI_API_KEY=sk-...` |
+| Ollama (local, no key) | `OPENAI_API_KEY=ollama` · `OPENAI_BASE_URL=http://localhost:11434/v1` · `OPENAI_MODEL=llama3.2` |
+| DeepSeek | `DEEPSEEK_API_KEY=...` |
+| Together / Groq / OpenRouter / vLLM | `OPENAI_API_KEY=...` · `OPENAI_BASE_URL=...` · `OPENAI_MODEL=...` |
+
+**Easiest path (free, 2 minutes):**
+
+```bash
+# 1. Go to https://open.bigmodel.cn/ → register → get API key
+# 2. Put it in e2e/.env:
+GLM_API_KEY=your_key_here
+GLM_BASE_URL=https://open.bigmodel.cn/api/paas/v4
+GLM_MODEL=glm-4-flash
+# 3. Run
+npx tsx e2e/demo-server.ts
+```
+
+Spin up an agent in three lines of code:
 
 ```ts
 import { createAgent } from "quark-agent";
 
 const { agent } = await createAgent({
-  apiKey: process.env.ARK_API_KEY!,
+  apiKey: process.env.GLM_API_KEY!,
   profile: "coding",          // coding-only tools
   extraCategories: ["web"],   // plus the Web category
 });
@@ -113,7 +146,7 @@ node e2e/e2e-browser-test.mjs
 </details>
 
 <details>
-<summary><b>Configuration</b></summary>
+<summary><b>Full configuration reference</b></summary>
 
 ```bash
 cp e2e/.env.example e2e/.env
@@ -125,13 +158,27 @@ ARK_API_KEY=
 ARK_BASE_URL=https://ark.cn-beijing.volces.com/api/coding/v3
 ARK_MODEL=doubao-seed-code
 
-# Priority 2: Model Proxy (Anthropic format)
+# Priority 2: Agnes AI (free, OpenAI-compatible)
+AGNES_API_KEY=
+AGNES_BASE_URL=https://apihub.agnes-ai.com/v1
+AGNES_MODEL=agnes-2.0-flash
+
+# Priority 3: GLM / ZhipuAI (free, OpenAI-compatible)
+GLM_API_KEY=
+GLM_BASE_URL=https://open.bigmodel.cn/api/paas/v4
+GLM_MODEL=glm-4-flash
+
+# Priority 4: Model Proxy (Anthropic format, local)
 MODEL_PROXY_URL=http://127.0.0.1:43191
 MODEL_PROXY_KEY=
+MODEL_PROXY_MODEL=GLM-4.5-Air
 
-# Priority 3: direct OpenAI-compatible API
+# Priority 5: Direct OpenAI-compatible API
 OPENAI_API_KEY=
+DEEPSEEK_API_KEY=
 ```
+
+At startup each provider is probed; the first healthy one becomes primary. If the primary fails at runtime, requests automatically fall back to the next provider in the chain.
 
 </details>
 

@@ -2216,6 +2216,24 @@ async function main() {
   console.log(`  Pet Game:          /pet.html`);
   console.log(`  Tools: read_file | write_file | edit_file | list_dir | search_files | find_files | shell | web_search | web_fetch | run_code | generate_image | weather | todo_write | task_list | memory_save | memory_search`);
   console.log(`  LLM Agent:         ${llmStatus}`);
+
+  // If no LLM provider is healthy, show a friendly setup hint so first-time
+  // users don't get stuck chatting with a rule-engine fallback.
+  if (!healthy && !cfg.useModelProxy) {
+    console.log("");
+    console.log("  ⚠️  No LLM provider is configured. Chat will NOT work until you add an API key.");
+    console.log("");
+    console.log("     Quark Agent is model-agnostic — it speaks the OpenAI-compatible API, but");
+    console.log("     does NOT ship with a built-in model. Pick ONE of these and fill in e2e/.env:");
+    console.log("");
+    console.log("       Free:   GLM_API_KEY     ← register at https://open.bigmodel.cn/");
+    console.log("       Free:   AGNES_API_KEY   ← register at https://wiki.agnes-ai.com/");
+    console.log("       Paid:   ARK_API_KEY     ← register at https://www.volcengine.com/product/ark");
+    console.log("       Local:  OPENAI_API_KEY=ollama  OPENAI_BASE_URL=http://localhost:11434/v1  OPENAI_MODEL=llama3.2");
+    console.log("");
+    console.log("     After editing e2e/.env, restart this server. See README §🔑 Get a Free API Key.");
+    console.log("");
+  }
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });
