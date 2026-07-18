@@ -1,0 +1,72 @@
+name: Bug Report
+description: Report something that's broken or behaves unexpectedly
+title: "[bug] "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report! Before submitting, please search
+        [existing issues](https://github.com/Madapexai/quark-agent/issues?q=is%3Aissue+label%3Abug)
+        to avoid duplicates.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the unexpected behavior. Include the smallest reproduction you can.
+      placeholder: "When I ran X, I expected Y, but got Z."
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Step-by-step so we can reproduce locally.
+      placeholder: |
+        1. `git clone ... && npm install`
+        2. `cp e2e/.env.example e2e/.env` (fill in keys)
+        3. `npx tsx e2e/demo-server.ts`
+        4. Send message "..."
+        5. Observe ...
+    validations:
+      required: true
+  - type: dropdown
+    id: benchmark
+    attributes:
+      label: Benchmark area
+      options:
+        - Not benchmark-related
+        - GAIA
+        - AgentBench — DB-Bench
+        - AgentBench — OS-Interaction
+        - AgentBench — Knowledge-Graph
+        - Other
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: Quark Agent version / commit
+      placeholder: "v0.1.0 or commit SHA"
+    validations:
+      required: true
+  - type: input
+    id: node
+    attributes:
+      label: Node.js version
+      placeholder: "20.x / 22.x / 24.x"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs / tool trace
+      description: Paste the SSE trace, tool calls, or error stack. Redact any API keys.
+      render: shell
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true

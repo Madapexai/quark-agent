@@ -1,0 +1,105 @@
+site_name: Quark Agent
+site_url: https://madapexai.github.io/quark-agent
+site_description: A 5KB agent kernel that composes everything you need.
+site_author: Madapexai
+repo_url: https://github.com/Madapexai/quark-agent
+repo_name: Madapexai/quark-agent
+edit_uri: edit/master/docs/
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.tracking
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+  palette:
+    - scheme: default
+      primary: deep purple
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - scheme: slate
+      primary: deep purple
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    logo: material/atom
+
+nav:
+  - Home: index.md
+  - Quick Start: quickstart.md
+  - Concepts:
+      - Kernel & Layers: concepts/kernel.md
+      - Tools & Skills: concepts/tools.md
+      - Channels: concepts/channels.md
+      - Profiles: concepts/profiles.md
+      - A2A Protocol: concepts/a2a.md
+      - Self-Evolution (GEPA): concepts/gepa.md
+  - Reference:
+      - 16 Tools: reference/tools.md
+      - 7 Channels: reference/channels.md
+      - defineAction API: reference/define-action.md
+      - Configuration: reference/config.md
+  - Benchmark:
+      - Overview: benchmark/index.md
+      - GAIA Results: benchmark/gaia.md
+      - AgentBench Results: benchmark/agentbench.md
+      - Reproduction: benchmark/reproduce.md
+  - Community:
+      - Contributing: community/contributing.md
+      - Roadmap: community/roadmap.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - toc:
+      permalink: true
+  - attr_list
+  - md_in_html
+  - def_list
+
+plugins:
+  - search:
+      lang:
+        - en
+        - zh
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Madapexai/quark-agent
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/
+  analytics:
+    provider: google
+    property: G-XXXXXXXXXX
+
+extra_css:
+  - assets/custom.css

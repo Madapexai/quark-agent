@@ -1,0 +1,22 @@
+name: Ideas
+description: Propose new features, tools, or direction for the project
+labels: ["ideas"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea
+      description: One paragraph — what, why, who benefits.
+    validations:
+      required: true
+  - type: textarea
+    id: alt
+    attributes:
+      label: Alternatives considered
+      placeholder: "I also thought about X, but ..."
+  - type: textarea
+    id: mock
+    attributes:
+      label: Mock API / usage example
+      description: Show how it would feel to use. Code blocks welcome.
+      render: ts

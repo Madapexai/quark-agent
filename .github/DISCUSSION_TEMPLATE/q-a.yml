@@ -1,0 +1,11 @@
+name: Q&A
+description: Ask a question about usage, configuration, or integrations
+labels: ["q-a"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+      description: Be specific — include what you tried and what you expected.
+    validations:
+      required: true

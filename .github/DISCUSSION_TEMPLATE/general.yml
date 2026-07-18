@@ -1,0 +1,11 @@
+name: General
+description: General discussion — questions, integrations, anything that isn't a bug or feature request
+labels: ["general"]
+body:
+  - type: textarea
+    id: body
+    attributes:
+      label: Topic
+      description: What's on your mind?
+    validations:
+      required: true

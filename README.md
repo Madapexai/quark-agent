@@ -2,79 +2,157 @@
 
 # Quark Agent
 
-**5KB 的 Agent 内核，拼出你要的一切。**
+**A 5KB agent kernel that composes everything you need.**
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178c6?style=flat-square)](https://www.typescriptlang.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](https://opensource.org/licenses/MIT)
-[![npm](https://img.shields.io/badge/npm-quark--agent-cb3837?style=flat-square&logo=npm)](https://www.npmjs.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178c6?style=flat-square?logo=typescript)](https://www.typescriptlang.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](./LICENSE)
+[![npm](https://img.shields.io/badge/npm-quark--agent-cb3837?style=flat-square?logo=npm)](https://www.npmjs.com/)
+[![Pass Rate](https://img.shields.io/badge/Benchmark-89.0%25-brightgreen?style=flat-square)](./e2e/FULL-EVAL-REPORT.md)
+[![GitHub stars](https://img.shields.io/github/stars/Madapexai/quark-agent?style=flat-square)](https://github.com/Madapexai/quark-agent/stargazers)
+[![GitHub Discussions](https://img.shields.io/badge/Discussions-Join-blue?style=flat-square?logo=github)](https://github.com/Madapexai/quark-agent/discussions)
 
-[English](#) · [简体中文](#)
+**Like quarks compose into protons, compose the agent you need from the smallest possible kernel.**
 
-像夸克组合成质子一样，用最小的内核拼出你需要的 Agent。
-
-不是又一个全家桶框架。核心不到 5KB gzip，工具、通道、模型——全是即插即用的 Skill。
+[English](./README.md) · [简体中文](./README.zh-CN.md)
 
 </div>
 
 ---
 
-## 30 秒跑起来
+> Not another all-in-one framework. The kernel is **<5KB gzipped**, and tools, channels, models — **everything is a plug-and-play Skill**.
+
+## Table of Contents
+
+- [Why Quark Agent](#why-quark-agent)
+- [Benchmark](#benchmark)
+- [30-Second Quick Start](#30-second-quick-start)
+- [16 Tools, 7 Categories](#16-tools-7-categories)
+- [One Agent, Seven Entrypoints](#one-agent-seven-entrypoints)
+- [Self-Evolution (GEPA)](#self-evolution-gepa)
+- [A2A: Agents Talking to Agents](#a2a-agents-talking-to-agents)
+- [Architecture](#architecture)
+- [Project Structure](#project-structure)
+- [Testing](#testing)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [Community](#community)
+- [License](#license)
+
+---
+
+## Why Quark Agent
+
+**Others** give you a fixed toolset, take it or leave it.
+
+**Quark Agent**: 16 tools across 7 categories, 6 profile presets, mix-and-match however you like. Define a new Skill with one `defineAction`.
+
+| | Quark Agent | Claude Code | Codex CLI |
+|---|:---:|:---:|:---:|
+| Kernel size | **<5KB** | — | — |
+| Composable tools | ✅ | ❌ fixed | ❌ fixed |
+| Self-evolution (GEPA) | ✅ | ❌ | ❌ |
+| Channel entries | 7 | CLI | CLI |
+| A2A protocol | built-in | — | — |
+| Profile presets | 6 | — | — |
+
+---
+
+## Benchmark
+
+Evaluated on the industry-standard **AgentBench (THUDM)** and **GAIA (Meta/HF)** — 200 tasks total, real LLM, real tool calls. Full trace-level report: [`e2e/FULL-EVAL-REPORT.md`](./e2e/FULL-EVAL-REPORT.md) / interactive HTML: [`e2e/FULL-EVAL-REPORT.html`](./e2e/FULL-EVAL-REPORT.html).
+
+| Benchmark | Total | Pass | Fail | Error | Pass Rate |
+|-----------|------:|----:|----:|------:|----------:|
+| GAIA (Meta/HF) | 100 | 93 | 7 | 0 | **93.0%** |
+| AgentBench (THUDM) | 100 | 85 | 9 | 6 | **85.0%** |
+| **Overall** | **200** | **178** | **16** | **6** | **89.0%** |
+
+**GAIA by difficulty** — L1: 97.5% · L2: 94.3% · L3: 84.0%
+**AgentBench by category** — DB-Bench: 76.0% · OS-Interaction: 93.3% · Knowledge-Graph: 95.0%
+
+> Reproduce: `PORT=3465 node e2e/full-eval.mjs --bench all` — ~75 minutes, ~200 real LLM calls.
+
+---
+
+## 30-Second Quick Start
 
 ```bash
 git clone https://github.com/Madapexai/quark-agent.git
 cd quark-agent && npm install
-cp e2e/.env.example e2e/.env   # 填上你的 API Key
+cp e2e/.env.example e2e/.env   # fill in your API key
 npx tsx e2e/demo-server.ts
 # → http://localhost:3456
 ```
 
-三行代码创建一个 Agent：
+Spin up an agent in three lines:
 
 ```ts
 import { createAgent } from "quark-agent";
 
 const { agent } = await createAgent({
   apiKey: process.env.ARK_API_KEY!,
-  profile: "coding",          // 只要编码类工具
-  extraCategories: ["web"],   // 再加一组 Web 工具
+  profile: "coding",          // coding-only tools
+  extraCategories: ["web"],   // plus the Web category
 });
 ```
 
+<details>
+<summary><b>Other installation options</b></summary>
+
+```bash
+# Run the ReAct demo directly (no UI)
+npx tsx examples/basic.ts
+
+# Headless E2E test against the running server
+node e2e/test-tools.mjs
+
+# Browser E2E test (requires Chrome)
+node e2e/e2e-browser-test.mjs
+```
+
+</details>
+
+<details>
+<summary><b>Configuration</b></summary>
+
+```bash
+cp e2e/.env.example e2e/.env
+```
+
+```env
+# Priority 1: Volcengine Ark (OpenAI-compatible)
+ARK_API_KEY=
+ARK_BASE_URL=https://ark.cn-beijing.volces.com/api/coding/v3
+ARK_MODEL=doubao-seed-code
+
+# Priority 2: Model Proxy (Anthropic format)
+MODEL_PROXY_URL=http://127.0.0.1:43191
+MODEL_PROXY_KEY=
+
+# Priority 3: direct OpenAI-compatible API
+OPENAI_API_KEY=
+```
+
+</details>
+
 ---
 
-## 有什么不一样
+## 16 Tools, 7 Categories
 
-**别家**：给你一个固定工具集，爱用不用。
+You don't need to load them all. The `profile` parameter decides what loads:
 
-**Quark Agent**：16 个工具按 7 类分，6 种 Profile 预设，随你挑随你组，写一个 `defineAction` 就能加新的。
-
-| | Quark Agent | Claude Code | Codex CLI |
-|---|:---:|:---:|:---:|
-| 内核体积 | **<5KB** | — | — |
-| 工具自由组合 | ✅ | ❌ 固定 | ❌ 固定 |
-| 自进化 (GEPA) | ✅ | ❌ | ❌ |
-| 多通道接入 | 7 种 | CLI | CLI |
-| A2A 协议 | 内置 | — | — |
-| Profile 裁剪 | 6 档 | — | — |
-
----
-
-## 16 个工具，7 个类别
-
-不需要全装。`profile` 参数决定你加载哪些：
-
-| 类别 | 工具 | minimal | coding | research | full |
+| Category | Tools | minimal | coding | research | full |
 |---|---|:---:|:---:|:---:|:---:|
-| 文件 | `read_file` `write_file` `edit_file` `list_dir` | | ✅ | | ✅ |
-| 搜索 | `search_files` `find_files` | | ✅ | | ✅ |
+| File | `read_file` `write_file` `edit_file` `list_dir` | | ✅ | | ✅ |
+| Search | `search_files` `find_files` | | ✅ | | ✅ |
 | Shell | `shell` | | ✅ | | ✅ |
 | Web | `web_search` `web_fetch` | | | ✅ | ✅ |
-| 代码 | `run_code` | ✅ | ✅ | | ✅ |
-| 图像 | `generate_image` | | | | ✅ |
-| 任务 | `todo_write` `task_list` | | | ✅ | ✅ |
-| 记忆 | `memory_save` `memory_search` | | | ✅ | ✅ |
+| Code | `run_code` | ✅ | ✅ | | ✅ |
+| Image | `generate_image` | | | | ✅ |
+| Task | `todo_write` `task_list` | | | ✅ | ✅ |
+| Memory | `memory_save` `memory_search` | | | ✅ | ✅ |
 
-写一个 Skill 只需一个 `defineAction`——定义一次，自动暴露到 Agent / HTTP / CLI / MCP / A2A：
+Define a Skill with one `defineAction` — it auto-exposes to Agent / HTTP / CLI / MCP / A2A:
 
 ```ts
 import { defineAction } from "quark-agent";
@@ -88,7 +166,7 @@ export const sendEmail = defineAction({
     body: { type: "string" },
   },
   handler: async ({ to, subject, body }) => {
-    // 你的逻辑
+    // your logic
     return { sent: true };
   },
 });
@@ -96,31 +174,59 @@ export const sendEmail = defineAction({
 
 ---
 
-## 一个 Agent，七个入口
+## One Agent, Seven Entrypoints
 
-同一个 Agent 实例，换个 Channel 就能跑在不同平台上：
+Same agent instance — just swap the channel:
 
 ```ts
-// 终端
+// Terminal
 import { CliChannel } from "quark-agent";
 new CliChannel({ agent }).start();
 
-// HTTP + SSE 流式
+// HTTP + SSE streaming
 import { HttpChannel } from "quark-agent";
 new HttpChannel({ agent, port: 3456 }).start();
 
-// 飞书 / 企微 / Telegram / GitHub / Webhook
-// 全部支持，接入方式一致
+// Feishu / WeCom / Telegram / GitHub / Webhook
+// all supported, same integration contract
 ```
 
 ---
 
-## 架构
+## Self-Evolution (GEPA)
+
+Hand the agent a set of test cases and let it tune its own prompts and tool-selection policy:
+
+```ts
+import { Evolver } from "quark-agent";
+
+const evolver = new Evolver({ agent, evalCases: [...], generations: 10 });
+await evolver.evolve();
+```
+
+---
+
+## A2A: Agents Talking to Agents
+
+```ts
+import { getA2ARegistry } from "quark-agent";
+
+getA2ARegistry().register({
+  name: "code-reviewer",
+  skills: [{ name: "review", description: "Review pull requests" }],
+});
+
+// other agents can now invoke it directly
+```
+
+---
+
+## Architecture
 
 ```
 ┌──────────────────────────────────────────┐
 │              Channels (7)                │
-│  CLI · HTTP · 飞书 · 企微 · Tg · GH · Hook│
+│  CLI · HTTP · Feishu · WeCom · Tg · GH · Hook
 ├──────────────────────────────────────────┤
 │            Agent Runtime                 │
 │  ReAct · Planner · Sub-Agent · Healer   │
@@ -133,137 +239,104 @@ new HttpChannel({ agent, port: 3456 }).start();
 └──────────────────────────────────────────┘
 ```
 
-按需引入：只用内核 → 加插件 → 加扩展 → 全家桶。你说了算。
+Pay for what you use: kernel only → add plugins → add extensions → full stack. Your call.
 
-| 层 | 包 | 内容 |
+| Layer | Package | Contents |
 |---|---|---|
-| Kernel | `packages/core` | Agent、Context、Runtime、Types — 零依赖 |
-| Plugins | `packages/plugins` | A2A、SSE、Workspace、defineAction |
-| Extensions | `packages/extensions` | Sessions、Healer、Skill 评分 |
-| Full | `src/` | 全部工具、通道、Provider |
+| Kernel | `packages/core` | Agent, Context, Runtime, Types — zero deps |
+| Plugins | `packages/plugins` | A2A, SSE, Workspace, defineAction |
+| Extensions | `packages/extensions` | Sessions, Healer, Skill scoring |
+| Full | `src/` | all tools, channels, providers |
 
 ---
 
-## 自进化
-
-给 Agent 一组测试用例，让它自己调优 Prompt 和工具选择策略：
-
-```ts
-import { Evolver } from "quark-agent";
-
-const evolver = new Evolver({ agent, evalCases: [...], generations: 10 });
-await evolver.evolve();
-```
-
----
-
-## A2A：Agent 之间互相通信
-
-```ts
-import { getA2ARegistry } from "quark-agent";
-
-// 注册你的 Agent
-getA2ARegistry().register({
-  name: "code-reviewer",
-  skills: [{ name: "review", description: "Review pull requests" }],
-});
-
-// 别的 Agent 可以直接调用
-```
-
----
-
-## Demo
-
-`e2e/` 目录有一个完整可跑的 ReAct Agent Demo：
-
-- SSE 流式输出，实时看到思考和工具调用过程
-- 3 层 LLM 路由：Ark API → Model Proxy → Direct API → 降级
-- 零外部依赖的专业 Web UI
-- `.env` 配置，不硬编码任何密钥
-
-<details>
-<summary>配置说明</summary>
-
-```bash
-cp e2e/.env.example e2e/.env
-```
-
-```env
-# 优先级 1：火山引擎 Ark（OpenAI 兼容）
-ARK_API_KEY=
-ARK_BASE_URL=https://ark.cn-beijing.volces.com/api/coding/v3
-ARK_MODEL=doubao-seed-code
-
-# 优先级 2：Model Proxy（Anthropic 格式）
-MODEL_PROXY_URL=http://127.0.0.1:43191
-MODEL_PROXY_KEY=
-
-# 优先级 3：直连 OpenAI 兼容 API
-OPENAI_API_KEY=
-```
-
-</details>
-
----
-
-## 测试
-
-```bash
-# API 集成测试
-node e2e/test-tools.mjs
-
-# 浏览器端到端测试（需要 Chrome）
-node e2e/e2e-browser-test.mjs
-```
-
-- 13/13 API 测试通过
-- 12/12 浏览器 E2E 测试通过
-- 全部 16 个工具均经真实 LLM 验证
-
----
-
-## 项目结构
+## Project Structure
 
 ```
 quark-agent/
 ├── src/
-│   ├── core/          内核：Agent、Context、Runtime
-│   ├── tools/         16+ 内置工具
-│   ├── channel/       7 种通道
+│   ├── core/          kernel: Agent, Context, Runtime
+│   ├── tools/         16+ built-in tools
+│   ├── channel/       7 channels
 │   ├── provider/      OpenAI / Anthropic / Gemini / Ollama
-│   ├── plugin/        插件注册 + 内置插件
-│   ├── skills/        技能发现、评分、沉淀
-│   ├── evolve/        GEPA 自进化
-│   ├── a2a/           Agent 间通信协议
+│   ├── plugin/        plugin registry + built-in plugins
+│   ├── skills/        skill discovery, scoring, persistence
+│   ├── evolve/        GEPA self-evolution
+│   ├── a2a/           agent-to-agent protocol
 │   ├── sync/          EventBus + SSE
-│   ├── memory/        SQLite 存储 + 压缩
-│   └── sandbox/       VM 沙箱
+│   ├── memory/        SQLite storage + compression
+│   └── sandbox/       VM sandbox
 ├── packages/
-│   ├── core/          零依赖内核
-│   ├── plugins/       官方插件
-│   └── extensions/    高阶扩展
-└── e2e/               Demo + 测试 + UI
+│   ├── core/          zero-dep kernel
+│   ├── plugins/       official plugins
+│   └── extensions/    high-order extensions
+└── e2e/               demo + tests + benchmark + UI
 ```
 
 ---
 
-## 贡献
+## Testing
 
-PR 欢迎。写个 `defineAction` 就是一个新 Skill，没那么多规矩。
+```bash
+# API integration tests
+node e2e/test-tools.mjs
+
+# browser E2E tests (requires Chrome)
+node e2e/e2e-browser-test.mjs
+
+# full benchmark suite (200 tasks, ~75 min)
+PORT=3465 node e2e/full-eval.mjs --bench all
+```
+
+- 13/13 API tests pass
+- 12/12 browser E2E tests pass
+- 178/200 benchmark tasks pass (**89.0%**)
+- All 16 tools verified against a real LLM
+
+---
+
+## Roadmap
+
+- [x] 5KB kernel + 16 composable tools
+- [x] 7 channels (CLI / HTTP / Feishu / WeCom / Tg / GH / Hook)
+- [x] A2A protocol + GEPA self-evolution
+- [x] 200-task benchmark suite (AgentBench + GAIA)
+- [ ] Standalone docs site (GitHub Pages, MkDocs Material)
+- [ ] `npx quark-agent` one-line installer
+- [ ] Plugin marketplace
+- [ ] Multimodal computer-use tool (Claude Computer Use style)
+
+---
+
+## Contributing
+
+PRs welcome. Read [`CONTRIBUTING.md`](./CONTRIBUTING.md) first — defining a `defineAction` is one Skill, no heavy ceremony.
+
+See the [open issues](https://github.com/Madapexai/quark-agent/issues) for things to work on, and [discussions](https://github.com/Madapexai/quark-agent/discussions) for ideas and Q&A.
+
+[![Contributors](https://contrib.rocks/image?repo=Madapexai/quark-agent&max=2000)](https://github.com/Madapexai/quark-agent/graphs/contributors)
+
+---
+
+## Community
+
+- 💬 [GitHub Discussions](https://github.com/Madapexai/quark-agent/discussions) — ask questions, share use cases
+- 🐛 [Issue Tracker](https://github.com/Madapexai/quark-agent/issues) — bugs and feature requests
+- 📚 [Benchmark Report](./e2e/FULL-EVAL-REPORT.md) — full trace-level evaluation
+- 🐦 Twitter: [@quark_agent](https://twitter.com/) (coming soon)
+
+If Quark Agent helps you, please consider giving it a ⭐ — it helps others discover the project.
 
 ---
 
 ## License
 
-[MIT](LICENSE)
+[MIT](./LICENSE)
 
 ---
 
 <div align="center">
 
-**小内核，大组合。**
-
-如果觉得有用，给个 ⭐
+**Small kernel, big composition.**
 
 </div>

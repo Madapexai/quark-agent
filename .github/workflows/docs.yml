@@ -1,0 +1,60 @@
+name: Deploy Docs to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "docs/**"
+      - ".github/workflows/docs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install MkDocs Material
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r docs/requirements.txt
+
+      - name: Copy benchmark artifacts into docs
+        run: |
+          mkdir -p docs/docs/benchmark
+          if [ -f e2e/FULL-EVAL-REPORT.html ]; then
+            cp e2e/FULL-EVAL-REPORT.html docs/docs/benchmark/full-eval-report.html
+          fi
+
+      - name: Build site
+        run: mkdocs build --strict --config-file docs/mkdocs.yml
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

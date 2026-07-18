@@ -1,0 +1,40 @@
+name: Feature Request
+description: Suggest a new tool, channel, or capability
+title: "[feat] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      placeholder: "I'm trying to ... but Quark Agent currently can't ..."
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      placeholder: "Add a `defineAction` that ... and expose it via ..."
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of contribution is this?
+      options:
+        - New built-in Tool
+        - New Channel (Feishu/Slack/Discord/...)
+        - New Profile preset
+        - New Skill / defineAction
+        - Benchmark fixture
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: checkboxes
+    id: willing
+    attributes:
+      label: Willing to implement?
+      options:
+        - label: I'm willing to submit a PR for this
+          required: false

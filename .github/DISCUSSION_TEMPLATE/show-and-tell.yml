@@ -1,0 +1,27 @@
+name: Show and Tell
+description: Share what you built with Quark Agent
+labels: ["showcase"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What did you build?
+      description: A short pitch — what it does, who it's for.
+    validations:
+      required: true
+  - type: input
+    id: link
+    attributes:
+      label: Link
+      placeholder: "https://github.com/you/your-project or demo URL"
+  - type: textarea
+    id: how
+    attributes:
+      label: How does it use Quark Agent?
+      description: Which tools/channels/profiles did you compose? Any custom `defineAction`?
+      render: ts
+  - type: input
+    id: screenshot
+    attributes:
+      label: Screenshot / GIF (optional)
+      placeholder: "Drag an image here, or paste a URL"

@@ -1,0 +1,24 @@
+/* Extra styles for Quark Agent docs */
+
+:root {
+  --qa-primary: #6b46c1;
+  --qa-accent: #4f46e5;
+}
+
+.md-header {
+  background: linear-gradient(135deg, var(--qa-primary), var(--qa-accent));
+}
+
+.md-tabs {
+  background: var(--qa-accent);
+}
+
+/* Bigger tables for benchmark data */
+.md-typeset table:not([class]) th,
+.md-typeset table:not([class]) td {
+  padding: 0.6rem 0.9rem;
+}
+
+.md-typeset table:not([class]) th {
+  background: var(--md-default-bg-color--lighter);
+}
