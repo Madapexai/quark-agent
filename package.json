@@ -1,0 +1,41 @@
+{
+  "name": "quark-agent",
+  "version": "0.1.0",
+  "description": "Quark Agent — The tiniest AI agent framework. Quark-sized core, universe-sized possibilities.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "micro-agent": "./dist/bin/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx bin/cli.ts",
+    "start": "node dist/bin/cli.js",
+    "typecheck": "tsc --noEmit",
+    "example": "tsx examples/basic.ts"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.11.1",
+    "puppeteer-core": "^25.3.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/node": "^26.1.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.0"
+  },
+  "keywords": [
+    "agent",
+    "llm",
+    "lightweight",
+    "self-evolving",
+    "sandbox",
+    "typescript",
+    "edge"
+  ],
+  "license": "MIT"
+}

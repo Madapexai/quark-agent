@@ -1,0 +1,10 @@
+{
+  "name": "@micro-agent/core",
+  "version": "0.1.0",
+  "description": "micro-agent 核心层：零依赖、<10KB、可嵌入任意 runtime",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "dependencies": {},
+  "license": "MIT"
+}

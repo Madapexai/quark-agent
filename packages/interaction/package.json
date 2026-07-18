@@ -1,0 +1,12 @@
+{
+  "name": "@micro-agent/interaction",
+  "version": "0.1.0",
+  "description": "micro-agent UI 交互层：Action HTTP 路由 + SSE 实时流 + A2A HTTP endpoint",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "micro-agent": "workspace:*"
+  },
+  "license": "MIT"
+}

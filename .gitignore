@@ -1,0 +1,21 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+.env
+.env.local
+*.tsbuildinfo
+
+# Test artifacts
+e2e/real-*.png
+e2e/webui-*.png
+e2e/screenshot-*.png
+e2e/screenshots/
+e2e/shots/
+e2e/e2e-output.txt
+e2e/report.html
+e2e/report.json
+e2e/TEST_REPORT.md
+e2e/*.png
+e2e/test-output*
+e2e/.data/

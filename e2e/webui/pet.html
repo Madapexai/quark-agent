@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pet — Micro Agent</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#fafafa;--surface:#ffffff;--border:#e5e5e5;--border-light:#f0f0f0;
+  --text:#1a1a1a;--text-sec:#6b6b6b;--text-tert:#999;
+  --blue:#2563eb;--blue-bg:#eff6ff;--green:#16a34a;--green-bg:#f0fdf4;
+  --orange:#ea580c;--orange-bg:#fff7ed;--red:#dc2626;--red-bg:#fef2f2;
+  --pink:#db2777;--pink-bg:#fdf2f8;--yellow:#ca8a04;--yellow-bg:#fefce8;
+  --radius:8px;--radius-sm:6px;
+  --shadow:0 1px 3px rgba(0,0,0,0.08);
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --mono:"SF Mono",Menlo,Consolas,monospace;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#1a1a1a;--surface:#212121;--border:#333;--border-light:#2a2a2a;
+    --text:#e5e5e5;--text-sec:#a0a0a0;--text-tert:#666;
+    --blue:#60a5fa;--blue-bg:#1e293b;--green:#4ade80;--green-bg:#052e16;
+    --orange:#fb923c;--orange-bg:#431407;--red:#f87171;--red-bg:#450a0a;
+    --pink:#f472b6;--pink-bg:#500724;--yellow:#facc15;--yellow-bg:#422006;
+    --shadow:0 1px 3px rgba(0,0,0,0.4);
+  }
+}
+html,body{height:100%}
+body{
+  font-family:var(--font);background:var(--bg);color:var(--text);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:20px;gap:16px;
+}
+.topnav{
+  width:100%;max-width:400px;display:flex;align-items:center;gap:8px;
+  padding-bottom:12px;border-bottom:1px solid var(--border);margin-bottom:4px;
+}
+.topnav a{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:13px;color:var(--text-sec);text-decoration:none;
+  padding:6px 10px;border-radius:var(--radius-sm);transition:150ms;
+}
+.topnav a:hover{background:var(--border-light);color:var(--text)}
+.topnav a svg{width:14px;height:14px}
+.topnav span{font-size:14px;font-weight:600;margin-left:auto}
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px;width:100%;max-width:400px;box-shadow:var(--shadow);
+}
+.level-row{
+  display:flex;align-items:center;gap:10px;margin-bottom:16px;
+  padding-bottom:12px;border-bottom:1px solid var(--border-light);
+}
+.pet-name{font-weight:600;font-size:15px}
+.lv-badge{
+  font-size:11px;font-weight:600;background:var(--blue-bg);color:var(--blue);
+  padding:2px 8px;border-radius:4px;font-family:var(--mono);
+}
+.exp-wrap{flex:1;display:flex;align-items:center;gap:6px}
+.exp-bar{flex:1;height:4px;background:var(--border-light);border-radius:2px;overflow:hidden}
+.exp-fill{height:100%;background:var(--blue);border-radius:2px;transition:width .4s}
+.exp-text{font-size:11px;color:var(--text-tert);font-family:var(--mono);min-width:32px;text-align:right}
+.pet-stage{
+  width:100%;height:200px;border-radius:var(--radius);
+  background:var(--surface);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;margin-bottom:16px;
+}
+.pet-stage canvas{width:120px;height:120px}
+.msg-float{
+  position:absolute;top:12px;left:50%;transform:translateX(-50%) translateY(-8px);
+  background:var(--text);color:var(--bg);font-size:12px;padding:4px 12px;
+  border-radius:4px;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;
+}
+.msg-float.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.stat{
+  background:var(--bg);border:1px solid var(--border-light);border-radius:var(--radius-sm);
+  padding:10px 12px;
+}
+.stat-top{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.stat-icon{width:14px;height:14px;flex-shrink:0}
+.stat-label{font-size:11px;color:var(--text-tert);text-transform:uppercase;letter-spacing:.5px;font-weight:500}
+.stat-val{font-size:16px;font-weight:700;margin-left:auto;font-family:var(--mono)}
+.stat-bar{height:4px;background:var(--border-light);border-radius:2px;overflow:hidden}
+.stat-fill{height:100%;border-radius:2px;transition:width .4s,background .3s}
+.actions-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.act-btn{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:10px 6px;color:var(--text);cursor:pointer;font:inherit;font-size:11px;
+  transition:150ms;
+}
+.act-btn:hover{background:var(--bg);border-color:var(--text-tert)}
+.act-btn:active{transform:scale(.97)}
+.act-btn:disabled{opacity:.4;cursor:not-allowed;pointer-events:none}
+.act-btn svg{width:18px;height:18px;color:var(--text-sec)}
+.log-box{
+  margin-top:14px;background:var(--bg);border:1px solid var(--border-light);
+  border-radius:var(--radius-sm);padding:10px;max-height:80px;overflow-y:auto;
+  font-size:11px;color:var(--text-tert);font-family:var(--mono);line-height:1.7;
+}
+.log-entry{padding:1px 0;border-bottom:1px solid var(--border-light)}
+.log-entry:last-child{border:none}
+.pet-bounce{animation:bounce .4s ease}
+@keyframes bounce{0%,100%{transform:translateY(0) scale(1)}40%{transform:translateY(-20px) scale(1.08)}}
+.pet-float{animation:float 2.5s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.pet-sick{filter:grayscale(.5) brightness(.85)}
+.pet-sleep{transform:scale(.85) rotate(-8deg)}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Back</a>
+  <span>Virtual Pet</span>
+</nav>
+
+<div class="card">
+  <div class="level-row">
+    <span class="pet-name" id="petName">Mimi</span>
+    <span class="lv-badge" id="lvBadge">Lv.1</span>
+    <div class="exp-wrap">
+      <div class="exp-bar"><div class="exp-fill" id="expFill" style="width:0%"></div></div>
+      <span class="exp-text" id="expText">0/100</span>
+    </div>
+  </div>
+
+  <div class="pet-stage">
+    <div class="msg-float" id="msg"></div>
+    <canvas id="petCanvas" class="pet-float" width="120" height="120"></canvas>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat">
+      <div class="stat-top">
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--green)"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+        <span class="stat-label">Hunger</span>
+        <span class="stat-val" id="hungerV">80</span>
+      </div>
+      <div class="stat-bar"><div class="stat-fill" id="hunger" style="width:80%;background:var(--green)"></div></div>
+    </div>
+    <div class="stat">
+      <div class="stat-top">
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--pink)"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        <span class="stat-label">Mood</span>
+        <span class="stat-val" id="happyV">80</span>
+      </div>
+      <div class="stat-bar"><div class="stat-fill" id="happy" style="width:80%;background:var(--pink)"></div></div>
+    </div>
+    <div class="stat">
+      <div class="stat-top">
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--yellow)"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <span class="stat-label">Energy</span>
+        <span class="stat-val" id="energyV">90</span>
+      </div>
+      <div class="stat-bar"><div class="stat-fill" id="energy" style="width:90%;background:var(--yellow)"></div></div>
+    </div>
+    <div class="stat">
+      <div class="stat-top">
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--red)"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        <span class="stat-label">Health</span>
+        <span class="stat-val" id="healthV">100</span>
+      </div>
+      <div class="stat-bar"><div class="stat-fill" id="health" style="width:100%;background:var(--red)"></div></div>
+    </div>
+  </div>
+
+  <div class="actions-grid">
+    <button class="act-btn" data-act="feed">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/></svg>
+      Feed
+    </button>
+    <button class="act-btn" data-act="play">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+      Play
+    </button>
+    <button class="act-btn" data-act="sleep">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      Sleep
+    </button>
+    <button class="act-btn" data-act="clean">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+      Clean
+    </button>
+    <button class="act-btn" data-act="heal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v8"/><path d="M8 12h8"/><path d="M19 3H5"/></svg>
+      Heal
+    </button>
+    <button class="act-btn" data-act="pet">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+      Pet
+    </button>
+  </div>
+
+  <div class="log-box" id="log"></div>
+</div>
+
+<script>
+(function(){
+  const LS_KEY = 'micro_pet_v2';
+  const canvas = document.getElementById('petCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = 120, H = 120;
+
+  const STAGES = [
+    { name: 'Mimi', body: '#f59e0b', ear: '#d97706', eye: '#1a1a1a' },
+    { name: 'Tabby', body: '#f97316', ear: '#ea580c', eye: '#1a1a1a' },
+    { name: 'Leo', body: '#eab308', ear: '#ca8a04', eye: '#1a1a1a' },
+    { name: 'Tiger', body: '#f97316', ear: '#dc2626', eye: '#1a1a1a' },
+    { name: 'Dragon', body: '#2563eb', ear: '#1d4ed8', eye: '#fbbf24' },
+  ];
+
+  let pet = loadPet();
+  let animState = { blink: 0, bounce: 0, sleeping: false };
+
+  function defaultPet(){
+    return { stage:0, exp:0, expMax:100, hunger:80, happy:80, energy:90, health:100, age:0, lastTick:Date.now(), log:[] };
+  }
+  function loadPet(){
+    try{ const d=JSON.parse(localStorage.getItem(LS_KEY)); if(d&&typeof d.stage==='number') return d; }catch{}
+    return defaultPet();
+  }
+  function save(){ localStorage.setItem(LS_KEY, JSON.stringify(pet)); }
+
+  function addLog(msg){
+    const t = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});
+    pet.log.unshift(`[${t}] ${msg}`);
+    pet.log = pet.log.slice(0,20);
+    save();
+  }
+
+  function showMsg(text){
+    const m = document.getElementById('msg');
+    m.textContent = text; m.classList.add('show');
+    setTimeout(()=>m.classList.remove('show'), 1400);
+  }
+
+  function barColor(pct){
+    if(pct<30) return 'var(--red)';
+    if(pct<60) return 'var(--orange)';
+    return null;
+  }
+  function defaultColor(id){
+    return {hunger:'var(--green)',happy:'var(--pink)',energy:'var(--yellow)',health:'var(--red)'}[id];
+  }
+
+  function updateUI(){
+    const stage = STAGES[Math.min(pet.stage, STAGES.length-1)];
+    document.getElementById('petName').textContent = stage.name;
+    document.getElementById('lvBadge').textContent = 'Lv.' + (pet.stage+1);
+    document.getElementById('expFill').style.width = (pet.exp/pet.expMax*100)+'%';
+    document.getElementById('expText').textContent = pet.exp+'/'+pet.expMax;
+
+    const bars = ['hunger','happy','energy','health'];
+    for(const id of bars){
+      const val = Math.max(0,Math.min(100,pet[id]));
+      const fill = document.getElementById(id);
+      fill.style.width = val+'%';
+      const c = barColor(val);
+      fill.style.background = c || defaultColor(id);
+      document.getElementById(id+'V').textContent = Math.round(val);
+    }
+
+    const c = canvas;
+    c.className = pet.health<40 ? 'pet-sick' : pet.energy<30 ? 'pet-sleep pet-float' : 'pet-float';
+    animState.sleeping = pet.energy<30;
+
+    document.getElementById('log').innerHTML = pet.log.map(e=>`<div class="log-entry">${e.replace(/[<>]/g,'')}</div>`).join('');
+  }
+
+  function gainExp(n){
+    pet.exp += n;
+    while(pet.exp >= pet.expMax && pet.stage < STAGES.length-1){
+      pet.exp -= pet.expMax;
+      pet.stage++;
+      pet.expMax = Math.floor(pet.expMax*1.5);
+      const s = STAGES[pet.stage];
+      addLog(`Evolved! Now ${s.name}`);
+      showMsg('Level Up!');
+      canvas.classList.add('pet-bounce');
+      setTimeout(()=>canvas.classList.remove('pet-bounce'),500);
+    }
+  }
+
+  function doAction(act){
+    const btns = document.querySelectorAll('.act-btn');
+    btns.forEach(b=>b.disabled=true);
+    setTimeout(()=>btns.forEach(b=>b.disabled=false),700);
+    canvas.classList.add('pet-bounce');
+    setTimeout(()=>canvas.classList.remove('pet-bounce'),400);
+
+    switch(act){
+      case 'feed':
+        pet.hunger=Math.min(100,pet.hunger+25); pet.happy=Math.min(100,pet.happy+5);
+        if(pet.hunger<20) pet.health=Math.min(100,pet.health+5);
+        addLog('Ate food. Yum!'); showMsg('Nom nom!'); gainExp(10); break;
+      case 'play':
+        if(pet.energy<20){ addLog('Too tired to play.'); showMsg('Tired...'); break; }
+        pet.happy=Math.min(100,pet.happy+20); pet.energy=Math.max(0,pet.energy-15); pet.hunger=Math.max(0,pet.hunger-10);
+        addLog('Had fun playing!'); showMsg('So happy!'); gainExp(20); break;
+      case 'sleep':
+        pet.energy=Math.min(100,pet.energy+40); pet.health=Math.min(100,pet.health+5);
+        addLog('Taking a nap...'); showMsg('zzZ'); gainExp(5); break;
+      case 'clean':
+        pet.health=Math.min(100,pet.health+15); pet.happy=Math.min(100,pet.happy+5);
+        addLog('Nice and clean!'); showMsg('Sparkling!'); gainExp(8); break;
+      case 'heal':
+        pet.health=Math.min(100,pet.health+30);
+        addLog('Feeling better now.'); showMsg('Healthy!'); gainExp(5); break;
+      case 'pet':
+        pet.happy=Math.min(100,pet.happy+10);
+        addLog('Purrs contently.'); showMsg('Purr~'); gainExp(3); break;
+    }
+    save(); updateUI();
+  }
+
+  document.querySelectorAll('.act-btn').forEach(b=>{
+    b.addEventListener('click',()=>doAction(b.dataset.act));
+  });
+  canvas.addEventListener('click',()=>doAction('pet'));
+
+  function drawPet(){
+    ctx.clearRect(0,0,W,H);
+    const stage = STAGES[Math.min(pet.stage, STAGES.length-1)];
+    const cx=60, cy=62;
+    const isDragon = pet.stage>=4;
+    const bounce = Math.sin(Date.now()/500)*2;
+    const y = cy + bounce;
+
+    ctx.save();
+    if(animState.sleeping){ ctx.translate(cx,y); ctx.rotate(-0.15); ctx.translate(-cx,-y); }
+
+    if(pet.health<40){ ctx.globalAlpha=0.7; }
+
+    const r = 28;
+
+    if(isDragon){
+      ctx.fillStyle=stage.body;
+      ctx.beginPath(); ctx.ellipse(cx,y+4,r+6,r-2,0,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle=stage.ear; ctx.lineWidth=2; ctx.stroke();
+      ctx.fillStyle=stage.ear;
+      ctx.beginPath(); ctx.moveTo(cx-18,y-r+6); ctx.lineTo(cx-12,y-r-12); ctx.lineTo(cx-4,y-r+2); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(cx+18,y-r+6); ctx.lineTo(cx+12,y-r-12); ctx.lineTo(cx+4,y-r+2); ctx.fill();
+      ctx.fillStyle=stage.eye;
+      if(animState.blink>0.85){
+        ctx.fillRect(cx-12,y-8,8,2); ctx.fillRect(cx+4,y-8,8,2);
+      } else {
+        ctx.beginPath(); ctx.arc(cx-8,y-6,4,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(cx+8,y-6,4,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle=stage.ear;
+        ctx.beginPath(); ctx.arc(cx-7,y-7,1.5,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(cx+9,y-7,1.5,0,Math.PI*2); ctx.fill();
+      }
+      ctx.strokeStyle=stage.ear; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.arc(cx,y+8,6,0.2,Math.PI-0.2); ctx.stroke();
+      ctx.fillStyle=stage.ear;
+      ctx.beginPath(); ctx.moveTo(cx+r-2,y+4); ctx.lineTo(cx+r+12,y-4); ctx.lineTo(cx+r+2,y+10); ctx.fill();
+    } else {
+      ctx.fillStyle=stage.body;
+      ctx.beginPath(); ctx.ellipse(cx,y,r,r-3,0,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle=stage.ear; ctx.lineWidth=2; ctx.stroke();
+      ctx.fillStyle=stage.ear;
+      ctx.beginPath(); ctx.moveTo(cx-16,y-r+8); ctx.lineTo(cx-12,y-r-6); ctx.lineTo(cx-4,y-r+2); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(cx+16,y-r+8); ctx.lineTo(cx+12,y-r-6); ctx.lineTo(cx+4,y-r+2); ctx.closePath(); ctx.fill();
+      ctx.fillStyle=stage.eye;
+      if(animState.blink>0.85){
+        ctx.fillRect(cx-12,y-8,7,2); ctx.fillRect(cx+5,y-8,7,2);
+      } else {
+        ctx.beginPath(); ctx.arc(cx-8,y-6,3.5,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(cx+8,y-6,3.5,0,Math.PI*2); ctx.fill();
+      }
+      ctx.fillStyle=stage.ear;
+      ctx.beginPath(); ctx.moveTo(cx-2,y+2); ctx.lineTo(cx+2,y+2); ctx.lineTo(cx,y+8); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle=stage.eye; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(cx-6,y+8); ctx.lineTo(cx-2,y+11); ctx.moveTo(cx+6,y+8); ctx.lineTo(cx+2,y+11); ctx.stroke();
+      ctx.strokeStyle=stage.body; ctx.lineWidth=4; ctx.lineCap='round';
+      ctx.beginPath(); ctx.moveTo(cx-10,y+r-4); ctx.quadraticCurveTo(cx-26,y+r+2,cx-20,y+r-10); ctx.stroke();
+    }
+
+    if(animState.sleeping){
+      ctx.fillStyle='var(--text-tert)';
+      ctx.font='12px sans-serif'; ctx.fillText('z',cx+r-4,y-r-2);
+      ctx.fillText('z',cx+r+6,y-r-10);
+    }
+
+    ctx.restore();
+    requestAnimationFrame(drawPet);
+  }
+
+  animState.blinkInterval = setInterval(()=>{
+    animState.blink=0;
+    const iv=setInterval(()=>{
+      animState.blink+=0.15;
+      if(animState.blink>=1){animState.blink=0;clearInterval(iv);}
+    },30);
+  },3500);
+
+  setInterval(()=>{
+    pet.hunger=Math.max(0,pet.hunger-2);
+    pet.happy=Math.max(0,pet.happy-1);
+    pet.energy=Math.max(0,pet.energy-1);
+    if(pet.hunger<20) pet.health=Math.max(0,pet.health-1);
+    if(pet.happy<20) pet.health=Math.max(0,pet.health-0.5);
+    pet.age++;
+    save(); updateUI();
+  },8000);
+
+  addLog('Pet hatched! Take good care of it.');
+  updateUI();
+  drawPet();
+})();
+</script>
+</body>
+</html>

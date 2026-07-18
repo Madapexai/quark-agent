@@ -1,0 +1,13 @@
+{
+  "name": "@micro-agent/extensions",
+  "version": "0.1.0",
+  "description": "micro-agent 高阶扩展：sessions/healer/skills/planner 等组合能力",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@micro-agent/core": "workspace:*",
+    "@micro-agent/plugins": "workspace:*"
+  },
+  "license": "MIT"
+}
