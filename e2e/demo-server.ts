@@ -890,6 +890,8 @@ type LLMResponse = {
     type: "function";
     function: { name: string; arguments: string };
   }>;
+  /** Set when content was already streamed token-by-token via text_delta events. */
+  _streamedTextDelta?: boolean;
 };
 
 function getLLMConfig() {
@@ -1228,6 +1230,7 @@ async function callOpenAICompatibleStream(
       model: provider.model,
       messages,
       tools,
+      tool_choice: "auto",
       stream: true,
     }),
   });
@@ -1305,6 +1308,7 @@ async function callOpenAICompatibleStream(
   return {
     content,
     tool_calls: toolCalls.length > 0 ? toolCalls : undefined,
+    _streamedTextDelta: true,
   };
 }
 
@@ -1393,6 +1397,14 @@ When the user asks a question:
 2. Use the appropriate tools to gather data
 3. Synthesize a comprehensive, well-formatted response
 
+**CRITICAL — Tool Use Policy:**
+- When the user asks about REAL-TIME data (weather, current events, web content, files), you MUST invoke the relevant tool. Do NOT answer from memory.
+- When the user asks you to READ a file, you MUST call read_file. Do NOT refuse or guess.
+- When the user asks you to LIST directory contents, you MUST call list_dir.
+- When the user asks you to RUN code, you MUST call run_code.
+- When the user asks you to FETCH a webpage, you MUST call web_fetch.
+- Only answer directly without tools for pure-knowledge questions (math, definitions, translations) where you already know the answer.
+
 Key behaviors:
 - For code questions: read files first, then edit/write with precision
 - For research: use web_search to find information, web_fetch to read pages
@@ -1453,8 +1465,11 @@ Key behaviors:
         messages.push({ role: "tool", tool_call_id: tc.id, content: resultStr });
       }
     } else {
-      // No tool calls — LLM gave final answer
-      if (response.content) {
+      // No tool calls — LLM gave final answer.
+      // content was already streamed token-by-token via text_delta in callOpenAICompatibleStream,
+      // so do NOT re-emit it as a `text` event (that would duplicate the output on the client).
+      // Only emit `text` if for some reason no text_delta was streamed (e.g. model-proxy path).
+      if (response.content && !response._streamedTextDelta) {
         send("text", response.content);
       }
       break;
