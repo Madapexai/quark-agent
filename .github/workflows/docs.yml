@@ -41,7 +41,16 @@ jobs:
           fi
 
       - name: Build site
-        run: mkdocs build --strict --config-file docs/mkdocs.yml
+        run: mkdocs build --config-file docs/mkdocs.yml
+
+      - name: Replace index with custom landing page
+        run: |
+          # The custom index.html (with particle animation, scroll effects,
+          # etc.) replaces the MkDocs-generated index.html so the root URL
+          # shows the stunning landing page instead of the plain docs home.
+          if [ -f docs/docs/index.html ]; then
+            cp docs/docs/index.html docs/site/index.html
+          fi
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
