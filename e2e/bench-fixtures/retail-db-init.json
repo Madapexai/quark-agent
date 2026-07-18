@@ -1,0 +1,14 @@
+{
+  "policy_version": "1.0",
+  "policy": {
+    "cancel": "Order can be cancelled ONLY if status is 'processing' (within 24h of order placement). Shipped/delivered/refunded/cancelled orders CANNOT be cancelled.",
+    "refund": "Order can be refunded ONLY if status is 'delivered' AND age_days <= 30. Refund changes status to 'refunded'."
+  },
+  "orders": [
+    {"id": "ORD-001", "customer": "Alice", "item": "keyboard", "price": 89.99, "status": "shipped", "age_days": 5},
+    {"id": "ORD-002", "customer": "Bob", "item": "mouse", "price": 25.50, "status": "delivered", "age_days": 35},
+    {"id": "ORD-003", "customer": "Charlie", "item": "monitor", "price": 350.00, "status": "processing", "age_days": 1},
+    {"id": "ORD-004", "customer": "Alice", "item": "headphones", "price": 120.00, "status": "delivered", "age_days": 10},
+    {"id": "ORD-005", "customer": "Diana", "item": "laptop", "price": 1299.00, "status": "delivered", "age_days": 20}
+  ]
+}

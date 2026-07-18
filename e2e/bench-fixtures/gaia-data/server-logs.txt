@@ -1,0 +1,20 @@
+2024-01-15 09:00:12 INFO  Server started on port 8080
+2024-01-15 09:00:15 INFO  Database connection established
+2024-01-15 09:01:23 WARN  Slow query detected: 1.2s
+2024-01-15 09:02:45 ERROR Failed login attempt from 192.168.1.100
+2024-01-15 09:03:12 ERROR Failed login attempt from 192.168.1.100
+2024-01-15 09:03:45 ERROR Failed login attempt from 192.168.1.100
+2024-01-15 09:04:01 INFO  User 'admin' logged in successfully
+2024-01-15 09:05:33 WARN  High memory usage: 82%
+2024-01-15 09:06:12 ERROR Database connection timeout
+2024-01-15 09:06:45 INFO  Database reconnection successful
+2024-01-15 09:07:23 WARN  Slow query detected: 2.1s
+2024-01-15 09:08:01 ERROR File not found: /data/config.yml
+2024-01-15 09:09:12 INFO  Backup completed: 1.2GB
+2024-01-15 09:10:33 ERROR Failed login attempt from 10.0.0.50
+2024-01-15 09:11:01 WARN  High CPU usage: 91%
+2024-01-15 09:12:23 ERROR API rate limit exceeded for key: abc123
+2024-01-15 09:13:12 INFO  Cache cleared: 256MB
+2024-01-15 09:14:33 ERROR Connection refused: 203.0.113.5
+2024-01-15 09:15:01 INFO  Health check passed
+2024-01-15 09:16:12 WARN  Disk space low: 15% remaining

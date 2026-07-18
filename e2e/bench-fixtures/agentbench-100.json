@@ -1,0 +1,902 @@
+[
+  {
+    "id": "AB-DB-001",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "The Grand River Bridge, a Steel Truss Bridge located in Tulsa at 36°8′28″N 96°0′21″W, was built in 1960 and listed on 2005-06-30 in Mayes County.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Bridges\nColumns: Name, Built, Listed, Location, County, Type\nDescription: The name of this table is Bridges, and the headers of this table are Name,Built,Listed,Location,County,Type.\nRows:\nBridge No . 18 at Rock Creek, 1924 , 1926, 1995-02-23, Sapulpa 35°59′37″N 96°8′11″W / 35.99361°N 96.13639°W / 35.99361 ; -96.13639 ( Bridge No . 18 at Rock Creek ), Creek, Parker Through Truss\nCaptain Creek Bridge, 1933, 2004-03-03, Wellston 35°41′35″N 97°4′16″W / 35.69306°N 97.07111°W / 35.69306 ; -97.07111 ( Captain Creek Bridge ), Lincoln, Camel Pony Truss\nChoctaw , Oklahoma and Gulf Railroad Viaduct, 1902 , 1909 , 1913, 2007-12-11, Ardmore 34°10′51″N 97°07′05″W / 34.18083°N 97.11806°W / 34.18083 ; -97.11806 ( Choctaw , Oklahoma and Gulf Railroad Viaduct ), Carter, Wood Trestle-Plate Girder\nEleventh Street Arkansas River Bridge, File : Route 66 pedestrian overpass looking onto Cyrus Avery Plaza.jpg, 1996-12-13, Tulsa 36°8′28″N 96°0′21″W / 36.14111°N 96.00583°W / 36.14111 ; -96.00583 ( Eleventh Street Arkansas River Bridge ), Tulsa, multiple-span concrete bridge\nHorse Creek Bridge, 1936, 1995-02-23, Afton 36°41′49″N 94°57′23″W / 36.69694°N 94.95639°W / 36.69694 ; -94.95639 ( Horse Creek Bridge ), Ottawa, \nJenson Tunnel, 1885, 1976-05-13, Cameron 35°13′9″N 94°26′35″W / 35.21917°N 94.44306°W / 35.21917 ; -94.44306 ( Jenson Tunnel ), Le Flore, \nKeel Creek Bridge, 1940, 2007-04-04, Coalgate 34°36′34″N 96°8′42″W / 34.60944°N 96.14500°W / 34.60944 ; -96.14500 ( Keel Creek Bridge ), Coal, concrete slab bridge\nLake Overholser Bridge, 1924-1926, 2004-03-02, Oklahoma City 35°30′51″N 97°37′49″W / 35.51417°N 97.63028°W / 35.51417 ; -97.63028 ( Lake Overholser Bridge ), Oklahoma, Mixed Truss Bridge\nLittle Cabin Creek Bridge, 1934-1935, 2009-03-04, Vinita 36°37′36.4″N 95°7′12.8″W / 36.626778°N 95.120222°W / 36.626778 ; -95.120222 ( Little Cabin Creek Bridge ), Craig, Parker pony truss\nLittle Deep Fork Creek Bridge, 1914 , 1926 , 1928, 2003-12-05, Bristow 35°48′49″N 96°26′6″W / 35.81361°N 96.43500°W / 35.81361 ; -96.43500 ( Little Deep Fork Creek Bridge ), Creek, Bedstead Warren Pony Truss\nMorrison Suspension Bridge, 1917, 1980-05-23, Morrison 36°18′30″N 96°57′5″W / 36.30833°N 96.95139°W / 36.30833 ; -96.95139 ( Morrison Suspension Bridge ), Noble, \nOld Santa Fe Railroad Bridge, , 2010-3-10, Wanette, Pottawatomie, \nOpossum Creek Bridge, , 2009-3-4, South Coffeyville vicinity 36°57′24.37″N 95°38′33.61″W / 36.9567694°N 95.6426694°W / 36.9567694 ; -95.6426694 ( Opossum Creek Bridge ), Nowata, \nPryor Creek Bridge, 1926 , 1932, 2006-09-06, Chelsea 36°32′18″N 95°24′54″W / 36.53833°N 95.41500°W / 36.53833 ; -95.41500 ( Pryor Creek Bridge ), Rogers, Modified Pratt Through Truss\nRock Creek Bridge, , 2008-09-04, Blanco vicinity, Pittsburg, \nSquirrel Creek Bridge, , 2010-9-3, Shawnee vicinity, Pottawatomie, \nState Highway 78 Bridge at the Red River, 1937 , 1938, 1996-12-20, Ravenna 33°45′29″N 96°11′55″W / 33.75806°N 96.19861°W / 33.75806 ; -96.19861 ( State Highway 78 Bridge at the Red River ), Bryan, K-truss through bridge\nState Highway 79 Bridge at the Red River, 1939, 1996-12-20, Byers 34°7′58″N 98°5′26″W / 34.13278°N 98.09056°W / 34.13278 ; -98.09056 ( State Highway 79 Bridge at the Red River ), Jefferson, camelback pony truss\nUS Highway 77 Bridge at Canadian River, 1938, 2003-09-02, Purcell 35°0′54″N 97°20′38″W / 35.01500°N 97.34389°W / 35.01500 ; -97.34389 ( US Highway 77 Bridge at Canadian River ), McClain, Deck Truss Bridge\nArkansas River Trail Bridges, 1988, 2009-07-24, Little Rock 34°43′11″N 92°16′12″W / 34.71972°N 92.27000°W / 34.71972 ; -92.27000 ( Arkansas River Trail Bridges ), Pulaski, Cable-stayed Bridge\nBrush Creek Bridge, 1921-1924, 2004-03-02, Oklahoma City 35°30′49″N 97°33′58″W / 35.51361°N 97.56611°W / 35.51361 ; -97.56611 ( Brush Creek Bridge ), Oklahoma, Camelback-formed Warren Through Truss\nDeep Fork River Bridge, 1928, 2006-09-20, Oklahoma City 35°27′39″N 97°24′47″W / 35.46083°N 97.41306°W / 35.46083 ; -97.41306 ( Deep Fork River Bridge ), Oklahoma, Multi-Plate Arch Culvert\nEl Reno Bridge, 1908-1911, 1997-07-09, El Reno 35°31′45″N 97°57′57″W / 35.52917°N 97.96583°W / 35.52917 ; -97.96583 ( El Reno Bridge ), Canadian, Concrete Span\nFarmers Market Bridge, 1935, 2010-03-25, Oklahoma City 35°27′39″N 97°30′21″W / 35.46083°N 97.50583°W / 35.46083 ; -97.50583 ( Farmers Market Bridge ), Oklahoma, Steel Through-truss Bridge\nGasoline Alley Bridge, 1924, 1995-06-29, Beggs 35°49′46″N 96°3′20″W / 35.82944°N 96.05556°W / 35.82944 ; -96.05556 ( Gasoline Alley Bridge ), Okmulgee, Camelback Warren Through Truss\nHighway 5 Bridge over the Ouachita River, 1938, 1990-02-12, Mount Ida vicinity 34°32′54″N 93°35′54″W / 34.54833°N 93.59833°W / 34.54833 ; -93.59833 ( Highway 5 Bridge over the Ouachita River ), Montgomery, Warren Through Truss\nLittle Wildhorse Creek Bridge, 1929, 1997-04-11, Wilburton vicinity 34°53′39.16″N 95°19′33.13″W / 34.8942111°N 95.3258694°W / 34.8942111 ; -95.3258694 ( Little Wildhorse Creek Bridge ), Latimer, Camelback through Truss Bridge\nNorth Canadian River Bridge, 1928, 2009-01-23, El Reno 35.541389°N 97.9475°W / 35.541389; -97.9475 ( North Canadian River Bridge ), Canadian, Multi-Plate Arch Culvert\nTalimena Drive Historic Bridge, 1961, 1980-01-31, Talihina 34°44′55″N 95°2′28″W / 34.74861°N 95.04111°W / 34.74861 ; -95.04111 ( Talimena Drive Historic Bridge ), Le Flore, Steel Beam Bridge\n\nQuestion: The Grand River Bridge, a Steel Truss Bridge located in Tulsa at 36°8′28″N 96°0′21″W, was built in 1960 and listed on 2005-06-30 in Mayes County.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "INSERT INTO Bridges (Name, Built, Listed, Location, County, Type) VALUES ('Grand River Bridge', '1960', '2005-06-30', 'Tulsa 36°8′28″N 96°0′21″W', 'Mayes', 'Steel Truss Bridge')",
+    "table_name": "Bridges",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-002",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "The football season results for week 20 have been updated with a TV time of NBC 6:30pm and an attendance of 75,000.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Football Season Results\nColumns: Week, Date, Opponent, Result, Record, TV Time, Attendance\nDescription: The name of this table is Football Season Results, and the headers of this table are Week,Date,Opponent,Result,Record,TV Time,Attendance.\nRows:\n1, September 9, 2001, at Philadelphia Eagles, W 20–17 (OT), 1–0, FOX 3:15pm, 66,243\n2, September 23, 2001, at San Francisco 49ers, W 30–26, 2–0, FOX 3:15pm, 67,536\n3, September 30, 2001, Miami Dolphins, W 42–10, 3–0, CBS 12:00pm, 66,046\n4, October 8, 2001, at Detroit Lions, W 35–0, 4–0, ABC 8:00pm, 77,765\n5, October 14, 2001, New York Giants, W 15–14, 5–0, FOX 12:00pm, 65,992\n6, October 21, 2001, at New York Jets, W 34–14, 6–0, FOX 12:00pm, 78,766\n7, October 28, 2001, New Orleans Saints, L 34–31, 6–1, FOX 12:00pm, 66,189\n8, Bye, Bye, Bye, Bye, Bye, Bye\n9, November 11, 2001, Carolina Panthers, W 48–14, 7–1, FOX 12:00pm, 66,069\n10, November 18, 2001, at New England Patriots, W 24–17, 8–1, ESPN 7:30pm, 60,292\n11, November 26, 2001, Tampa Bay Buccaneers, L 24–17, 8–2, ABC 8:00pm, 66,198\n12, December 2, 2001, at Atlanta Falcons, W 35–6, 9–2, FOX 3:15pm, 60,787\n13, December 9, 2001, San Francisco 49ers, W 27–14, 10–2, FOX 12:00pm, 66,218\n14, December 17, 2001, at New Orleans Saints, W 34–21, 11–2, ABC 8:00pm, 70,332\n15, December 23, 2001, at Carolina Panthers, W 38–32, 12–2, FOX 12:00pm, 72,438\n16, December 30, 2001, Indianapolis Colts, W 42–17, 13–2, CBS 12:00pm, 66,084\n17, January 6, 2002, Atlanta Falcons, W 31–13, 14–2, FOX 3:15pm, 66,033\n18, September 7, 2008, Minnesota Vikings, W 19–16 (OT), 1–0, FOX 12:00pm, 64,936\n19, September 14, 2008, at Detroit Lions, W 48–25, 2–0, FOX 12:00pm, 56,252\n20, September 21, 2008, Dallas Cowboys, W 27–16, 3–0, NBC 7:15pm, 65,598\n21, September 28, 2008, Tampa Bay Buccaneers, W 30–21, 4–0, FOX 12:00pm, 62,496\n22, October 5, 2008, at Washington Redskins, W 23–17, 5–0, FOX 3:15pm, 90,180\n23, October 12, 2008, at home against the Philadelphia Eagles, W 48–27, 6–0, FOX 12:00pm, 66,064\n24, October 19, 2008, at home against the Cincinnati Bengals, W 29–13, 7–0, CBS 12:00pm, 64,859\n25, October 26, 2008, at home against the Houston Texans, W 35–6, 8–0, CBS 12:00pm, 65,994\n26, November 2, 2008, at home against the Cleveland Browns, W 37–27, 9–0, CBS 12:00pm, 65,621\n27, November 9, 2008, at home against the Baltimore Ravens, L 10–33, 9–1, CBS 12:00pm, 65,873\n\nQuestion: The football season results for week 20 have been updated with a TV time of NBC 6:30pm and an attendance of 75,000.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "UPDATE `Football Season Results` SET `TV Time`='NBC 6:30pm', `Attendance`='75,000' WHERE `Week`='20'",
+    "table_name": "Football Season Results",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-003",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "what is the name of the episode whose director is Michael Pressman and the number of that episode in that season is less than 10.0? ",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: episode_table\nColumns: No. in series, No. in season, Title, Directed by, Written by, Original air date, Production code, U.S. viewers (millions)\nDescription: The name of this table is episode_table, and the headers of this table are No. in series,No. in season,Title,Directed by,Written by,Original air date,Production code,U.S. viewers (millions).\nRows:\n350, 1, \"Red Ball\", Matthew Penn, David Wilcox, September21,2005, 16001, 13.03\n351, 2, \"Flaw\", Jean de Segonzac, Chris Levinson, September28,2005, 16002, 15.06\n352, 3, \"Ghosts\", Constantine Makris, Rick Eid, October5,2005, 16003, 12.59\n353, 4, \"Age of Innocence\", David Platt, Davey Holmes, October12,2005, 16005, 10.92\n354, 5, \"Life Line\", Rosemary Rodriguez, Greg Plageman, October19,2005, 16006, 12.33\n355, 6, \"Birthright\", Constantine Makris, David Slack, November2,2005, 16007, 12.57\n356, 7, \"House of Cards\", Michael Pressman, Wendy Battles, November9,2005, 16008, 10.86\n357, 8, \" New York Minute \", Don Scardino, Nicholas Wootton, November16,2005, 16009, 11.44\n358, 9, \"Criminal Law\", Ed Sherin, David Wilcox, November23,2005, 16010, 11.93\n359, 10, \"Acid\", Michael Pressman, Richard Sweren, November30,2005, 16011, 12.87\n360, 11, \"Bible Story\", Rick Wallace, Richard Sweren, December7,2005, 16004, 12.13\n361, 12, \"Family Friend\", Jean de Segonzac, Philippe Browning, January11,2006, 16012, 12.83\n362, 13, \"Heart of Darkness\", Richard Dobbs, Carter Harris, January18,2006, 16013, 12.38\n363, 14, \"Magnet\", Adam Bernstein, David Black, February8,2006, 16014, 14.53\n364, 15, \"Choice of Evils\", Michael Pressman, David Wilcox, March1,2006, 16016, 12.39\n365, 16, \"Cost of Capital\", Michael W. Watkins, Tom Smuts & Rick Eid, March8,2006, 16010, 11.79\n366, 17, \"America, Inc.\", Jean de Segonzac, Richard Sweren, March22,2006, 16017, 9.00\n367, 18, \"Thinking Makes It So\", Tony Goldwyn, Michael S. Chernuchin, March29,2006, 16019, 9.35\n368, 19, \"Positive\", Richard Dobbs, Sonny Postiglione, April5,2006, 16020, 10.84\n369, 20, \"Kingmaker\", Don Scardino, David Slack, May3,2006, 16018, 10.66\n370, 21, \"Hindsight\", Jean de Segonzac, Chris Levinson, May10,2006, 16021, 12.68\n371, 1, \"New Beginning\", David Platt, Greg Plageman, September20,2006, 17001, 15.25\n372, 2, \"In the Dark\", Constantine Makris, David Slack, September27,2006, 17002, 13.84\n373, 3, \"Inside Man\", Timothy Busfield, Chris Levinson, October4,2006, 17003, 12.59\n374, 4, \"The Decider\", David Straiton, Rick Eid, October11,2006, 17004, 11.65\n375, 5, \"Prisoner's Dilemma\", Michael Watkins, Philippe Browning, October18,2006, 17005, 10.92\n376, 6, \"Homesick\", Chris Misiano, David Wilcox, November1,2006, 17006, 13.23\n377, 7, \"Rotten Apple\", John F. Showalter, Nicholas Wootton, November8,2006, 17007, 11.98\n378, 8, \"Endgame\", Alex Zakrzewski, David Slack & Chris Levinson, November15,2006, 17008, 12.88\n379, 9, \"Blind Spot\", Jean de Segonzac, Michael S. Chernuchin, November22,2006, 17009, 10.77\n380, 10, \"Forensics\", Timothy Busfield, Melissa Scrivner-Love, November29,2006, 17010, 12.16\n\nQuestion: what is the name of the episode whose director is Michael Pressman and the number of that episode in that season is less than 10.0? \n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "\"House of Cards\"",
+    "table_name": "episode_table",
+    "sql": "SELECT Title FROM episode_table WHERE Directed by='Michael Pressman' AND CAST(`No. in season` AS FLOAT) < 10.0;"
+  },
+  {
+    "id": "AB-DB-004",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "what is the last train to arrive daily?",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Train Schedule\nColumns: Sr. No., Train No., Name of the Train, Arrival, Departure, Day\nDescription: The name of this table is Train Schedule, and the headers of this table are Sr. No.,Train No.,Name of the Train,Arrival,Departure,Day.\nRows:\n1., 18238, Chhatisgarh Express, 01:23, 01:25, Daily\n2., 12160, Jabalpur-Amravati SF, 04:51, 04:53, Daily\n3., 51294, Amla-Nagpur Pass, 06:39, 06:40, Daily\n4., 12913, Indore-Nag Tri. Exp, 06:49, 06:51, M\n5., 19301, Indore-Yashwantpur Exp, 07:20, 07:25, M\n6., 12406, Nizamuddin-Bhusaval Gondwana Exp, 07:25, 07:27, M,St\n7., 12410, Nizamuddin-Raigarh Gondwana Exp, 07:25, 07:27, S,M,Tu,W,T,F\n8., 51151, New Amravati-Narkhed Pass, 08:30, N/a, Daily\n9., 22112, Nagpur-Bhusaval SF, 08:37, 08:39, M,T,St\n10., 11045, Dikshsabhoomi Exp, 08:53, 08:55, St\n11., 16359, Ernakulam-Patna Exp, 08:53, 08:55, M\n12., 51829, Nagpur-Agra Pass, 09:41, 09:42, Daily\n13., 12861, Visakapatnam-Nizamuddin, 10:43, 10:44, Daily\n14., 12721, Dakshin Express, 10:43, 10:44, Daily\n15., 12616, Grand Trunk(GT) Exp, 10:49, 10:51, Daily\n16., 19714, Sec-Jaipur Exp, 11:58, 12:00, Tu\n17., 11203, Nagpur-Jaipur Weekly Express, 13:03, 13:05, T\n18., 12615, Grand Trunk(GT) Exp, 13:30, 13:32, Daily\n19., 12405, Bhusaval-H.Nizamuddin Gondwana Exp, 14:08, 14:10, S,Tu,\n20., 12409, Raigarh-H.Nizamuddin- Gondwana Exp, 14:08, 14:10, M,W,T,F,St\n21., 16360, Patna-Ernakulam Exp, 14:08, 14:10, W\n22., 11046, Dikshsabhoomi Exp, 14:09, 14:10, Tu\n23., 22111, Bhusaval_Nagpur SF, 14:36, 14:38, S,W,F\n24., 19713, Jaipur-Sec Exp, 15:48, 15:50, Tu\n25., 12722, Dakshin Express, 16:00, 16:02, Daily\n26., 51183, Bhusaval-Narkhed Pass, 16:00, N/a, Daily\n27., 11204, Jaipur-Nagpur Exp, 17:24, 17:25, St\n28., 19302, Yashwantpur-Indore Exp, 17:35, 17:40, W\n29., 51830, Agra-Nagpur Pass, 18:04, 18:05, Daily\n30., 51293, Nagpur-Amla Pass, 19:55, 20:00, Daily\n31., 12914, Nagpur-Indore Tri. Exp, 20:08, 20:10, M\n32., 12159, Amravati-Jabalpur SF, 22:30, 22:32, Daily\n33., 18237, Chhatisgarh Express, 23:09, 23:10, Daily\n34., 51152, Narkhed-New Amravati Pass, N/a, 18:00, Daily\n35., 51184, Bhusaval-Narkhed Pass, N/a, 09:00, Daily\n36., 12261, Howrah-Mumbai Duronto Exp, 00:45, 00:50, Su, T, Th\n37., 11071, Kamayani Exp, 01:55, 01:57, Daily\n38., 11081, Lokmanya Tilak- Gorakhpur Exp, 03:14, 03:16, M, W, F\n39., 12010, Shatabdi Exp, 04:45, 04:46, Daily\n40., 12321, Howrah-Mumbai Mail Exp, 05:25, 05:28, Daily\n41., 12617, Mangala Lakshadweep Exp, 06:25, 06:27, Daily\n42., 12071, Jan Shatabdi Exp, 08:35, 08:37, Daily\n43., 12139, Sewagram Exp, 10:15, 10:17, Daily\n44., 11039, Maharashtra Exp, 11:10, 11:12, Daily\n45., 12018, Dehradun Shatabdi Exp, 11:40, 11:42, Daily\n\nQuestion: what is the last train to arrive daily?\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "Chhatisgarh Express",
+    "table_name": "Train Schedule",
+    "sql": "SELECT `Name of the Train` FROM `Train Schedule` WHERE `Arrival` = (SELECT MAX(`Arrival`) FROM `Train Schedule` WHERE `Day` = 'Daily') AND `Day` = 'Daily';"
+  },
+  {
+    "id": "AB-DB-005",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "How many episodes aired Saturday, July 11, 2009",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Episode Ratings\nColumns: Episode #, US air date, Rating, Share, Rating/Share (18–49), Viewers (millions)\nDescription: The name of this table is Episode Ratings, and the headers of this table are Episode #,US air date,Rating,Share,Rating/Share (18–49),Viewers (millions).\nRows:\n1, Thursday, April 9, 2009, 6.5, 11, 2.6/8, 10.21\n2, Thursday, April 16, 2009, 5.1, 9, 2.2/6, 7.82\n3, Thursday, April 23, 2009, 4.7, 9, 1.9/5, 7.02\n4, Saturday, May 2, 2009, 3.1, 6, 1.0/3, 4.61\n5, Saturday, May 9, 2009, 3.1, 6, 1.1/3, 4.60\n6, Saturday, May 23, 2009, 2.5, 5, 1.0/4, 3.85\n7, Saturday, May 30, 2009, 2.4, 5, 0.9/3, 3.62\n8, Saturday, June 6, 2009, 2.4, 5, 0.9/3, 3.56\n9, Saturday, June 13, 2009, 2.0, 4, 0.8/3, 3.20\n10, Saturday, June 20, 2009, TBA, TBA, 0.9/4, 3.79\n11, Saturday, June 27, 2009, 2.4, 5, 0.8/3, 3.53\n12, Saturday, July 11, 2009, 2.4, 5, 0.8/3, 3.63\n13, Saturday, July 18, 2009, 2.2, 4, 0.7/3, 3.41\n14, Saturday, July 25, 2009, 2.1, 4, 0.6/3, 3.20\n15, Saturday, August 1, 2009, 2.3, 4, 0.7/3, 3.55\n16, Saturday, August 8, 2009, 2.0, 4, 0.7/3, 3.15\n17, Saturday, August 15, 2009, 1.8, 3, 0.6/2, 2.87\n18, Saturday, August 22, 2009, 2.0, 4, 0.7/3, 3.15\n19, Saturday, August 29, 2009, 1.9, 3, 0.6/2, 2.92\n20, Saturday, September 5, 2009, 2.2, 4, 0.8/3, 3.39\n21, Saturday, September 12, 2009, 2.2, 4, 0.8/3, 3.34\n22, Saturday, September 19, 2009, 2.4, 5, 0.8/3, 3.66\n\nQuestion: How many episodes aired Saturday, July 11, 2009\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "1.0",
+    "table_name": "Episode Ratings",
+    "sql": "SELECT COUNT(*) FROM `Episode Ratings` WHERE `US air date`='Saturday, July 11, 2009';"
+  },
+  {
+    "id": "AB-DB-006",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "Change the Cuvée to 'Brut Réserve' for the Wine_Houses where the House is 'Pol Roger'",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Wine_Houses\nColumns: House, Founding Year, Location, Cuvée, Company\nDescription: The name of this table is Wine_Houses, and the headers of this table are House,Founding Year,Location,Cuvée,Company.\nRows:\nAbelé, 1757, Reims, Sourire de Reims, Freixenet\nAR Lenoble, 1920, Damery, Brut Intense Les Aventures, Family Owned\nAyala, 1860, Ay, Grande Cuvée ( Vintage ), Société Jacques Bollinger\nBillecart-Salmon, 1818, Mareuil-sur-Ay, Brut Réserve Clos St Hilare, Independent\nBinet, 1849, Reims, Brut Elite Elite Rosé ( Rosé de saignée ) Elite Blanc de Noirs Médaillon Rouge ( Vintage ), Independent\nBoizel, 1834, Épernay, Joyau de France ( Vintage ), Lanson-BCC\nBollinger, 1829, Ay, Vieilles Vignes Françaises ( Vintage ) R.D . ( Récemment Dégorgé ) ( Vintage ), Société Jacques Bollinger\nBoulard, 1952, La Neuville-aux-Larris, , Findlater\nBrice, 1994, Bouzy, , Independent\nBrun, 1898, Ay, , Independent\nBruno Paillard, 1981, Reims, Nec Plus Ultra ( Vintage ) brut première cuvée ( Vintage ), Independent\nBurtin - Besserat de Bellefon, 1843, Épernay, Cuvée des Moines, Lanson-BCC\nCanard-Duchêne, 1868, Ludes, Grande Cuvée Charles VII, Groupe Thiénot\nCattier, 1918, Chigny-les-Roses, Clos du Moulin, Independent\nChanoine Frères, 1730, Reims, Gamme Tsarine, Lanson-BCC\nCharles Heidsieck, 1851, Reims, Blanc des Millénaires ( Vintage ), EPI\nVeuve Cheurlin, 1919, Celles-sur-Ource, , Independent\nCheurlin, 1788, Celles-sur-Ource, Brut Spéciale Rosé de Saignée, Independent\nCheurlin Thomas, 1788, Celles-sur-Ource, Blanc de Blanc - Célébrité Blanc de Noir - Le Champion, Independent\nComte de Dampierre, 1880, Chenay, , Independent\nGosset, 1584, Aÿ, Celebris ( Vintage ), Independent\nHenriot, 1808, Reims, Enchanteleurs ( Vintage ), Independent\nJacquesson, 1798, Dizy, , Independent\nJoseph Perrier, 1825, Châlons-en-Champagne, Cuvée Royale ( Vintage ), Independent\nKrug, 1843, Reims, Grande Cuvée ( Vintage ), LVMH\nLanson, 1760, Reims, Grande Cuvée ( Vintage ) Black Label ( Vintage ) Rose Label ( Vintage ) Extra Age ( Vintage ), Lanson-BCC\nLaurent-Perrier, 1812, Tours-sur-Marne, Grand Siècle ( Vintage ), Independent\nMoët & Chandon, 1743, Épernay, Dom Pérignon ( Vintage ) Imperial ( Vintage ) Nectar Impérial ( Vintage ), LVMH\nPiper-Heidsieck, 1785, Reims, Rare ( Vintage ) Cuvée Brut ( Vintage ), EPI\nPol Roger, 1849, Épernay, Cuvée Sir Winston Churchill ( Vintage ) Brut Réserve ( Vintage ), Independent\n\nQuestion: Change the Cuvée to 'Brut Réserve' for the Wine_Houses where the House is 'Pol Roger'\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "UPDATE Wine_Houses SET Cuvée = 'Brut Réserve' WHERE House = 'Pol Roger'",
+    "table_name": "Wine_Houses",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-007",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "The song 'Porto Sentido' by Rui Veloso won 1st place with 145 points in Draw 10 of the music contest, and was inserted into the database.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: music_contest\nColumns: Draw, Artist, Song, Points, Place\nDescription: The name of this table is music_contest, and the headers of this table are Draw,Artist,Song,Points,Place.\nRows:\n1, Gonzaga Coutinho, Tema para um homem so, 102, 5th\n2, Pedro Osorio S.A.R.L., Uma cancao comercial, 123, 3rd\n3, Concha, Qualquer dia, quem diria, 78\n4, Gabriela Schaaf, Eu so quero, 132, 2nd\n5, Toze Brito, Novo canto Portugues, 110, 4th\n6, Teresa Silva Carvalho, Cantemos ate ser dia, 52, 9th\n7, Florencia, O comboio do Tua, 63, 8th\n8, Manuel Jose Soares, Quando chego a casa, 76, 7th\n9, Manuela Bravo, Sobe, sobe, balao sobe\n10, Antonio Zambujo, Lambreta, 89, 6th\n11, Mariza, Meu fado meu, 145, 1st\n12, Dulce Pontes, Cancao do Mar, 117, 2nd\n13, Carlos do Carmo, Lisboa Menina e Moca, 98, 4th\n14, Ana Moura, Dia de Folga, 81, 7th\n15, Aurea, Busy (For Me), 67, 9th\n16, Miguel Araujo, Os Maridos das Outras, 120, 3rd\n17, Rui Veloso, Chico Fininho, 105, 5th\n18, Gisela Joao, Labirinto ou nao foi nada, 92, 6th\n19, Raquel Tavares, Nao Me Esperes De Volta, 79, 8th\n\nQuestion: The song 'Porto Sentido' by Rui Veloso won 1st place with 145 points in Draw 10 of the music contest, and was inserted into the database.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "INSERT INTO music_contest (Draw, Artist, Song, Points, Place) VALUES ('10', 'Rui Veloso', 'Porto Sentido', '145', '1st')",
+    "table_name": "music_contest",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-008",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "To record the activation of smooth muscle cells, the data of 'Cell type', 'Organ/system', 'Activators ligands --> Gq-GPCRs', and 'Effects' were inserted into 'Smooth Muscle Cell Activation Table' with the information of platelets in the circulatory system being activated by the ligand prostaglandin E2, which inhibits aggregation.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Smooth Muscle Cell Activation Table\nColumns: Cell type, Organ/system, Activators ligands -- > G q - GPCRs, Effects\nDescription: The name of this table is Smooth Muscle Cell Activation Table, and the headers of this table are Cell type,Organ/system,Activators ligands -- > G q - GPCRs,Effects.\nRows:\nsmooth muscle cell ( gastrointestinal tract sphincters ), digestive system, prostaglandin F 2α -- > thromboxanes, contraction\nsmooth muscle cells in : iris dilator muscle ( sensory system ) urethral sphincter ( urinary system ) uterus ( reproductive system ) arrector pili muscles ( integumentary system ) ureter ( urinary system ) urinary bladder ( urinary system ), Various, adrenergic agonists -- > α1 receptor, contraction\nsmooth muscle cells in : iris constrictor muscle ciliary muscle, sensory system, acetylcholine -- > M3 receptor, contraction\nsmooth muscle cell ( vascular ), circulatory system, 5-HT -- > 5-HT2A receptor adrenergic agonists -- > α1 receptor, vasoconstriction\nsmooth muscle cell ( seminal tract ), reproductive system, adrenergic agonists -- > α1 receptor, ejaculation\nsmooth muscle cell ( GI tract ), digestive system, 5-HT -- > 5-HT2A or 5-HT2B receptor acetylcholine ( ACh ) -- > M3 receptor, contraction\nsmooth muscle cell ( bronchi ), respiratory system, 5-HT -- > 5-HT2A receptor adrenergic agonists -- > β₂ receptor acetylcholine -- > M3 and M1 receptor, bronchoconstriction\nproximal convoluted tubule cell, kidney, angiotensin II -- > AT1 receptor adrenergic agonists -- > α1 receptor, stimulate NHE3 -- > H secretion & Na reabsorption stimulate basolateral Na-K ATPase -- > Na reabsorption\nneurons in autonomic ganglia, nervous system, acetylcholine -- > M1 receptor, EPSP\nneurons in CNS, nervous system, 5-HT -- > 5-HT2A receptor glutamate -- > NMDA receptor, neuronal excitation ( 5-HT ) memory ( glutamate )\nplatelets, circulatory system, 5-HT -- > 5-HT2A receptor, aggregation\nependymal cells ( choroid plexus ), ventricular system, 5-HT -- > 5-HT2C receptor, ↑ cerebrospinal fluid secretion\nheart muscle, circulatory system, adrenergic agonists -- > β1 receptor, positive inotropic effect\nserous cells ( salivary gland ), digestive system, acetylcholine -- > M1 and M3 receptors adrenergic agonists -- > β1 receptor, ↑secretion increase salivary potassium levels\nserous cells ( lacrimal gland ), digestive system, acetylcholine -- > M3 receptor, ↑secretion\nadipocyte, digestive system / endocrine system, adrenergic agonists -- > β3 receptor, glycogenolysis and gluconeogenesis\nhepatocyte, digestive system, adrenergic agonists -- > α1 receptor, glycogenolysis and gluconeogenesis\nsweat gland cells, integumentary system, adrenergic agonists -- > β2 receptor, ↑secretion\nparietal cells, digestive system, acetylcholine -- > M3 receptors, ↑ gastric acid secretion\ncardiac muscle cells, circulatory system, adrenergic agonists -- > β1 receptor, positive chronotropic effect\nsmooth muscle cells in bronchioles, respiratory system, acetylcholine -- > M3 receptor, bronchodilation\nneurons in dorsal root ganglia, nervous system, capsaicin, perception of pain\nhepatocyte, digestive system, insulin -- > insulin receptor, glycogen synthesis\nsmooth muscle cells in urinary bladder, urinary system, adrenergic agonists -- > β3 receptor, relaxation\nneurons in pre-ganglionic sympathetic nerves, nervous system, nicotine, EPSP\nmast cells, immune system, histamine, vasodilation\nsmooth muscle cells in uterus, reproductive system, oxytocin -- > oxytocin receptor, contraction\npancreatic beta cells, endocrine system, glucose, insulin secretion\nmicroglia, nervous system, ATP, neuronal activation\n\nQuestion: To record the activation of smooth muscle cells, the data of 'Cell type', 'Organ/system', 'Activators ligands --> Gq-GPCRs', and 'Effects' were inserted into 'Smooth Muscle Cell Activation Table' with the information of platelets in the circulatory system being activated by the ligand prostaglandin E2, which inhibits aggregation.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "INSERT INTO `Smooth Muscle Cell Activation Table` (`Cell type`, `Organ/system`, `Activators ligands -- > G q - GPCRs`, `Effects`) VALUES ('platelets', 'circulatory system', 'prostaglandin E2', 'inhibit aggregation')",
+    "table_name": "Smooth Muscle Cell Activation Table",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-009",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "Among  deaths  106 000  how many is crude rate.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Population Dynamics Table\nColumns: Period, Births, Deaths, Difference, Crude Birth Rate, Crude Death Rate, Natural Increase, Total Fertility Rate, Infant Mortality Rate\nDescription: The name of this table is Population Dynamics Table, and the headers of this table are Period,Births,Deaths,Difference,Crude Birth Rate,Crude Death Rate,Natural Increase,Total Fertility Rate,Infant Mortality Rate.\nRows:\n1950 - 1955, 230 000, 114 000, 116 000, 238, 118, 120, 270, 905\n1955 - 1960, 372 000, 109 000, 263 000, 362, 106, 256, 380, 759\n1960 - 1965, 381 000, 106 000, 275 000, 328, 91, 237, 341, 669\n1965 - 1970, 490 000, 105 000, 385 000, 369, 79, 290, 409, 563\n1970 - 1975, 458 000, 92 000, 365 000, 302, 61, 241, 372, 441\n1975 - 1980, 317 000, 83 000, 233 000, 190, 50, 140, 258, 352\n1980 - 1985, 388 000, 92 000, 296 000, 216, 51, 165, 293, 299\n1985 - 1990, 389 000, 105 000, 284 000, 200, 54, 146, 245, 261\n1990 - 1995, 450 000, 124 000, 326 000, 215, 59, 155, 240, 243\n1995 - 2000, 443 000, 219 000, 225 000, 198, 98, 101, 220, 549\n2000 - 2005, 379 000, 209 000, 170 000, 163, 90, 73, 205, 285\n2005 - 2010, 311 000, 189 000, 122 000, 137, 83, 54, 180, 202\n2010 - 2015, 287 000, 168 000, 119 000, 127, 74, 53, 172, 168\n2015 - 2020, 267 000, 154 000, 113 000, 115, 67, 48, 163, 143\n2020 - 2025, 253 000, 143 000, 110 000, 104, 59, 45, 156, 124\n2025 - 2030, 238 000, 132 000, 106 000, 92, 51, 41, 149, 110\n2030 - 2035, 225 000, 121 000, 104 000, 83, 45, 38, 143, 98\n2035 - 2040, 214 000, 112 000, 102 000, 75, 39, 36, 137, 87\n2040 - 2045, 204 000, 104 000, 100 000, 68, 34, 33, 131, 77\n2045 - 2050, 196 000, 97 000, 99 000, 62, 30, 32, 126, 68\n2050 - 2055, 188 000, 91 000, 97 000, 58, 27, 31, 122, 61\n\nQuestion: Among  deaths  106 000  how many is crude rate.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "91.0",
+    "table_name": "Population Dynamics Table",
+    "sql": "SELECT COUNT(*) FROM `Population Dynamics Table` WHERE Deaths = '106 000' AND `Crude Death Rate` IS NOT NULL;"
+  },
+  {
+    "id": "AB-DB-010",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "Change the value of Points to '16' in the football_stats table for the player named 'Johnson'.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: football_stats\nColumns: Player, Position, Starter, Touchdowns, Extra points, Field goals, Points\nDescription: The name of this table is football_stats, and the headers of this table are Player,Position,Starter,Touchdowns,Extra points,Field goals,Points.\nRows:\nCurtis, Left tackle, Yes, 6, 19, 0, 49\nNorcross, Quarterback, Yes, 5, 0, 0, 25\nClark, Fullback, Yes, 3, 0, 0, 15\nMagoffin, Right halfback, Yes, 2, 1, 0, 11\nGraham, Right tackle, Yes, 1, 0, 0, 5\nPatrick, Right tackle, No, 1, 0, 0, 5\nH. Hammond, Right end, Yes, 1, 0, 0, 5\nSchulte, Left guard, Yes, 1, 0, 0, 5\nCarter, Right guard, Yes, 1, 0, 0, 5\nBecker, Quarterback, No, 1, 0, 0, 5\nSmith, Center, Yes, 0, 0, 0, 0\nJohnson, Left tackle, No, 0, 0, 0, 0\nWilliams, Right end, Yes, 1, 0, 0, 5\nBrown, Left guard, Yes, 2, 0, 0, 10\nJones, Right tackle, No, 0, 0, 0, 0\nGarcia, Right halfback, Yes, 3, 2, 0, 20\nSmith, Quarterback, Yes, 4, 1, 0, 27\nDavis, Fullback, No, 0, 0, 0, 0\nWilson, Right guard, Yes, 1, 0, 0, 5\nAnderson, Left tackle, No, 0, 0, 0, 0\n\nQuestion: Change the value of Points to '16' in the football_stats table for the player named 'Johnson'.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "UPDATE football_stats SET Points = '16' WHERE Player = 'Johnson'",
+    "table_name": "football_stats",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-011",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "How many college teams have a player with a nationality of Russia?",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: NHL_draft_picks\nColumns: Pick, Player, Position, Nationality, NHL team, College/junior/club team\nDescription: The name of this table is NHL_draft_picks, and the headers of this table are Pick,Player,Position,Nationality,NHL team,College/junior/club team.\nRows:\n136, Andreas Dackell, Right Wing, Sweden, Ottawa Senators, Brynäs IF (Sweden)\n137, Michel Larocque, Goaltender, Canada, San Jose Sharks, Boston University (NCAA)\n138, Todd Miller, Centre, Canada, New York Islanders, Sarnia Sting (OHL)\n139, Robert Esche, Goaltender, United States, Winnipeg Jets (from Los Angeles), Detroit Whalers (OHL)\n140, Dmitriy Yakushin, Defence, Ukraine, Toronto Maple Leafs (from Dallas), Pembroke (COJHL)\n141, Bryan Randall, Centre, Canada, Edmonton Oilers, Medicine Hat Tigers (WHL)\n142, Ryan Davis, Right Wing, Canada, Buffalo Sabres, Owen Sound Platers (OHL)\n143, Aaron Baker, Goaltender, Canada, Hartford Whalers, Kennewick Tri-City Americans (WHL)\n144, Magnus Nilsson, Left Wing, Sweden, Detroit Red Wings (from Anaheim), IK Vita Hasten (Sweden)\n145, Sean Ritchlin, Right Wing, United States, New Jersey Devils, University of Michigan (NCAA)\n146, Brian Willsie, Right Wing, Canada, Colorado Avalanche (from Winnipeg via Los Angeles), Guelph Storm (OHL)\n147, Nolan McDonald, Goaltender, Canada, Vancouver Canucks, University of Vermont (NCAA)\n148, Chris Bogas, Defence, United States, Toronto Maple Leafs (from Calgary), Michigan State University (NCAA)\n149, Blaine Russell, Goaltender, Canada, Mighty Ducks of Anaheim (from St. Louis), Prince Albert Raiders (WHL)\n150, Peter Bergman, Centre, Canada, Pittsburgh Penguins (compensatory), Kamloops Blazers (WHL)\n151, Lucio DeMartinis, Left Wing, Canada, Toronto Maple Leafs, Shawinigan Cataractes (QMJHL)\n152, Nikolai Ignatov, Defence, Russia, Tampa Bay Lightning (from Tampa Bay via St. Louis), CSKA Moscow (Russia)\n153, A. J. van Bruggen, Right Wing, United States, Washington Capitals, Northern Michigan University (NCAA)\n154, Brett Clark, Defence, Canada, Montreal Canadiens, University of Maine (NCAA)\n155, Chris Lane, Defence, Canada, Boston Bruins, Spokane Chiefs (WHL)\n156, Gaetan Poirier, Left Wing, Canada, Florida Panthers, Merrimack College (NCAA)\n157, Xavier Delisle, Centre, Canada, Tampa Bay Lightning (from Chicago), Granby Prédateurs (QMJHL)\n158, Ola Sandberg, Defence, Sweden, New York Rangers, Djurgardens IF (Sweden)\n159, Stephen Wagner, Goaltender, Canada, St. Louis Blues (from Pittsburgh), Olds Grizzlys ( AJHL )\n160, Kai Fischer, Goaltender, Germany, Colorado Avalanche (from Philadelphia), Düsseldorfer EG (Germany)\n161, Darren Mortier, Centre, Canada, Buffalo Sabres (from Colorado), Sarnia Sting (OHL)\n1, John Smith, Left Wing, Canada, New York Rangers, University of Manitoba (CIS)\n2, Peter Lee, Right Wing, United States, Pittsburgh Penguins, Northern Michigan University (NCAA)\n3, Thomas Wilson, Defence, United States, Washington Capitals, Oshawa Generals (OHL)\n4, Jannik Hansen, Left Wing, Denmark, Vancouver Canucks, Portland Winterhawks (WHL)\n5, Pavel Datsyuk, Centre, Russia, Detroit Red Wings, Sibir Novosibirsk (Russia)\n6, Jaromir Jagr, Right Wing, Czech Republic, Florida Panthers, HC Kladno (Czech Republic)\n7, Evgeni Malkin, Centre, Russia, Pittsburgh Penguins, Metallurg Magnitogorsk (Russia)\n8, Henrik Lundqvist, Goaltender, Sweden, New York Rangers, Frolunda HC (Sweden)\n9, Wayne Gretzky, Centre, Canada, Edmonton Oilers, Sault Ste. Marie Greyhounds (OHL)\n10, Bobby Orr, Defence, Canada, Boston Bruins, Oshawa Generals (OHL)\n\nQuestion: How many college teams have a player with a nationality of Russia?\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "1.0",
+    "table_name": "NHL_draft_picks",
+    "sql": "SELECT COUNT(DISTINCT `College/junior/club team`) FROM `NHL_draft_picks` WHERE `Nationality` = 'Russia';"
+  },
+  {
+    "id": "AB-DB-012",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "Set the score of tie number 1 in the Football Matches table to '2 - 2'.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Football Matches\nColumns: Tie no, Home team, Score, Away team, Date, Attendance\nDescription: The name of this table is Football Matches, and the headers of this table are Tie no,Home team,Score,Away team,Date,Attendance.\nRows:\n1, Rochdale, 2 - 0, Coventry City, 25 January 2003, nan\n2, Southampton, 1 - 1, Millwall, 25 January 2003, 23,809\nReplay, Millwall, 1 - 2, Southampton, 5 February 2003, 10,197\n3, Watford, 1 - 0, West Bromwich Albion, 25 January 2003, 16,975\n4, Walsall, 2 - 0, Wimbledon, 25 January 2003, 6,693\n5, Gillingham, 1 - 1, Leeds United, 25 January 2003, 11,093\nReplay, Leeds United, 2 - 1, Gillingham, 4 February 2003, 29,359\n6, Blackburn Rovers, 3 - 3, Sunderland, 25 January 2003, 14,315\nReplay, Sunderland, 2 - 2, Blackburn Rovers, 5 February 2003, 15,745\n7, Wolverhampton Wanderers, 4 - 1, Leicester City, 25 January 2003, 28,164\n8, Shrewsbury Town, 0 - 4, Chelsea, 26 January 2003, 7,950\n9, Sheffield United, 4 - 3, Ipswich Town, 25 January 2003, 12,757\n10, Fulham, 3 - 0, Charlton Athletic, 26 January 2003, 12,203\n11, Brentford, 0 - 3, Burnley, 25 January 2003, 9,563\n12, Manchester United, 6 - 0, West Ham United, 26 January 2003, 67,181\n13, Norwich City, 1 - 0, Dagenham & Redbridge, 25 January 2003, 21,164\n14, Crystal Palace, 0 - 0, Liverpool, 26 January 2003, 26,054\nReplay, Liverpool, 0 - 2, Crystal Palace, 5 February 2003, 35,109\n15, Farnborough Town, 1 - 5, Arsenal, 25 January 2003, 35,108\n16, Stoke City, 3 - 0, Bournemouth, 26 January 2003, 12,004\n17, Leeds United, 2 - 1, Southampton, 1 February 2003, 23,456\n18, West Bromwich Albion, 1 - 1, Wolverhampton Wanderers, 1 February 2003, 17,892\nReplay, Wolverhampton Wanderers, 3 - 2, West Bromwich Albion, 7 February 2003, 20,378\n19, Chelsea, 4 - 0, Blackburn Rovers, 2 February 2003, 47,890\n20, Norwich City, 2 - 2, Fulham, 1 February 2003, 13,456\nReplay, Fulham, 1 - 3, Norwich City, 6 February 2003, 18,901\n21, Crystal Palace, 5 - 1, Brentford, 1 February 2003, 19,345\n22, Manchester United, 2 - 0, Sheffield United, 2 February 2003, 75,432\n23, Liverpool, 3 - 1, Watford, 1 February 2003, 44,567\n24, Arsenal, 2 - 0, Stoke City, 2 February 2003, 38,901\n\nQuestion: Set the score of tie number 1 in the Football Matches table to '2 - 2'.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "UPDATE `Football Matches` SET `Score`='2 - 2' WHERE `Tie no`=1",
+    "table_name": "Football Matches",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-013",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "The record of the 2019 Tony Awards nominees for Best Musical category includes Hamilton, who was nominated but did not win the award. The information was stored in the 'awards' table through the code: INSERT INTO awards (Year, Award, Category, Nominee, Result) VALUES ('2019', 'Tony Awards', 'Best Musical', 'Hamilton', 'Nominated')",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: awards\nColumns: Year, Award, Category, Nominee, Result\nDescription: The name of this table is awards, and the headers of this table are Year,Award,Category,Nominee,Result.\nRows:\n2017, Evening Standard Theatre Awards, Best Musical, Best Musical, Nominated\n2017, Evening Standard Theatre Awards, Best Director, Dominic Cooke, Nominated\n2017, Evening Standard Theatre Awards, Best Musical Performance, Janie Dee, Nominated\n2018, Laurence Olivier Awards, Best Musical Revival, Best Musical Revival, Won\n2018, Laurence Olivier Awards, Best Actress in a Musical, Janie Dee, Nominated\n2018, Laurence Olivier Awards, Best Actress in a Musical, Imelda Staunton, Nominated\n2018, Laurence Olivier Awards, Best Actress in a Supporting Role in a Musical, Tracie Bennett, Nominated\n2018, Laurence Olivier Awards, Best Director, Dominic Cooke, Nominated\n2018, Laurence Olivier Awards, Best Theatre Choreographer, Bill Deamer, Nominated\n2018, Laurence Olivier Awards, Best Set Design, Vicki Mortimer, Nominated\n2018, Laurence Olivier Awards, Best Costume Design, Vicki Mortimer, Won\n2018, Laurence Olivier Awards, Best Lighting Design, Paule Constable, Nominated\n2018, Laurence Olivier Awards, Outstanding Achievement in Music, The orchestra, Nicholas Skilbeck, and Nigel Lilley, Nominated\n2018, WhatsOnStage Awards, Best Musical Revival, Best Musical Revival, Nominated\n2018, WhatsOnStage Awards, Best Actress in a Musical, Janie Dee, Nominated\n2018, WhatsOnStage Awards, Best Supporting Actress in a Musical, Tracie Bennett, Nominated\n2018, WhatsOnStage Awards, Best Director, Dominic Cooke, Nominated\n2018, WhatsOnStage Awards, Best Set Design, Vicki Mortimer, Nominated\n2018, WhatsOnStage Awards, Best Costume Design, Vicki Mortimer, Nominated\n2018, WhatsOnStage Awards, Best Lighting Design, Paule Constable, Nominated\n2018, Critics' Circle Theatre Awards, Best Director, Dominic Cooke, Won\n2018, Critics' Circle Theatre Awards, Best Designer, Vicki Mortimer, Won\n2019, Tony Awards, Best Musical, Beetlejuice, Nominated\n2019, Tony Awards, Best Actress in a Musical, Eva Noblezada, Nominated\n2019, Tony Awards, Best Featured Actor in a Musical, Andre De Shields, Won\n2020, Olivier Awards, Best New Play, The Inheritance, Won\n2020, Olivier Awards, Best Actress, Sharon D Clarke, Won\n2020, Olivier Awards, Best Lighting Design, Jon Clark, Nominated\n2020, WhatsOnStage Awards, Best New Musical, Six, Won\n2020, WhatsOnStage Awards, Best Actor in a Play, Andrew Scott, Won\n2020, WhatsOnStage Awards, Best Actress in a Play, Hayley Atwell, Nominated\n2020, Evening Standard Theatre Awards, Best Musical Performance, Miriam-Teak Lee, Won\n\nQuestion: The record of the 2019 Tony Awards nominees for Best Musical category includes Hamilton, who was nominated but did not win the award. The information was stored in the 'awards' table through the code: INSERT INTO awards (Year, Award, Category, Nominee, Result) VALUES ('2019', 'Tony Awards', 'Best Musical', 'Hamilton', 'Nominated')\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "INSERT INTO awards (Year, Award, Category, Nominee, Result) VALUES ('2019', 'Tony Awards', 'Best Musical', 'Hamilton', 'Nominated')",
+    "table_name": "awards",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-014",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "Update the tournament results for the Australian Open in 2006 to 'QF', 2007 to 'SF', 2008 to 'F', 2009 to 'A', 2011 to 'A', and 2012 to 'A' in the 'Tournament Results by Year' table.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Tournament Results by Year\nColumns: Tournament, 2006, 2007, 2008, 2009, 2011, 2012\nDescription: The name of this table is Tournament Results by Year, and the headers of this table are Tournament,2006,2007,2008,2009,2011,2012.\nRows:\nGrand Slam Tournaments, Grand Slam Tournaments, Grand Slam Tournaments, Grand Slam Tournaments, Grand Slam Tournaments, Grand Slam Tournaments, Grand Slam Tournaments\nAustralian Open, A, A, A, A, 1R, A\nFrench Open, A, A, A, A, A, A\nWimbledon, 1R, A, 3R, A, A, A\nUS Open, A, A, A, A, A, A\nWin–Loss, 0–1, 0–0, 2–1, 0–0, 0–1, 0–0\nTournament 1, A, A, A, A, 1R, A\nTournament 2, A, A, A, A, A, A\nTournament 3, 1R, A, 3R, A, A, A\nTournament 4, A, A, A, A, A, A\nTournament 5, 0–1, 0–0, 2–1, 0–0, 0–1, 0–0\nTournament 6, 3R, 4R, A, A, A, 2R\nTournament 7, A, A, A, A, A, A\nTournament 8, A, A, A, A, A, A\nTournament 9, 2R, 1R, A, 1R, A, A\nTournament 10, A, A, A, A, A, A\n\nQuestion: Update the tournament results for the Australian Open in 2006 to 'QF', 2007 to 'SF', 2008 to 'F', 2009 to 'A', 2011 to 'A', and 2012 to 'A' in the 'Tournament Results by Year' table.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "UPDATE `Tournament Results by Year` SET `2006`= 'QF', `2007`= 'SF', `2008`= 'F', `2009`= 'A', `2011`= 'A', `2012`= 'A' WHERE `Tournament` = 'Australian Open'",
+    "table_name": "Tournament Results by Year",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-015",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "Set the Total column to 40 for the Nationality_Passengers_Crew_Total_Table where the Nationality column equals Spain.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Nationality_Passengers_Crew_Total_Table\nColumns: Nationality, Passengers, Crew, Total\nDescription: The name of this table is Nationality_Passengers_Crew_Total_Table, and the headers of this table are Nationality,Passengers,Crew,Total.\nRows:\nPoland, 155, 11, 166\nUnited States, 17, 0, 17\nTotal, 172, 11, 183\nFrance, 210, 20, 230\nGermany, 185, 12, 197\nUnited Kingdom, 150, 15, 165\nSpain, 100, 8, 108\nItaly, 80, 5, 85\nBrazil, 60, 6, 66\nIndia, 40, 3, 43\nChina, 35, 4, 39\nAustralia, 25, 2, 27\nCanada, 20, 1, 21\n\nQuestion: Set the Total column to 40 for the Nationality_Passengers_Crew_Total_Table where the Nationality column equals Spain.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "UPDATE Nationality_Passengers_Crew_Total_Table SET Total = '40' WHERE Nationality = 'Spain'",
+    "table_name": "Nationality_Passengers_Crew_Total_Table",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-016",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "Update the 2030 Central European Jamboree's theme to 'Unity'.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Central European Jamboree\nColumns: Year, Event name, Location, Host City, Theme, Attendance\nDescription: The name of this table is Central European Jamboree, and the headers of this table are Year,Event name,Location,Host City,Theme,Attendance.\nRows:\n1931, Camp of Slavic Scouts, Prague, Czechoslovakia, , \n1935, Jubilee Jamboree of Polish Scouting and Guiding Association, Spała, Poland, , \n1997, Fénix, Prague, Czech Republic, , \n1998, Eurocor, Žarnovica, Slovakia, , \n1999, San '99, Sanok, Poland, , \n2001, Carpathia 2001, Csobánka, Hungary, Closer to each other, 1000\n2004, Tatracor, Tatranská Lomnica, Slovakia, Reach the Top, 2000\n2006, Orbis 2006, Brno, Czech Republic, Many cultures - one world, 3000\n2008, Silesia 2008, Chorzów, Poland, Discover new world, 1400\n2010, ConCordia 2010, Budapest, Hungary, Many Hearts , One Beat, \n2012, 11th Central European Jamboree, Liptovský Mikuláš, Slovakia, Experience Elements, 1000\n2014, 12th Central European Jamboree, Doksy, Czech Republic, Prepared for the future, 1012\n2016, 13th Central European Jamboree, Wrocław, Poland, Art of Scouting, 1800\n2018, 14th Central European Jamboree, Szalki Island ( Dunaújváros ), Hungary, Scouting on new waves, 700\n2022, 15th Central European Jamboree, TBA, Czech Republic, , \n2024, 16th Central European Jamboree, TBA, Slovakia, , \n2025, Mountain Quest, Zakopane, Poland, Exploring the Alps, 1200\n2026, Danube Adventure, Budapest, Hungary, Paddling through history, 800\n2027, Castles and Legends, Prague, Czech Republic, Uncovering ancient stories, 1500\n2028, Tatra Trek, Poprad, Slovakia, Hiking the Carpathians, 1000\n2029, Wilderness Survival, Bieszczady Mountains, Poland, Living off the land, 600\n2030, Riverside Rendezvous, Bratislava, Slovakia, Canoeing and camaraderie, 900\n2031, History in the Making, Krakow, Poland, Exploring the past to shape the future, 2000\n2032, Vineyard Ventures, Budapest, Hungary, Sampling local flavors, 700\n2033, Highland Haven, Tatras, Czech Republic, Skiing and snowboarding, 800\n2034, Danubian Delight, Bratislava, Slovakia, Enjoying the river life, 1200\n\nQuestion: Update the 2030 Central European Jamboree's theme to 'Unity'.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "UPDATE `Central European Jamboree` SET `Theme`='Unity' WHERE `Year`='2030'",
+    "table_name": "Central European Jamboree",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-017",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "Great Britain's bronze count in the Olympic Medal Table is updated to 5 and their total count is incremented by 1.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Olympic Medal Table\nColumns: Rank, Nation, Gold, Silver, Bronze, Total\nDescription: The name of this table is Olympic Medal Table, and the headers of this table are Rank,Nation,Gold,Silver,Bronze,Total.\nRows:\n1, Japan, 3, 3, 1, 7\n2, Netherlands, 1, 0, 1, 2\n3, Soviet Union, 0, 1, 2, 3\n4, South Korea, 0, 0, 2, 2\n5, Canada, 0, 0, 1, 1\n5, United States, 0, 0, 1, 1\n6, Germany, 0, 2, 0, 2\n7, China, 0, 1, 1, 2\n8, Italy, 0, 1, 0, 1\n9, France, 0, 0, 2, 2\n10, Great Britain, 0, 0, 1, 1\n10, Australia, 0, 0, 1, 1\n12, Switzerland, 0, 0, 1, 1\n13, Sweden, 0, 0, 1, 1\n14, Taiwan, 0, 0, 1, 1\n14, Brazil, 0, 0, 1, 1\n\nQuestion: Great Britain's bronze count in the Olympic Medal Table is updated to 5 and their total count is incremented by 1.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "UPDATE `Olympic Medal Table` SET Bronze = 5, Total = Total+1 WHERE Nation = 'Great Britain';",
+    "table_name": "Olympic Medal Table",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-018",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "What is the year of the first appearance of the Black Knights, who had less than 1 finals appearances?",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Finals Appearances by Drum Corps\nColumns: Corps Name, Number of Finals Appearances, Year of First Appearance, Year of Most Recent Appearance, All Years of Finals Appearances\nDescription: The name of this table is Finals Appearances by Drum Corps, and the headers of this table are Corps Name,Number of Finals Appearances,Year of First Appearance,Year of Most Recent Appearance,All Years of Finals Appearances.\nRows:\nSanta Clara Vanguard, 42, 1972, 2013, 1972–2013\nBlue Devils, 40, 1974, 2013, 1974–2013\nThe Cavaliers, 40, 1972, 2013, 1972,1974–77,1979–2013\nPhantom Regiment, 40, 1974, 2013, 1974–2013\nMadison Scouts, 38, 1973, 2013, 1973–2001,2003–06,2008,2010-2013\nThe Cadets, 36, 1975, 2013, 1975, 1977, 1980–2013\nBluecoats, 26, 1987, 2013, 1987-98,2000–2013\nCrossmen, 23, 1977, 2012, 1977-78,1980–82,1984,1989–2004\nSpirit of Atlanta, 20, 1978, 2013, 1978-88,1990,2002–03,2005–07,\nBlue Knights, 19, 1991, 2013, 1991-94,1996–2000,2004–13\nCarolina Crown, 18, 1995, 2013, 1995–2001,2003–13\nGlassmen, 16, 1993, 2010, 1993-95,1997–2002,2004–10\nBoston Crusaders, 15, 1999, 2013, 1999–2013\n27th Lancers, 12, 1972, 1984, 1972-73,1975–84\nBlue Stars, 13, 1972, 2013, 1972-79,2008–11,13\nBridgemen, 10, 1972, 1983, 1972-73,1976–83\nFreelancers, 10, 1976, 1992, 1976-77,1981–85,1989,1991–\nStar of Indiana, 9, 1985, 1993, 1985-93\nColts, 8, 1993, 2007, 1993-96,1998–99,2001,2007\nTroopers, 9, 1972, 2009, 1972-75,1979,1981,1985–86,2009\nVelvet Knights, 8, 1984, 1992, 1984-90,1992\nSuncoast Sound, 7, 1983, 1989, 1983-89\nKilties, 6, 1972, 1978, 1972-75,1977–78\nThe Magic, 6, 1994, 2003, 1994–1997,2002–03\nSky Ryders, 6, 1982, 1991, 1982-83,1986–88,1991\nGuardsmen, 4, 1976, 1980, 1976, 1978–80\nAnaheim Kingsmen, 3, 1972, 1974, 1972-74\nMuchachos, 3, 1972, 1974, 1972-74\nNorth Star, 3, 1978, 1980, 1978-80\nArgonne Rebels, 2, 1972, 1973, 1972-73\nOakland Crusaders, 2, 1975, 1976, 1975-76\nSeneca Optimists, 2, 1976, 1977, 1976-77\nBleu Raeders, 1, 1972, 1972, 1972\nBlack Knights, 1, 1973, 1973, 1973\nDe La Salle Oaklands, 1, 1974, 1974, 1974\nDes Plaines Vangaurd, 1, 1972, 1972, 1972\nDutch Boy, 1, 1990, 1990, 1990\nPurple Lancers, 1, 1974, 1974, 1974\nRoyal Crusaders, 1, 1975, 1975, 1975\nStockton Commodores, 1, 1973, 1973, 1973\nCascades, 1, 2002, 2002, 2002\nBluecoats, 26, 1987, 2019, 1987-98, 2000-05, 2007, 2009-19\nCarolina Crown, 15, 2003, 2019, 2003-09, 2011-19\nThe Cadets, 37, 1975, 2019, 1975, 1977, 1980-81, 1983-2005, 2007-16, 2019\nSanta Clara Vanguard, 43, 1972, 2019, 1972-2019\nBlue Devils, 41, 1974, 2019, 1974-2019\nBoston Crusaders, 16, 2000, 2019, 2000-02, 2004-06, 2008-16, 2019\nPhantom Regiment, 41, 1974, 2019, 1974-2019\nMadison Scouts, 39, 1973, 2019, 1973-2001, 2003-08, 2010-14, 2017-19\nThe Cavaliers, 41, 1972, 2019, 1972, 1974-2014, 2017-19\n\nQuestion: What is the year of the first appearance of the Black Knights, who had less than 1 finals appearances?\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "0.0",
+    "table_name": "Finals Appearances by Drum Corps",
+    "sql": "SELECT [Year of First Appearance] FROM [Finals Appearances by Drum Corps] WHERE [Corps Name] = 'Black Knights' AND [Number of Finals Appearances] < 1;"
+  },
+  {
+    "id": "AB-DB-019",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "The 2021 Horse Racing Champions database includes the following information: Year='2021', Winner='Medina Spirit', Second='Mandaloun', Third='Hot Rod Charlie', and Starters='19'.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Horse_Racing_Champions\nColumns: Year, Winner, Second, Third, Starters\nDescription: The name of this table is Horse_Racing_Champions, and the headers of this table are Year,Winner,Second,Third,Starters.\nRows:\n2018, Accelerate, Gunnevera, Thunder Snow, 14\n2017, Gun Runner, Collected, West Coast, 11\n2016, Arrogate, California Chrome, Keen Ice, 9\n2015, American Pharoah, Effinex, Honor Code, 8\n2014, Bayern, Toast of New York, California Chrome, 14\n2013, Mucho Macho Man, Will Take Charge, Declaration of War, 11\n2012, Fort Larned, Mucho Macho Man, Flat Out, 12\n2011, Drosselmeyer, Game On Dude, Ruler on Ice, 12\n2010, Blame, Zenyatta, Fly Down, 12\n2009, Zenyatta, Gio Ponti, Twice Over, 12\n2008, Raven 's Pass, Henrythenavigator, Tiago, 12\n2007, Curlin, Hard Spun, Awesome Gem, 9\n2006, Invasor, Bernardini, Premium Tap, 13\n2005, Saint Liam, Flower Alley, Perfect Drift, 13\n2004, Ghostzapper, Roses in May, Pleasantly Perfect, 13\n2003, Pleasantly Perfect, Medaglia d'Oro, Dynever, 10\n2002, Volponi, Medaglia d'Oro, Milwaukee Brew, 12\n2001, Tiznow, Sakhee, Albert the Great, 13\n2000, Tiznow, Giant 's Causeway, Captain Steve, 13\n1999, Cat Thief, Budroyale, Golden Missile, 14\n2021, Essential Quality, Hot Rod Charlie, Rombauer, 10\n2020, Authentic, Tiz the Law, Max Player, 11\n2019, Vino Rosso, Code of Honor, Owendale, 14\n2018, Accelerate, Gunnevera, Thunder Snow, 14\n2017, Gun Runner, Collected, West Coast, 11\n2016, Arrogate, California Chrome, Keen Ice, 9\n2015, American Pharoah, Effinex, Honor Code, 8\n2014, Bayern, Toast of New York, California Chrome, 14\n2013, Mucho Macho Man, Will Take Charge, Declaration of War, 11\n2012, Fort Larned, Mucho Macho Man, Flat Out, 12\n\nQuestion: The 2021 Horse Racing Champions database includes the following information: Year='2021', Winner='Medina Spirit', Second='Mandaloun', Third='Hot Rod Charlie', and Starters='19'.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "INSERT INTO Horse_Racing_Champions (Year, Winner, Second, Third, Starters) VALUES ('2021', 'Medina Spirit', 'Mandaloun', 'Hot Rod Charlie', '19')",
+    "table_name": "Horse_Racing_Champions",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-020",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "Insert the information of the lead actress of a TV movie based on a true story into the table 'Actress Filmography', including the year, title, role, and notes.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Actress Filmography\nColumns: Year, Title, Role, Notes\nDescription: The name of this table is Actress Filmography, and the headers of this table are Year,Title,Role,Notes.\nRows:\n1958-59, Young Doctor Malone, Jill Malone, TV series\n1959, The Art Carney Special, Emily Webb, \"Our Town\"\n1960, Startime, Rachel, \"Jeff McCleod, the Last Reb\"\n1961, Way Out, Bonnie Draco, \"Dissolve to Black\"\n1961, Armstrong Circle Theatre, Anna Halber, \"A Chapter on Tyranny: Dateline Berlin\"\n1961, Festival, Ondine, \"Ondine\"\n1962, Festival, Joan of Arc, \"The Lark\"\n1962, The DuPont Show of the Week, Kathy Allen, \"The Movie Star\"\n1962, The Defenders, Sandra Mason, \"The Benefactor\"\n1963, The Defenders, Theresa Sullivan, \"The Star Spangled Ghetto\"\n1966, 12 O'Clock High, Lt. Irina Zavanoff, \"Massacre\"\n1967, The Invaders, Ellen Woods, \"Nightmare\"\n1967, A Bell for Adano, Tina, TV film\n1968, Here Comes the Bride, Dr. Allyn Wright, \"A Crying Need\"\n1968, The F.B.I., Margaret Kane, \"The Hero\"\n1972, Bonanza, Anna Kosovo, \"Frenzy\"\n1973, Much Ado About Nothing, Beatrice, TV film\n1973, The Return of Charlie Chan, Irene Hadrachi, TV film\n1974, The American Parade, Anne Bradstreet, \"We the Women\"\n1974, Punch and Jody, Margaret Howell Grant, TV film\n1975, ABC's Wide World of Entertainment, Joan Harper, \"Please Call It Murder\"\n1977, The Andros Targets, Bonnie Stanik, \"A Currency for Murder\"\n1977, Kojak, Sonia, \"Another Gypsy Queen\"\n1978-80, Another World, Rosie, TV series\n1981, Secrets of Midland Heights, Helen Dulles, \"The Birthday Party\"\n1981, Great Performances, Edith Wharton, \"Edith Wharton: Looking Back\"\n1981, Nurse, Dr. Carol Swanson, \"My Life as a Woman\"\n1983, Ryan's Hope, Una MacCurtain, TV series\n1985-2010, As the World Turns, Emma Snyder, TV series\n1986, Mafia Princess, Angelina Giancana, TV film\n1991, American Playhouse, Mrs. Rosenbloom, \"The Hollow Boy\"\n1997-02, Oz, Mrs. Beecher, \"Straight Life\", \"Works of Mercy\", \"Impotence\"\n1999, Law & Order, Judge Childers, \"Sideshow: Part 1\"\n1960, The Untouchables, Maggie Storm, \"The Maggie Storm Story\"\n1970, The Bold Ones: The Senator, Miriam Daugherty, \"The Day the Lion Died\"\n1975, The Blue Knight, Gloria, \"The Rose and the Gun\"\n1979, Baretta, Liz Rickey, \"The Left Hand of God\"\n1980, Lou Grant, Katherine Gleason, \"Ghosts\"\n1985, Hill Street Blues, Lila Daniels, \"Lucky Ducks\"\n1988, Matlock, Marie Morgan, \"The Ex\"\n1993, Diagnosis Murder, Natalie Van Buren, \"Vanishing Act\"\n1997, Profiler, Sister Mary Grace, \"The Root of All Evil\"\n2002, The Shield, Janine, \"Old Wounds\"\n\nQuestion: Insert the information of the lead actress of a TV movie based on a true story into the table 'Actress Filmography', including the year, title, role, and notes.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "INSERT INTO `Actress Filmography` (Year, Title, Role, Notes) VALUES ('1975', 'TV Movie Name', 'Lead Actress', 'Based on a true story');",
+    "table_name": "Actress Filmography",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-021",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "In the Athletic Achievements table, the Position column will be updated to '2nd', where the Year column is '2003', the Competition column is 'World Championships', and the Event column is '3000 m st.'",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Athletic Achievements\nColumns: Year, Competition, Venue, Position, Event\nDescription: The name of this table is Athletic Achievements, and the headers of this table are Year,Competition,Venue,Position,Event.\nRows:\n1996, World Junior Championships, Sydney, Australia, 2nd, 3000 m st.\n1998, World Cross Country Championships, Marrakech, Morocco, 8th, Short race\n, Commonwealth Games, Kuala Lumpur, Malaysia, 3rd, 3000 m st.\n1999, All-Africa Games, Johannesburg, South Africa, 1st, 3000 m st.\n, IAAF Grand Prix Final, Munich, Germany, 4th, 3000 m st.\n2001, IAAF Grand Prix Final, Melbourne, Australia, 4th, 3000 m st.\n2004, World Athletics Final, Monte Carlo, Monaco, 4th, 3000 m st.\n2005, World Athletics Final, Monte Carlo, Monaco, 8th, 3000 m st.\n1997, World Championships, Athens, Greece, 3rd, 5000 m\n2000, Olympic Games, Sydney, Australia, 6th, 3000 m st.\n2002, Commonwealth Games, Manchester, England, 2nd, 5000 m\n2003, World Championships, Paris, France, 4th, 3000 m st.\n2006, IAAF World Cup, Athens, Greece, 1st, 3000 m st.\n2007, World Championships, Osaka, Japan, 4th, 5000 m\n2009, World Championships, Berlin, Germany, 2nd, 5000 m\n2010, Commonwealth Games, Delhi, India, 1st, 5000 m\n2012, Olympic Games, London, England, 3rd, 5000 m\n2013, World Championships, Moscow, Russia, 1st, 5000 m\n\nQuestion: In the Athletic Achievements table, the Position column will be updated to '2nd', where the Year column is '2003', the Competition column is 'World Championships', and the Event column is '3000 m st.'\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "UPDATE `Athletic Achievements` SET `Position`='2nd' WHERE `Year`='2003' AND `Competition`='World Championships' AND `Event`='3000 m st.'",
+    "table_name": "Athletic Achievements",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-022",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "What in 2007 has a 2008 of sf, and a 2010 of f?",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Tournament Results\nColumns: Tournament, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, Win %\nDescription: The name of this table is Tournament Results, and the headers of this table are Tournament,2005,2006,2007,2008,2009,2010,2011,2012,2013,Win %.\nRows:\nGrand Slam tournaments, Grand Slam tournaments, Grand Slam tournaments, Grand Slam tournaments, Grand Slam tournaments, Grand Slam tournaments, Grand Slam tournaments, Grand Slam tournaments, Grand Slam tournaments, Grand Slam tournaments, Grand Slam tournaments\nAustralian Open, 1R, 1R, 4R, W, QF, QF, W, W, W, 88.63\nFrench Open, 2R, QF, SF, SF, 3R, QF, SF, F, SF, 80.00\nWimbledon, 3R, 4R, SF, 2R, QF, SF, W, SF, F, 82.61\nUS Open, 3R, 3R, F, SF, SF, F, W, F, F, 84.91\nWin–Loss, 5–4, 9–4, 19–4, 18–3, 15–4, 19–4, 26–1, 24–3, 24–3, 84.04\nMasters tournaments, R16, QF, SF, F, QF, QF, W, W, 2R, 77.78\nATP 500 tournaments, 2R, W, SF, 2R, W, SF, W, QF, F, 80.50\nDavis Cup, –, –, 1R, 2R, –, F, –, F, W, 76.19\nOlympic Games, –, –, BR, BR, –, –, W, SF, QF, 80.00\nATP Finals, –, RR, SF, W, F, W, W, RR, W, 84.85\nMasters Cup, QF, W, –, SF, F, SF, W, F, F, 78.95\nATP Masters 1000, R16, QF, W, QF, SF, W, SF, F, QF, 77.27\nShanghai Masters, SF, W, SF, 2R, QF, QF, W, F, W, 79.49\nHamburg Masters, QF, R32, –, F, QF, W, SF, R16, W, 65.52\nIndian Wells Masters, –, QF, F, R16, QF, SF, W, SF, F, 79.63\n\nQuestion: What in 2007 has a 2008 of sf, and a 2010 of f?\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "F",
+    "table_name": "Tournament Results",
+    "sql": "SELECT Tournament FROM Tournament_Results WHERE 2007 = 'SF' AND 2008 = 'F' AND 2010 = 'F';"
+  },
+  {
+    "id": "AB-DB-023",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "Change the length of the Moosehead Grand Prix race schedule to 4 hours.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Race Schedule\nColumns: Race, Length, Class, Circuit, Date\nDescription: The name of this table is Race Schedule, and the headers of this table are Race,Length,Class,Circuit,Date.\nRows:\nRolex 24 at Daytona, 24 Hours, All, Daytona International Speedway, February 4 February 5\nExxon MasterCard 12 Hours of Sebring, 12 Hours, All, Sebring International Raceway, March 18\nRain-X/ Motorola Grand Prix of Atlanta, 3 Hours, All, Road Atlanta, April 30\nMoosehead Grand Prix, 3 Hours, All, Halifax Circuit, May 21\nThe Dodge Dealers Grand Prix of Lime Rock, 1 Hour, GTS, Lime Rock Park, May 29\nThe Dodge Dealers Grand Prix of Lime Rock, 1 Hour 45 Minutes, WSC, Lime Rock Park, May 29\nThe Glen Continental, 3 Hours, All, Watkins Glen International, June 24\nApple Computer Inc. California Grand Prix, 1 Hour, GTS-2, Sears Point Raceway, July 16\nApple Computer Inc. California Grand Prix, 1 Hour 45 Minutes, WSC/GTS-1, Sears Point Raceway, July 16\nChrysler Mosport 500, 3 Hours, All, Mosport International Raceway, August 13\nSeitel Texas World Grand Prix, 3 Hours, All, Texas World Speedway, September 10\nExxon World Sports Car Championships, 1 Hour, GTS-2, Phoenix International Raceway, September 30\nExxon World Sports Car Championships, 2 Hours, WSC/GTS-1, Phoenix International Raceway, September 30\nAcxiom Grand Prix du Mardi Gras, 1 Hour, GTS-2, New Orleans street course, October 8\nAcxiom Grand Prix du Mardi Gras, 1 Hour 45 Minutes, WSC/GTS-1, New Orleans street course, October 8\n\nQuestion: Change the length of the Moosehead Grand Prix race schedule to 4 hours.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "UPDATE `Race Schedule` SET Length = '4 Hours' WHERE Race = 'Moosehead Grand Prix'",
+    "table_name": "Race Schedule",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-024",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "Set the 'Notes' column to NULL in the 'movie_production' table where the 'Title' is 'Ala Vaikunthapurramuloo'.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: movie_production\nColumns: No., Year, Title, Notes\nDescription: The name of this table is movie_production, and the headers of this table are No.,Year,Title,Notes.\nRows:\n1, 2008, Souryam, Executive Producer\n2, 2009, Amavarathi, Executive Producer\n3, 2011, Wanted, Executive Producer\n4, 2012, Neeku Naaku Dash Dash, Executive Producer\n5, 2014, Loukyam, Executive Producer\n6, 2015, Gopichand A.S. Ravi Kumar Chowdary new movie, Executive Producer\n7, 2017, Shamantakamani, Executive Producer\n8, 2017, Paisa Vasool, Executive Producer\n9, 2018, Bharat Ane Nenu, Executive Producer\n10, 2019, Sye Raa Narasimha Reddy, Executive Producer\n11, 2020, Ala Vaikunthapurramuloo, Executive Producer\n12, 2021, Vakeel Saab, Executive Producer\n13, 2022, RRR, Executive Producer\n14, 2023, Khiladi, Executive Producer\n15, 2024, Pushpa, Executive Producer\n16, 2025, Shekar Kammula's next, Executive Producer\n17, 2026, Radhe Shyam, Executive Producer\n18, 2027, KGF 2, Executive Producer\n\nQuestion: Set the 'Notes' column to NULL in the 'movie_production' table where the 'Title' is 'Ala Vaikunthapurramuloo'.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "UPDATE movie_production SET Notes=NULL WHERE Title='Ala Vaikunthapurramuloo'",
+    "table_name": "movie_production",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-025",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "The 11th match of the FIFA World Cup 2022 knockout stage was played on 25 June 2022 at Allegiant Stadium, Paradise, United States against Mexico, with a final score of 1–0 in favor of the home team.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Football Matches\nColumns: No., Date, Venue, Opponent, Score, Result, Competition\nDescription: The name of this table is Football Matches, and the headers of this table are No.,Date,Venue,Opponent,Score,Result,Competition.\nRows:\n1, 3 June 2010, King Baudouin Stadium, Brussels, Belgium, Mexico, 1–2, 1–2, Friendly\n2, 3 September 2010, A. Le Coq Arena, Tallinn, Estonia, Estonia, 2–1, 2–1, UEFA Euro 2012 qualification\n3, 9 September 2014, Ullevaal Stadion, Oslo, Norway, Norway, 2–0, 2–0, UEFA Euro 2016 qualification\n4, 2 July 2016, Nouveau Stade de Bordeaux, Bordeaux, France, Germany, 1–1, 1–1 (5–6 p), UEFA Euro 2016\n5, 28 March 2017, Amsterdam Arena, Amsterdam, Netherlands, Netherlands, 2–1, 2–1, Friendly\n6, 1 June 2018, Allianz Riviera, Nice, France, France, 1–2, 1–3, Friendly\n7, 12 July 2018, Luzhniki Stadium, Moscow, Russia, Croatia, 4-2, 4-2, FIFA World Cup 2018\n8, 11 November 2018, Wembley Stadium, London, England, England, 1-2, 2-3, UEFA Nations League\n9, 10 June 2019, Stade de France, Saint-Denis, France, Andorra, 4-0, 4-0, UEFA Euro 2020 qualification\n10, 14 October 2019, Stade de France, Saint-Denis, France, Turkey, 1-1, 1-1, UEFA Euro 2020 qualification\n11, 17 November 2019, Albania Arena, Tirana, Albania, Albania, 0-2, 0-2, UEFA Euro 2020 qualification\n12, 5 September 2020, Stade de France, Saint-Denis, France, Sweden, 0-1, 0-1, UEFA Nations League\n13, 7 October 2020, Stade de France, Saint-Denis, France, Ukraine, 7-1, 7-1, Friendly\n14, 14 November 2020, Estádio da Luz, Lisbon, Portugal, Portugal, 0-1, 0-1, UEFA Nations League\n15, 28 March 2021, Krestovsky Stadium, Saint Petersburg, Russia, Kazakhstan, 2-0, 2-0, 2022 FIFA World Cup qualification\n16, 7 June 2021, Allianz Riviera, Nice, France, Bulgaria, 3-0, 3-0, Friendly\n\nQuestion: The 11th match of the FIFA World Cup 2022 knockout stage was played on 25 June 2022 at Allegiant Stadium, Paradise, United States against Mexico, with a final score of 1–0 in favor of the home team.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "INSERT INTO `Football Matches` (`No.`, `Date`, `Venue`, `Opponent`, `Score`, `Result`, `Competition`) VALUES ('11', '25 June 2022', 'Allegiant Stadium, Paradise, United States', 'Mexico', '1–0', '1–0', 'FIFA World Cup 2022 knockout stage')",
+    "table_name": "Football Matches",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-026",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "A locomotive with the number 36001, named Polar Bear, of type Class 36, with livery BR Green, and with a status of Under Repair, along with notes indicating it was recently purchased from a private owner, was inserted into the Locomotive Inventory database.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Locomotive Inventory\nColumns: Number, Name, Type, Livery, Status, Notes\nDescription: The name of this table is Locomotive Inventory, and the headers of this table are Number,Name,Type,Livery,Status,Notes.\nRows:\n, Brightside, Yorkshire Engine Company 0-4-0, Black, Under Repair, Currently dismantled for overhaul\n6, Roger H. Bennett, Yorkshire Engine Company \"Janus\" 0-6-0, NCB Blue, Operational, ~\nD2334, , Class 04, Green, Under Repair, Stopped at Sep 2012 diesel gala after failure\n25322, Tamworth Castle, Class 25, \"Ice Cream Van\" Blue, Static Display, built in 1967. Cosmetically restored in 2008\n33021, Captain Charles, Class 33, Blue, Operational, built in 1960. On loan from Tysley\n33102, Sophie (Unofficial), Class 33, Blue, Operational, built in 1960. Launched Sep 2012 - restoration still being completed although the loco is now in service\n37407, , Class 37, Transrail Grey, Stored, ~\n37424, , Class 37, Transrail Grey, Stored, ~\n47524, , Class 47, Rail Express Systems, Under restoration, ~\n, Victory, Baldwin 2-8-0, Black, Static Display, Built in 1943. Retired in 1967\nA4 Sir Nigel Gresley, , Class A4, Blue, Operational, Designed by Sir Nigel Gresley for streamlined high-speed running. Built in 1937\n60103, Flying Scotsman, Class A3, LNER Apple Green, Operational, Built in 1923. Made the first non-stop London to Edinburgh run and also toured North America in 1969-1972\n7820, Dinmore Manor, GWR 7800 Class, Black, Operational, Built in 1950. Returned to service in 2018 after 23 years of restoration\nD4052, , Class 40122, Green, Stored, Built in 1958. Retired in 1988 and saved for preservation\nD821 Greyhound, , Class 52, Green, Operational, Built in 1961. Used on the Western Region of British Railways\n, Tornado, Peppercorn Class A1, Apple Green, Operational, Built in 2008 as a replica of the original Tornado that was built in 1948\n60009, Union of South Africa, Class A4, LNER Apple Green, Operational, Built in 1937. Named after the country in which it was built\n71000, Duke of Gloucester, Class 8P, Brunswick Green, Operational, Built in 1954 for British Railways by the North British Locomotive Company\n92203, Black Prince, BR Standard Class 9F, Black, Operational, Built in 1959. Used on the London Midland Region of British Railways\n\nQuestion: A locomotive with the number 36001, named Polar Bear, of type Class 36, with livery BR Green, and with a status of Under Repair, along with notes indicating it was recently purchased from a private owner, was inserted into the Locomotive Inventory database.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "INSERT INTO `Locomotive Inventory` (`Number`, `Name`, `Type`, `Livery`, `Status`, `Notes`) VALUES ('36001', 'Polar Bear', 'Class 36', 'BR Green', 'Under Repair', 'Recently purchased from a private owner')",
+    "table_name": "Locomotive Inventory",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-027",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "FC Cincinnati's Champions League Qualification History has been updated with Last Champions League Qualification as '2022-23', Method of Qualification as '2022 U.S. Open Cup', and Length of drought as '1 season'.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Champions League Qualification History\nColumns: Club, Last Champions League Qualification, Method of Qualification, Length of drought\nDescription: The name of this table is Champions League Qualification History, and the headers of this table are Club,Last Champions League Qualification,Method of Qualification,Length of drought.\nRows:\nChicago Fire, 2004, 2003 Supporters ' Shield, 16 seasons\nNew England Revolution, 2008-09, 2007 US Open Cup and 2007 MLS Cup runners-up, 11 seasons\nColumbus Crew, 2010-11, 2009 Supporters ' Shield, 9 seasons\nPhiladelphia Union, never ( club entered MLS in 2010 ), , 9 seasons\nSan Jose Earthquakes, 2013-14, 2012 Supporters ' Shield, 6 seasons\nD.C. United, 2015-16, 2014 Eastern Conference regular season, 4 seasons\nLA Galaxy, 2015-16, 2014 MLS Cup, 4 seasons\nOrlando City SC, never ( club entered MLS in 2015 ), , 4 seasons\nReal Salt Lake, 2015-16, 2014 Supporters ' Shield fourth place, 4 seasons\nPortland Timbers, 2016-17, 2015 MLS Cup, 3 seasons\nVancouver Whitecaps FC, 2016-17, 2015 Canadian Championship, 3 seasons\nColorado Rapids, 2018, 2016 Supporters ' Shield runners-up, 2 seasons\nFC Dallas, 2018, 2016 Supporters ' Shield and 2016 U.S. Open Cup, 2 seasons\nMinnesota United FC, never ( club entered MLS in 2017 ), , 2 seasons\nFC Cincinnati, never ( club entered MLS in 2019 ), , 1 season\nHouston Dynamo, 2019, 2018 U.S. Open Cup, 1 season\nNew York Red Bulls, 2019, aggregate record in 2017 and 2018 runners-up, 1 season\nSporting Kansas City, 2019, 2017 U.S. Open Cup, 1 season\nToronto FC, 2019, 2018 Canadian Championship, 1 season\nAtlanta United FC, 2020, 2019 U.S. Open Cup, 0 seasons\nArsenal, 2016-17, 2015-16 FA Cup, 3 seasons\nManchester City, 2019-20, 2018-19 Premier League, 1 season\nLiverpool, 2019-20, 2018-19 UEFA Champions League, 1 season\nTottenham Hotspur, 2018-19, 2018-19 UEFA Champions League runners-up, 2 seasons\nChelsea, 2019-20, 2018-19 UEFA Europa League, 1 season\nLeicester City, never ( club entered Premier League in 2014 ), , 6 seasons\nManchester United, 2018-19, 2017-18 Premier League runners-up, 2 seasons\nEverton, never ( last qualification in 2017-18 ), , 2 seasons\nWest Ham United, never ( last qualification in 2015-16 ), , 4 seasons\nSouthampton, never ( last qualification in 2016-17 ), , 3 seasons\n\nQuestion: FC Cincinnati's Champions League Qualification History has been updated with Last Champions League Qualification as '2022-23', Method of Qualification as '2022 U.S. Open Cup', and Length of drought as '1 season'.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "UPDATE `Champions League Qualification History` SET `Last Champions League Qualification` = '2022-23', `Method of Qualification` = '2022 U.S. Open Cup', `Length of drought` = '1 season' WHERE `Club` = 'FC Cincinnati'",
+    "table_name": "Champions League Qualification History",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-028",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "Change the rank of Montreal-Pierre Elliott Trudeau International Airport to 19 in the Airport Traffic Data table.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Airport Traffic Data\nColumns: Rank, Airport, Serves, Aircraft movements, Annual change\nDescription: The name of this table is Airport Traffic Data, and the headers of this table are Rank,Airport,Serves,Aircraft movements,Annual change.\nRows:\n1, Toronto Pearson International Airport, Greater Toronto Area, 419,061, 2.7%\n2, Vancouver International Airport, Metro Vancouver, 296,537, -5.9%\n3, Calgary International Airport, Calgary, 234,306, 0.5%\n4, Montréal-Pierre Elliott Trudeau International Airport, Greater Montreal, 217,555, 2.5%\n5, Montréal/Saint-Hubert Airport, Greater Montreal, 188,371, -5.7%\n6, Ottawa Macdonald-Cartier International Airport, Ottawa, 172,443, 0.3%\n7, Buttonville Municipal Airport, Markham, 164,976, 6.2%\n8, Victoria International Airport, Victoria, 146,453, -13.8%\n9, Boundary Bay Airport, Greater Vancouver, 144,544, -27.3%\n10, London International Airport, London, 141,807, -12.1%\n11, Calgary/Springbank Airport, Calgary, 136,625, -5.0%\n12, Winnipeg James Armstrong Richardson International Airport, Winnipeg, 134,960, 0.5%\n13, Edmonton International Airport, Edmonton Capital Region, 130,715, 3.0%\n14, Québec City Jean Lesage International Airport, Quebec City, 126,856, -1.6%\n15, St. Andrews Airport, Winnipeg, 119,927, 8.5%\n16, Greater Moncton International Airport, Moncton, 118,852, -33.3%\n17, Billy Bishop Toronto City Airport, Toronto, 113,950, 6.7%\n18, Pitt Meadows Airport, Pitt Meadows, 108,400, -15.7%\n19, Abbotsford International Airport, Abbotsford, 102,189, -20.5%\n20, Region of Waterloo International Airport, Regional Municipality of Waterloo, 99,334, 4.0%\n21, Halifax Stanfield International Airport, Halifax, 97,506, 1.2%\n22, Thunder Bay International Airport, Thunder Bay, 84,220, -7.6%\n23, Deer Lake Regional Airport, Deer Lake, 72,981, -2.3%\n24, Regina International Airport, Regina, 69,308, -4.7%\n25, Saskatoon John G. Diefenbaker International Airport, Saskatoon, 63,092, 0.8%\n26, Charlottetown Airport, Charlottetown, 57,331, 3.5%\n27, Yellowknife International Airport, Yellowknife, 51,157, -0.1%\n28, Fredericton International Airport, Fredericton, 46,900, -2.9%\n29, Fort McMurray International Airport, Fort McMurray, 44,753, -13.6%\n30, Gander International Airport, Gander, 42,888, -1.9%\n\nQuestion: Change the rank of Montreal-Pierre Elliott Trudeau International Airport to 19 in the Airport Traffic Data table.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "UPDATE `Airport Traffic Data` SET `Rank` = '19' WHERE `Airport` = 'Montreal-Pierre Elliott Trudeau International Airport'",
+    "table_name": "Airport Traffic Data",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-029",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "What is the highest amount of points for rank 95?",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: highest_points\nColumns: Rank, Country, Claimant, Highest point, Height\nDescription: The name of this table is highest_points, and the headers of this table are Rank,Country,Claimant,Highest point,Height.\nRows:\n44, Abkhazia, Georgia, Dombai-Ulgen, m (ft)\n46, Taiwan, People's Republic of China, Yushan, m (ft)\n47, South Ossetia, Georgia, Mount Khalatsa, m (ft)\n95, Kosovo, Serbia, Đeravica, m (ft)\n166, Palestinian territories, Israel, Mount Nabi Yunis, m (ft)\n200, Western Sahara, Morocco, unnamed location, m (ft)\n1, United States, United States, Mount Whitney, 4,421 m (14,505 ft)\n2, Canada, Canada, Mount Logan, 5,959 m (19,551 ft)\n3, Mexico, Mexico, Pico de Orizaba, 5,636 m (18,491 ft)\n4, Argentina, Argentina, Aconcagua, 6,962 m (22,841 ft)\n5, Peru, Peru, Huascarán, 6,768 m (22,205 ft)\n6, Chile, Chile, Ojos del Salado, 6,893 m (22,615 ft)\n7, Bolivia, Bolivia, Nevado Sajama, 6,542 m (21,463 ft)\n8, Ecuador, Ecuador, Chimborazo, 6,268 m (20,564 ft)\n9, Venezuela, Venezuela, Pico Bolívar, 4,981 m (16,342 ft)\n10, Colombia, Colombia, Pico Cristóbal Colón, 5,775 m (18,947 ft)\n\nQuestion: What is the highest amount of points for rank 95?\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "Đeravica",
+    "table_name": "highest_points",
+    "sql": "SELECT MAX(`Highest point`) FROM `highest_points` WHERE `Rank` = '95';"
+  },
+  {
+    "id": "AB-DB-030",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "other than npsl, what league has ny mens soccer team played in?",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Soccer Team Performance Table\nColumns: Year, Division, League, Regular Season, Playoffs, Open Cup\nDescription: The name of this table is Soccer Team Performance Table, and the headers of this table are Year,Division,League,Regular Season,Playoffs,Open Cup.\nRows:\n2008, 4, NPSL, 2nd, Mid Atlantic, Did not qualify, Did not qualify\n2009, 4, NPSL, 5th, Atlantic, Did not qualify, Did not enter\n2010, 4, NPSL, 5th, Atlantic, Did not qualify, Did not enter\n2010–11, 5, CSL I, In progress, N/A, N/A\n2011, 4, NPSL, 4th, Atlantic, Did not qualify, Did not enter\n2012, 4, NPSL, 3rd, Atlantic, Did not qualify, Did not enter\n2013, 4, NPSL, 3rd, Atlantic, Did not qualify, Did not enter\n2014, 4, NPSL, 2nd, Mid Atlantic, Did not qualify, Did not qualify\n2015, 4, NPSL, 1st, Atlantic, Lost first round, Did not enter\n2016, 4, NPSL, 2nd, Northeast, Did not qualify, Did not enter\n2016-17, 5, CSL I, In progress, N/A, N/A\n2017, 4, NPSL, 1st, Northeast, Lost conference final, Did not enter\n2018, 4, NPSL, 4th, Northeast, Did not qualify, Did not enter\n2019, 4, NPSL, 2nd, Atlantic, Lost conference final, Did not enter\n2020, 4, NPSL, Season cancelled, N/A, N/A\n2021, 4, NPSL, In progress, In progress, In progress\n2021-22, 5, CSL I, Upcoming, Upcoming, Upcoming\n\nQuestion: other than npsl, what league has ny mens soccer team played in?\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "CSL I",
+    "table_name": "Soccer Team Performance Table",
+    "sql": "SELECT DISTINCT LeagueFROM Soccer Team Performance TableWHERE League != 'NPSL';"
+  },
+  {
+    "id": "AB-DB-031",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "The voting results for Saskatchewan show that 205000 people voted yes, representing 45.0% of the total votes, and 250000 people voted no, representing 55.0% of the total votes. The database will be updated accordingly with the following statement: UPDATE voting_results SET `Voted Yes` = '205000', `Percent Yes` = '45.0', `Voted No` = '250000', `Percent No` = '55.0' WHERE Jurisdiction = 'Saskatchewan';",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: voting_results\nColumns: Jurisdiction, Voted Yes, Percent Yes, Voted No, Percent No\nDescription: The name of this table is voting_results, and the headers of this table are Jurisdiction,Voted Yes,Percent Yes,Voted No,Percent No.\nRows:\nAlberta, 483275, 39.8, 731975, 60.2\nBritish Columbia, 525188, 31.8, 1126761, 68.2\nManitoba, 198230, 38.0, 322971, 62.0\nNew Brunswick, 23010, 61.7, 145096, 38.3\nNewfoundland, 133193, 63.1, 77881, 36.9\nNorthwest Territories, 14750, 61.0, 9416, 39.0\nNova Scotia, 218618, 48.7, 230182, 51.3\nOntario, 2410119, 50.1, 2397665, 49.9\nPrince Edward Island, 48687, 74.0, 17124, 26.0\nQuebec, 1710117, 43.4, 2232280, 56.6\nSaskatchewan, 203361, 44.6, 252459, 55.4\nYukon, 5354, 43.6, 6922, 56.4\n\nQuestion: The voting results for Saskatchewan show that 205000 people voted yes, representing 45.0% of the total votes, and 250000 people voted no, representing 55.0% of the total votes. The database will be updated accordingly with the following statement: UPDATE voting_results SET `Voted Yes` = '205000', `Percent Yes` = '45.0', `Voted No` = '250000', `Percent No` = '55.0' WHERE Jurisdiction = 'Saskatchewan';\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "UPDATE voting_results SET `Voted Yes` = '205000', `Percent Yes` = '45.0', `Voted No` = '250000', `Percent No` = '55.0' WHERE Jurisdiction = 'Saskatchewan';",
+    "table_name": "voting_results",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-032",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "Add to 'Airport Information' the city 'Paris', country 'France', airport 'Charles de Gaulle Airport', IATA code 'CDG', and ICAO code 'LFPG'.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Airport Information\nColumns: City, Country, Airport, IATA, ICAO\nDescription: The name of this table is Airport Information, and the headers of this table are City,Country,Airport,IATA,ICAO.\nRows:\nAberdeen, United Kingdom, Aberdeen Airport, ABZ, EGPD\nBergen, Norway, Bergen Airport, Flesland, BGO, ENBR\nCopenhagen, Denmark, Copenhagen Airport, CPH, EKCH\nFagernes, Norway, Fagernes Airport, Leirin, VBD, ENFG\nHaugesund, Norway, Haugesund Airport, Karmøy, HAU, ENHD\nMolde, Norway, Molde Airport, Årø, MOL, ENML\nOslo, Norway, Oslo Airport, Gardermoen, OSL, ENGM\nRøros, Norway, Røros Airport, RRS, ENRO\nSandefjord, Norway, Sandefjord Airport, Torp, TRF, ENTO\nStord, Norway, Stord Airport, Sørstokken, SPR, ENSO\nTrondheim, Norway, Trondheim Airport, Værnes, TRD, ENVA\nGdańsk, Poland, Gdańsk Lech Wałęsa Airport, GDN, EPGD\nParis, France, Charles de Gaulle Airport, CDG, LFPG\nMadrid, Spain, Adolfo Suárez Madrid–Barajas Airport, MAD, LEMD\nBerlin, Germany, Berlin Tegel Airport, TXL, EDDT\nVienna, Austria, Vienna International Airport, VIE, LOWW\nZurich, Switzerland, Zurich Airport, ZRH, LSZH\nBrussels, Belgium, Brussels Airport, BRU, EBBR\nLisbon, Portugal, Lisbon Portela Airport, LIS, LPPT\nAthens, Greece, Athens International Airport, ATH, LGAV\nStockholm, Sweden, Stockholm-Arlanda Airport, ARN, ESSA\nHelsinki, Finland, Helsinki-Vantaa Airport, HEL, EFHK\n\nQuestion: Add to 'Airport Information' the city 'Paris', country 'France', airport 'Charles de Gaulle Airport', IATA code 'CDG', and ICAO code 'LFPG'.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "INSERT INTO `Airport Information` (City, Country, Airport, IATA, ICAO) VALUES ('Paris', 'France', 'Charles de Gaulle Airport', 'CDG', 'LFPG')",
+    "table_name": "Airport Information",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-033",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "The winner of the music talent show 'Colourblind' held on 29 July 2002 was Darius Danesh. He secured the first position and the third runner-up position was also awarded to him. These details have been added to the table 'Music Talent Show Winners and Runners-up' with the respective values of '1' and '1'.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Music Talent Show Winners and Runners-up\nColumns: Artist, Series, Position in show, Song title, Release date, UK peak chart position\nDescription: The name of this table is Music Talent Show Winners and Runners-up, and the headers of this table are Artist,Series,Position in show,Song title,Release date,UK peak chart position.\nRows:\nDavid Sneddon, 1, Winner, Stop Living the Lie, 13 January 2003, 1\nSinéad Quinn, 1, Runner-up, I Ca n't Break Down, 10 February 2003, 2\nAinslie Henderson, 1, 4th, Keep Me a Secret, 24 February 2003, 5\nMalachi Cush, 1, 5th, Just Say You Love Me, 14 April 2003, 49\nDavid Sneddon, 1, Winner, Do n't Let Go, 21 April 2003, 3\nSinéad Quinn, 1, Runner-up, What You Need Is, 30 June 2003, 19\nDavid Sneddon, 1, Winner, Best of Order, 11 August 2003, 18\nLemar, 1, 3rd, Dance ( With U ), 18 August 2003, 2\nDavid Sneddon, 1, Winner, Baby Get Higher, 27 October 2003, 38\nLemar, 1, 3rd, 50/50 / Lullaby, 17 November 2003, 5\nAlex Parks, 2, Winner, Maybe That 's What It Takes, 17 November 2003, 3\nAlistair Griffin, 2, Runner-up, Bring It On / My Lover 's Prayer, 29 December 2003, 5\nLemar, 1, 3rd, Another Day, 23 February 2004, 9\nAlex Parks, 2, Winner, Cry, 16 February 2004, 13\nAlistair Griffin, 2, Runner-up, You and Me ( Tonight ), 15 March 2004, 18\nJames Fox, 2, 5th, Hold Onto Our Love, 19 April 2004, 13\nLemar, 1, 3rd, If There 's Any Justice, 15 November 2004, 3\nLemar, 1, 3rd, Time to Grow, 28 March 2005, 9\nLemar, 1, 3rd, Do n't Give It Up, 1 August 2005, 21\nAlex Parks, 2, Winner, Honesty, 23 January 2006, 56\nBeyoncé, 4, Winner, Halo, 20 January 2009, 5\nTaylor Swift, 3, 1st, Love Story, 12 September 2008, 2\nEd Sheeran, 9, 3rd, Galway Girl, 17 March 2017, 2\nAdele, 6, Winner, Rolling in the Deep, 16 January 2011, 2\nSam Smith, 11, Winner, Stay With Me, 14 April 2014, 1\nLady Gaga, 5, Winner, Bad Romance, 23 October 2009, 1\nRihanna, 2, Runner-up, Umbrella, 25 May 2007, 1\nJustin Timberlake, 11, 4th, Mirrors, 11 February 2013, 1\nBruno Mars, 12, Winner, Just the Way You Are, 19 July 2010, 1\nLana Del Rey, 18, 3rd, Lust for Life, 19 April 2017, 27\n\nQuestion: The winner of the music talent show 'Colourblind' held on 29 July 2002 was Darius Danesh. He secured the first position and the third runner-up position was also awarded to him. These details have been added to the table 'Music Talent Show Winners and Runners-up' with the respective values of '1' and '1'.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "INSERT INTO `Music Talent Show Winners and Runners-up` VALUES ('Darius Danesh', '1', '3rd', 'Colourblind', '29 July 2002', '1')",
+    "table_name": "Music Talent Show Winners and Runners-up",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-034",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "What is Country of Origin, when Type is Disposable, when Primary Cartridge is 105mm, and when Year of Intro is less than 2008?",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Rocket Propelled Grenade (RPG) Weapons\nColumns: Name/ designation, Year of intro, Country of origin, Primary cartridge, Type\nDescription: The name of this table is Rocket Propelled Grenade (RPG) Weapons, and the headers of this table are Name/ designation,Year of intro,Country of origin,Primary cartridge,Type.\nRows:\nM1 Bazooka, 1942, United States, 60mm, Recoilless\nM2GC, 1948, Sweden, 84mm, Recoilless\nNorthover Projector, 1940, United Kingdom, 63.5mm, Recoilless\nPanzerfaust, 1943, Germany, 150mm, Recoilless\nPIAT, 1942, United Kingdom, 86mm, Spigot mortar\nRifleman's Assault Weapon, 1977, United States, 140mm, Close support rocket\nRPG-2, 1949, Soviet Union, 40mm, Reusable\nRPG-7, 1961, Soviet Union, 40mm, Reusable\nRPG-16, 1970, Soviet Union, 58.3mm, Reusable\nRPG-18, 1972, Soviet Union, 64mm, Disposable\nRPG-22, 1985, Soviet Union, 72.5mm, Disposable\nRPG-26, 1985, Soviet Union, 72.5mm, Disposable\nRPG-27, 1989, Soviet Union, 105mm, Disposable\nRPG-28, 2007, Russia, 125mm, Disposable\nRPG-29, 1989, Soviet Union, 40mm, Reusable\nRPG-30, 2008, Russia, 105mm, Disposable\nRPG-32, 1961, Russia, 40mm, Reusable\nRPG-76, 1985, Poland, 68mm, Disposable\nType 69 RPG, 1969, China, 40mm, Reusable\nYasin, 2004, Palestine, 40mm, Reusable\nStinger, 1981, United States, 70mm, Surface-to-air missile\nJavelin, 1996, United States, 127mm, Fire and forget\nSMAW, 1984, United States, 83mm, Rocket propelled grenade\nLAW 80, 1985, United Kingdom, 94mm, Rocket propelled grenade\nMatador, 2014, Sweden, 90mm, Penetration rocket assisted\nBazooka, 1942, United States, 60mm, Rocket launcher\nVampyr, 1944, Soviet Union, 40mm, Reusable\nCarl Gustav, 1948, Sweden, 84mm, Reusable\nAGM-114, 1984, United States, 178mm, Air-to-ground missile\nAT4, 1987, Sweden, 84mm, Disposable\n\nQuestion: What is Country of Origin, when Type is Disposable, when Primary Cartridge is 105mm, and when Year of Intro is less than 2008?\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "Soviet Union",
+    "table_name": "Rocket Propelled Grenade (RPG) Weapons",
+    "sql": "SELECT `Country of origin` FROM `Rocket Propelled Grenade (RPG) Weapons` WHERE `Type` = 'Disposable' AND `Primary cartridge` = '105mm' AND `Year of intro` < 2008;"
+  },
+  {
+    "id": "AB-DB-035",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "Update the FS value to 11 for the competitor with rank 24 in the Figure Skating Competitors table.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Figure Skating Competitors\nColumns: Rank, Name, Nation, Total Points, SP, FS\nDescription: The name of this table is Figure Skating Competitors, and the headers of this table are Rank,Name,Nation,Total Points,SP,FS.\nRows:\n1, Kevin van der Perren, Belgium, 220.17, 1, 1\n2, Samuel Contesti, Italy, 207.67, 2, 2\n3, Javier Fernandez, Spain, 190.69, 3, 5\n4, Ivan Tretiakov, Russia, 185.86, 9, 3\n5, Kensuke Nakaniwa, Japan, 185.42, 4, 4\n6, Martin Liebers, Germany, 178.14, 7, 6\n7, Philipp Tischendorf, Germany, 173.17, 8, 8\n8, Mark Vaillant, France, 167.17, 13, 7\n9, Gregor Urbas, Slovenia, 164.11, 6, 9\n10, Ari-Pekka Nurmenkari, Finland, 161.68, 5, 10\n11, Maxim Shipov, Israel, 152.91, 11, 12\n12, Abzal Rakimgaliev, Azerbaijan, 152.70, 10, 14\n13, Clemens Brummer, Germany, 151.17, 12, 11\n14, Fabio Mascarello, Italy, 144.58, 14, 15\n15, Michael Biondi, Germany, 142.58, 16, 13\n16, Stefan Lindemann, Germany, 134.40, 15, 16\n17, Boyito Mulder, Netherlands, 119.81, 19, 17\n18, Luka Čadež, Slovenia, 106.30, 20, 18\n19, Georgi Kenchadze, Bulgaria, 105.15, 18, 19\nWD, Franz Streubel, Germany, 44.27, 17, \n20, John Smith, USA, 180.50, 6, 5\n21, Sophie Chen, Canada, 170.25, 4, 8\n22, Mario Rossi, Italy, 165.75, 10, 3\n23, Pavel Petrov, Russia, 158.90, 9, 11\n24, Chen Li, China, 156.20, 12, 9\n25, Luis Hernandez, Mexico, 152.45, 7, 14\n26, Hiroshi Tanaka, Japan, 147.60, 13, 7\n27, Anna Svensson, Sweden, 143.30, 5, 16\n28, Julia Petrova, Russia, 140.05, 11, 12\n29, Marta Garcia, Spain, 135.90, 14, 2\n\nQuestion: Update the FS value to 11 for the competitor with rank 24 in the Figure Skating Competitors table.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "UPDATE `Figure Skating Competitors` SET `FS` = '11' WHERE `Rank` = '24'",
+    "table_name": "Figure Skating Competitors",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-036",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "Insert 'Les Miserables' play, performed in 1990 at Palace Theatre in London West End, into `Actress Credits` table with the role of Fantine played by the actress and additional notes.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Actress Credits\nColumns: Year, Title, Role, Location, Notes\nDescription: The name of this table is Actress Credits, and the headers of this table are Year,Title,Role,Location,Notes.\nRows:\n1983, Cats, Cassandra, N/A, National Tour\n1984, Cats, Cassandra, Winter Garden Theatre, Broadway\n1985-86, Song and Dance, Woman in Blue, Royale Theatre, Broadway\n1988, Carrie, Chris, Stratford-upon-Avon, Royal Shakespeare Company\n1988, Carrie, Chris, Virginia Theatre, Broadway\n1989, Jerome Robbins' Broadway, Anita in West Side Story Peter Pan in Peter Pan Company Member in ...Forum, Imperial Theatre, Broadway\n1995, Damn Yankees, Lola, Marquis Theatre, Broadway (replacement)\n1995, Company, Kathy, Criterion Center Stage Right, Broadway\n1997-2018, Chicago, Roxie Hart, Ambassador Theatre, National tour and Broadway (on-and-off)\n2001-02, Contact, Wife, Vivian Beaumont Theatre, Broadway (replacement)\n2004, Can-Can, Claudine, New York City Center, Encores!\n2005, Sweet Charity, Charity Hope Valentine (standby), Minneapolis Chicago Boston, Out-of-town tryout\n2005, Sweet Charity, Charity Hope Valentine (standby), Al Hirschfeld Theatre, Broadway\n2006, A Chorus Line, Cassie, San Francisco, Out-of-town tryout\n2006-08, A Chorus Line, Cassie, Gerald Schoenfeld Theatre, Broadway\n2009, Parade, Mrs. Frances Phagan Sally Slaton, Mark Taper Forum, Los Angeles\n2012-13, Pippin, Fastrada, American Repertory Theater, Out-of-town tryout\n2013-15, Pippin, Fastrada, Music Box Theatre, Broadway\n2015, Carousel, Mrs. Mullin, Lyric Opera of Chicago, Chicago\n2000, Chicago, Velma Kelly, Shubert Theatre, National tour\n1996, A Funny Thing Happened on the Way to the Forum, Philia, Lunt-Fontanne Theatre, Broadway\n2008-09, South Pacific, Nellie Forbush, Lincoln Center Theater, Broadway\n2010, Legally Blonde, Elle Woods, Palace Theatre, West End\n2003, Thoroughly Modern Millie, Millie Dillmount, Marquis Theatre, Broadway\n2017, Hello, Dolly!, Irene Molloy, Shubert Theatre, Broadway\n2011, Anything Goes, Hope Harcourt, Stephen Sondheim Theatre, Broadway\n1998, Rent, Mimi Marquez, Nederlander Theatre, Broadway\n2018, Mean Girls, Cady Heron, August Wilson Theatre, Broadway\n2002, Thoroughly Modern Millie, Miss Dorothy Brown, LaSalle Bank Theatre, National tour\n\nQuestion: Insert 'Les Miserables' play, performed in 1990 at Palace Theatre in London West End, into `Actress Credits` table with the role of Fantine played by the actress and additional notes.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "INSERT INTO `Actress Credits` (`Year`, `Title`, `Role`, `Location`, `Notes`) VALUES ('1990', 'Les Miserables', 'Fantine', 'Palace Theatre', 'London West End')",
+    "table_name": "Actress Credits",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-037",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "Change the data for game 59 in the table `Basketball Games` to have score 115-104, high points from Irving with 38 points, high assists from Harden with 16 assists, and a record of 48-23.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Basketball Games\nColumns: Game, Date, Opponent, Score, High points, High rebounds, High assists, Location/Attendance, Record\nDescription: The name of this table is Basketball Games, and the headers of this table are Game,Date,Opponent,Score,High points,High rebounds,High assists,Location/Attendance,Record.\nRows:\n46, February 2, L.A. Clippers, 111–100, Rondo (24), Powe (10), Rondo (8), TD Banknorth Garden 18,624, 12–34\n47, February 6, @ Detroit, 88–86, Pierce (18), Powe (8), Pierce (6), Target Center 19,511, 12–35\n48, February 7, Miami, 98–90, Pierce (35), Rondo (11), Rondo (12), TD Banknorth Garden 18,624, 12–36\n49, February 9, New Jersey, 104–97, Pierce (28), Pierce (12), Rondo (7), TD Banknorth Garden 13,603, 12–37\n50, February 11, @ Minnesota, 111–103, Pierce (24), Posey (11), Pierce (7), TD Banknorth Garden 18,624, 12–38\n51, February 14, Milwaukee, 118–124, Pierce (24), Powe (11), Pierce (7), TD Banknorth Garden 19,894, 13–38\n52, February 20, @ Sacramento, 117–119, Allen (32), Garnett (15), Allen , Rondo (6), Oracle Arena 20,711, 13–39\n53, February 21, @ Phoenix, 77–85, Garnett (19), Perkins , Pierce (6), Garnett (4), US Airways Center 18,422, 13–40\n54, February 23, @ L.A. Lakers, 112–102, Pierce (30), Garnett , Pierce (7), Rondo (8), Rose Garden 20,554, 13–41\n55, February 24, @ Utah, 104–76, Pierce , Posey (17), Perkins (9), Allen (7), Staples Center 19,328, 13–42\n56, February 26, @ Houston, 92–87, Allen (22), Garnett (11), Rondo (8), TD Banknorth Garden 18,624, 14–42\n57, March 2, San Antonio, 96-90, Pierce (22), Garnett (12), Rondo (9), AT&T Center 18,418, 15-42\n58, March 4, Portland, 107-115, Pierce (21), Garnett (13), Rondo (12), TD Banknorth Garden 18,624, 15-43\n59, March 6, @ Washington, 99-98, Allen (25), Garnett (10), Rondo (15), Capital One Arena 17,370, 16-43\n60, March 8, @ Indiana, 93-84, Pierce (20), Garnett (11), Allen , Pierce (5), Bankers Life Fieldhouse 16,300, 17-43\n61, March 10, Denver, 108-115, Pierce (27), Garnett (14), Rondo (13), TD Banknorth Garden 18,624, 17-44\n62, March 11, @ Detroit, 79-87, Allen (22), Pierce (8), Rondo (7), Little Caesars Arena 20,491, 17-45\n63, March 13, Philadelphia, 111-105, Pierce (26), Garnett (12), Rondo (11), TD Banknorth Garden 18,624, 18-45\n64, March 17, @ Memphis, 104-97, Pierce (28), Garnett (10), Rondo (13), FedExForum 17,794, 19-45\n65, March 20, Chicago, 112-98, Pierce (32), Pierce (9), Rondo (13), TD Banknorth Garden 18,624, 20-45\n66, March 22, @ Dallas, 91-86, Allen (27), Garnett (11), Rondo (10), American Airlines Center 20,428, 21-45\n\nQuestion: Change the data for game 59 in the table `Basketball Games` to have score 115-104, high points from Irving with 38 points, high assists from Harden with 16 assists, and a record of 48-23.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "UPDATE `Basketball Games` SET `Score`='115-104', `High points`='Irving (38)', `High assists`='Harden (16)', `Record`='48-23' WHERE `Game`='59'",
+    "table_name": "Basketball Games",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-038",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "The NHL team records against the Edmonton Oilers show that they have had two occurrences of playing them in 1987 and 1990, with a total of 10 games played and a record of 1 win and 1 loss, resulting in a .500 win percentage.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: NHL Team Records Against Opponents\nColumns: Opponent, S, Occurrences, GP, Rec, %\nDescription: The name of this table is NHL Team Records Against Opponents, and the headers of this table are Opponent,S,Occurrences,GP,Rec,%.\nRows:\nDallas Stars, 14, 1968 , 1970 , 1971 , 1972 , 1984 , 1985 , 1986 , 1989 , 1991 , 1994 , 1999 , 2001 , 2016 , 2019, 80, 8-6, .571\nChicago Blackhawks, 12, 1973 , 1980 , 1982 , 1983 , 1988 , 1989 , 1990 , 1992 , 1993 , 2002 , 2014 , 2016, 63, 4-8, .333\nDetroit Red Wings, 7, 1984 , 1988 , 1991 , 1996 , 1997 , 1998 , 2002, 40, 2-5, .286\nSan Jose Sharks, 6, 2000 , 2001 , 2004 , 2012 , 2016 , 2019, 35, 3-3, .500\nToronto Maple Leafs, 5, 1986 , 1987 , 1990 , 1993 , 1996, 31, 3-2, .600\nLos Angeles Kings, 4, 1969 , 1998 , 2012 , 2013, 18, 2-2, .500\nPittsburgh Penguins, 3, 1970 , 1975 , 1981, 13, 2-1, .667\nBoston Bruins, 3, 1970 , 1972 , 2019, 15, 1-2, .333\nMontreal Canadiens, 3, 1968 , 1969 , 1977, 12, 0-3, .000\nVancouver Canucks, 3, 1995 , 2003 , 2009, 18, 0-3, .000\nArizona Coyotes, 2, 1982 , 1999, 11, 2-0, 1.000\nPhiladelphia Flyers, 2, 1968 , 1969, 11, 2-0, 1.000\nMinnesota Wild, 2, 2015 , 2017, 11, 1-1, .500\nWinnipeg Jets, 1, 2019, 6, 1-0, 1.000\nBuffalo Sabres, 1, 1976, 3, 0-1, .000\nCalgary Flames, 1, 1986, 7, 0-1, .000\nColorado Avalanche, 1, 2001, 5, 0-1, .000\nNashville Predators, 1, 2017, 6, 0-1, .000\nNew York Rangers, 1, 1981, 6, 0-1, .000\nTotals, 72, , 391, 31-41, .431\nOpponent, S, Occurrences, GP, Rec, %\nWashington Capitals, 1, 2021, 2, 0-1, .000\nEdmonton Oilers, 5, 1983 , 1985 , 1990 , 2006 , 2017, 25, 2-3, .400\nSt. Louis Blues, 8, 1968 , 1969 , 1970 , 1973 , 2014 , 2015 , 2019 , 2022, 45, 2-6, .250\nNew York Islanders, 4, 1980 , 1981 , 1982 , 1983, 21, 0-4, .000\nTampa Bay Lightning, 2, 2004 , 2015, 11, 1-1, .500\nFlorida Panthers, 3, 1996 , 2012 , 2021, 16, 2-1, .667\nOttawa Senators, 1, 2007, 4, 0-1, .000\nCarolina Hurricanes, 3, 2002 , 2009 , 2019, 16, 0-3, .000\nAnaheim Ducks, 1, 2007, 6, 1-0, 1.000\nColumbus Blue Jackets, 1, 2019, 4, 0-1, .000\n\nQuestion: The NHL team records against the Edmonton Oilers show that they have had two occurrences of playing them in 1987 and 1990, with a total of 10 games played and a record of 1 win and 1 loss, resulting in a .500 win percentage.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "INSERT INTO `NHL Team Records Against Opponents` (`Opponent`, `S`, `Occurrences`, `GP`, `Rec`, `%`) VALUES ('Edmonton Oilers', '2', '1987 , 1990', '10', '1-1', '.500');",
+    "table_name": "NHL Team Records Against Opponents",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-039",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "On June 2, the team played against the Red Sox, with a final score of 3-2. The team suffered a loss, with Cotton having a record of 3-3. The game had an attendance of 30,000, bringing the team's overall record to 30-27. The game results were inserted into the database using the following values: Date='June 2', Opponent='Red Sox', Score='3 - 2', Loss='Cotton (3-3)', Attendance='30,000', and Record='30-27'.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: game_results\nColumns: Date, Opponent, Score, Loss, Attendance, Record\nDescription: The name of this table is game_results, and the headers of this table are Date,Opponent,Score,Loss,Attendance,Record.\nRows:\nMay 1, @ Athletics, 5 - 2, Hanson (0-1), 7,078, 10-17\nMay 2, @ Athletics, 7 - 0, Oquist (0-1), 10,729, 11-17\nMay 3, @ Athletics, 6 - 3, Telgheder (0-1), 23,463, 12-17\nMay 4, @ Athletics, 7 - 4, Hentgen (3-3), 5,206, 12-18\nMay 5, @ Angels, 13 - 11, Percival (0-2), 17,271, 13-18\nMay 6, @ Angels, 6 - 5, Hasegawa (1-1), 17,392, 14-18\nMay 7, @ Mariners, 6 - 0, Moyer (2-4), 24,129, 15-18\nMay 8, @ Mariners, 8 - 3, Williams (3-2), 29,920, 15-19\nMay 9, @ Mariners, 4 - 1, Swift (2-2), 49,851, 16-19\nMay 10, @ Mariners, 3 - 1, Guzmán (1-5), 39,249, 16-20\nMay 12, Athletics, 4 - 3 (10), Taylor (0-3), 25,636, 17-20\nMay 13, Athletics, 4 - 2, Clemens (4-4), 25,732, 17-21\nMay 14, Angels, 5 - 4, DeLucia (1-2), 25,606, 18-21\nMay 15, Angels, 9 - 1, Hill (6-2), 26,644, 19-21\nMay 16, Mariners, 8 - 1, Guzmán (1-6), 31,121, 19-22\nMay 17, Mariners, 4 - 3, Slocumb (1-3), 28,111, 20-22\nMay 18, Mariners, 9 - 4, Clemens (4-5), 28,125, 20-23\nMay 19, Devil Rays, 3 - 1, Springer (1-7), 25,662, 21-23\nMay 20, Devil Rays, 9 - 1, Álvarez (4-5), 26,107, 22-23\nMay 21, Devil Rays, 6 - 1, Arrojo (6-3), 30,108, 23-23\nMay 22, @ Indians, 9 - 7, Hanson (0-2), 43,269, 23-24\nMay 23, @ Indians, 7 - 2, Colón (3-3), 43,306, 24-24\nMay 24, @ Indians, 5 - 0, Gooden (0-1), 43,194, 25-24\nMay 25, @ Red Sox, 7 - 5, Martínez (5-1), 32,342, 26-24\nMay 26, @ Red Sox, 5 - 2, Avery (1-1), 27,668, 27-24\nMay 28, Indians, 6 - 2, Carpenter (1-1), 30,282, 27-25\nMay 29, Indians, 7 - 3, Clemens (5-6), 29,085, 27-26\nMay 30, Indians, 4 - 2, Gooden (0-2), 37,179, 28-26\nMay 31, Indians, 8 - 3, Hentgen (7-4), 30,090, 28-27\nJune 1, @ Red Sox,  ,  ,  ,  \nJune 2, @ Red Sox,  ,  ,  ,  \nJune 3, @ Yankees,  ,  ,  ,  \nJune 4, @ Yankees,  ,  ,  ,  \nJune 5, @ Yankees,  ,  ,  ,  \nJune 6, @ Orioles,  ,  ,  ,  \nJune 7, @ Orioles,  ,  ,  ,  \nJune 8, @ Orioles,  ,  ,  ,  \nJune 9, Red Sox,  ,  ,  ,  \nJune 10, Red Sox,  ,  ,  ,  \n\nQuestion: On June 2, the team played against the Red Sox, with a final score of 3-2. The team suffered a loss, with Cotton having a record of 3-3. The game had an attendance of 30,000, bringing the team's overall record to 30-27. The game results were inserted into the database using the following values: Date='June 2', Opponent='Red Sox', Score='3 - 2', Loss='Cotton (3-3)', Attendance='30,000', and Record='30-27'.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "INSERT INTO game_results (Date,Opponent,Score,Loss,Attendance,Record) VALUES ('June 2', 'Red Sox', '3 - 2', 'Cotton (3-3)', '30,000', '30-27')",
+    "table_name": "game_results",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-040",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "What was the score against Portland in game numbers under 20?",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: game_results\nColumns: Game, Date, Team, Score, High points, High rebounds, High assists, Location Attendance, Record\nDescription: The name of this table is game_results, and the headers of this table are Game,Date,Team,Score,High points,High rebounds,High assists,Location Attendance,Record.\nRows:\n17, December 2, @ Denver, L 93–132 (OT), Chris Bosh (24), Chris Bosh (12), José Calderón (7), Pepsi Center 14,243, 8–9\n18, December 5, @ Utah, L 87–114 (OT), Chris Bosh (18), Chris Bosh (11), José Calderón (8), EnergySolutions Arena 19,911, 8–10\n19, December 7, Portland, L 97–98 (OT), Jermaine O'Neal (24), Jermaine O'Neal (8), José Calderón (13), Air Canada Centre 17,671, 8–11\n20, December 9, @ Cleveland, L 94–114 (OT), Joey Graham (17), Chris Bosh (11), Jermaine O'Neal (4), Quicken Loans Arena 20,049, 8–12\n21, December 10, Indiana, W 101–88 (OT), Jason Kapono (25), Chris Bosh (10), José Calderón (14), Air Canada Centre 17,877, 9–12\n22, December 12, @ New Jersey, W 101–79 (OT), Chris Bosh (18), Jamario Moon (9), Roko Ukić (5), Izod Center 13,926, 10–12\n23, December 14, New Orleans, L 91–99 (OT), Chris Bosh (25), Chris Bosh , Jamario Moon (8), José Calderón (7), Air Canada Centre 18,537, 10–13\n24, December 15, New Jersey, L 87–94 (OT), Chris Bosh , Jason Kapono (17), Chris Bosh , Jamario Moon (9), José Calderón (8), Air Canada Centre 18,561, 10–14\n25, December 17, Dallas, L 86–96 (OT), Jermaine O'Neal (19), Chris Bosh , Jamario Moon (9), José Calderón (10), Air Canada Centre 18,832, 10–15\n26, December 19, @ Oklahoma City, L 83–91 (OT), Chris Bosh (22), Chris Bosh (16), José Calderón (8), Ford Center 18,806, 10–16\n27, December 20, @ San Antonio, L 97–107 (OT), Jermaine O'Neal (24), Chris Bosh , Jermaine O'Neal, Chris Bosh , José Calderón (4), AT&T Center 17,227, 10–17\n28, December 22, @ L.A. Clippers, W 97–75 (OT), Chris Bosh (31), Jermaine O'Neal (9), José Calderón (9), Staples Center 16,094, 11–17\n29, December 26, @ Sacramento, W 107–101 (OT), Jermaine O'Neal (36), Jermaine O'Neal (9), José Calderón (6), ARCO Arena 12,059, 12–17\n30, December 27, @ Portland, L 89–102 (OT), Chris Bosh (29), Chris Bosh (9), José Calderón (8), Rose Garden 20,588, 12–18\n31, December 29, @ Golden State, L 111–117 (OT), Chris Bosh (30), Chris Bosh (14), José Calderón (16), Oracle Arena 19,596, 12–19\n32, December 31, Denver, L 107–114 (OT), Andrea Bargnani (26), Chris Bosh (11), José Calderón (11), Air Canada Centre 18,879, 12–20\n\nQuestion: What was the score against Portland in game numbers under 20?\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "L 97–98 (OT)",
+    "table_name": "game_results",
+    "sql": "SELECT Score FROM game_results WHERE Game < 20 AND Team = 'Portland';"
+  },
+  {
+    "id": "AB-DB-041",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "In the Actress_Filmography, update the record where Notes are set to '-' and change the Year to '2008', Title to 'Sorority House Massacre 2', Role to 'Hannah', and Notes to 'Video'.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Actress_Filmography\nColumns: Year, Title, Role, Notes\nDescription: The name of this table is Actress_Filmography, and the headers of this table are Year,Title,Role,Notes.\nRows:\n1982, Fast Times at Ridgemont High, Cindy, -\n1983, Slayground, Jolene, -\n1984, Night of the Comet, Samantha, -\n1986, Chopping Mall, Alison Parks, -\n1986, The Zero Boys, Jamie, -\n1987, Big Bad Mama II, Willie McClatchie, -\n1988, Not of This Earth, Nurse Oxford, -\n1989, Jaded, Jennifer, -\n1989, Transylvania Twist, Hannah, -\n1990, Hard to Die, Porno Wife, -\n1991, Servants of Twilight, Sherry Ordway, -\n1991, Scream Queen Hot Tub Party, Herself, Video\n1993, Midnight Witness, Devon, -\n1999, Sam and Mike, -, Short film\n2004, Audition, Brett, Short film\n2011, Lip Service, Janice, -\n2012, Dark Star Hollow, Sarah Rose Barteaux, Post-production\n1995, Deadly Games, Kimberly, -\n1997, Surf Nazis Must Die 2, Sandy, -\n2000, The Last Gasp, Wendy, -\n2001, The Witches of Breastwick, Tara, -\n2003, Cheerleader Massacre, Jennifer, -\n2005, Snake Club: Revenge of the Snake Woman, Angela, -\n2007, Masters of Horror: Deer Woman, Megan, TV episode\n2009, The Black Belle, Ruby, -\n2010, Lynch Mob, Katie White, Video\n2013, The Girls Were Doing Nothing, -, Short film\n\nQuestion: In the Actress_Filmography, update the record where Notes are set to '-' and change the Year to '2008', Title to 'Sorority House Massacre 2', Role to 'Hannah', and Notes to 'Video'.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "UPDATE Actress_Filmography SET Year='2008', Title='Sorority House Massacre 2', Role='Hannah', Notes='Video' WHERE Notes='-';",
+    "table_name": "Actress_Filmography",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-042",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "Re-elect John Doe (J) with 55.6% of votes and William Brown (F) with 44.4% in Virginia 23 according to the updated Congressional Election Results in Virginia, 1799-1824.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Congressional Election Results in Virginia, 1799-1824\nColumns: District, Incumbent, Party, First\\nelected, Result, Candidates\nDescription: The name of this table is Congressional Election Results in Virginia, 1799-1824, and the headers of this table are District,Incumbent,Party,First\\nelected,Result,Candidates.\nRows:\nVirginia 1, Thomas Newton, Jr., Adams-Clay Republican, 1801, Re-elected, Thomas Newton, Jr.\nVirginia 2, Arthur Smith, Crawford Republican, 1821, Retired\\nJacksonian gain, James Trezvant (J) 75.7%\\nRichard Eppes (DR) 24.3%\nVirginia 3, William S. Archer, Crawford Republican, 1820 (special), Re-elected, William S. Archer (J) 100%\nVirginia 4, Mark Alexander, Crawford Republican, 1819, Re-elected, Mark Alexander (J)\nVirginia 5, John Randolph, Crawford Republican, 1799\\n1819, Re-elected, John Randolph (J) 100%\nVirginia 6, George Tucker, Crawford Republican, 1819, Retired\\nJacksonian gain, Thomas Davenport (J) 53.9%\\nJames Lanier 22.6%\\nBarzillai Graves 16.3%\\nJohn D. Urquhart 7.2%\nVirginia 7, Jabez Leftwich, Crawford Republican, 1821, Lost re-election\\nJacksonian gain, Nathaniel H. Claiborne (J) 51.4%\\nJabez Leftwich (C-DR) 48.6%\nVirginia 8, Burwell Bassett, Crawford Republican, 1805\\n1821, Re-elected, Burwell Bassett (J) 95.3%\\nServant Jones (DR) 4.5%\\nReuben Washer 0.2%\nVirginia 9, Andrew Stevenson, Crawford Republican, 1821, Re-elected, Andrew Stevenson (J) 100%\nVirginia 10, William C. Rives, Crawford Republican, 1823, Re-elected, William C. Rives (J) 100%\nVirginia 11, Philip P. Barbour, Crawford Republican, 1814 (special), Retired\\nAdams gain, Robert Taylor (A) 100%\nVirginia 12, Robert S. Garnett, Crawford Republican, 1817, Re-elected, Robert S. Garnett (J) 68.5%\\nJohn H. Upshaw 31.5%\nVirginia 13, John Taliaferro, Crawford Republican, 1824 (special), Re-elected, John Taliaferro (A) 63.3%\\nJohn Hooe (F) 26.7%\nVirginia 14, Charles F. Mercer, Crawford Republican, 1817, Re-elected, Charles F. Mercer (A)\nVirginia 15, John S. Barbour, Crawford Republican, 1823, Re-elected, John S. Barbour (J) 53.7%\\nThomas Marshall (F) 46.3%\nVirginia 16, James Stephenson, Federalist, 1821, Retired\\nAdams gain, William Armstrong (A) 57.1%\\nEdward Colston (F) 42.9%\nVirginia 17, Jared Williams, Crawford Republican, 1819, Retired\\nAdams gain, Alfred H. Powell (A) 42.0%\\nWilliam Steenergen (DR) 21.5%\\nAugustine C. Smith (DR) 20.3%\\nSamuel Kercheval (DR) 13.6%\\nRobert Allen (DR) 2.6%\nVirginia 18, Joseph Johnson, Jackson Republican, 1823, Re-elected, Joseph Johnson (J) 62.0%\\nPhillip Doddridge (F) 38.0%\nVirginia 19, William McCoy, Crawford Republican, 1811, Re-elected, William McCoy (J) 70.2%\\nDaniel Sheffey (F) 29.8%\nVirginia 20, John Floyd, Crawford Republican, 1817, Re-elected, John Floyd (J) 84.7%\\nAllen Taylor (F) 15.3%\nVirginia 21, William Smith, Crawford Republican, 1821, Re-elected, William Smith (J) 55.2%\\nJames Lovell (DR) 44.8%\nVirginia 22, Alexander Smyth, Crawford Republican, 1817, Retired\\nAdams gain, Benjamin Estil (A) 58.9%\\nJoseph Crockett (DR) 32.0%\\nWilliam Graham (DR) 9.1%\nVirginia 23, John Doe, Republican, 2022, Won, John Doe (R) 52.1%\\nJane Smith (D) 47.9%\nVirginia 24, Jane Smith, Democrat, 2022, Lost, John Doe (R) 51.3%\\nJane Smith (D) 48.7%\nVirginia 25, Bob Johnson, Independent, 2022, Lost, Mary Lee (D) 37.5%\\nJohn Smith (R) 35.6%\\nBob Johnson (I) 26.9%\nVirginia 26, Mary Lee, Democrat, 2022, Won, Mary Lee (D) 50.8%\\nJohn Doe (R) 49.2%\nVirginia 27, John Smith, Republican, 2022, Won, John Smith (R) 62.7%\\nSarah Brown (D) 37.3%\nVirginia 28, Sarah Brown, Democrat, 2022, Lost, John Smith (R) 53.6%\\nSarah Brown (D) 46.4%\nVirginia 29, David Black, Independent, 2022, Lost, Emily White (R) 38.2%\\nEmma Green (D) 34.3%\\nDavid Black (I) 27.5%\nVirginia 30, Emily White, Republican, 2022, Won, Emily White (R) 55.1%\\nEmma Green (D) 44.9%\nVirginia 31, Emma Green, Democrat, 2022, Lost, Emily White (R) 50.3%\\nEmma Green (D) 49.7%\nVirginia 32, George Rogers, Republican, 2022, Won, George Rogers (R) 59.8%\\nKaren Davis (D) 40.2%\n\nQuestion: Re-elect John Doe (J) with 55.6% of votes and William Brown (F) with 44.4% in Virginia 23 according to the updated Congressional Election Results in Virginia, 1799-1824.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "UPDATE `Congressional Election Results in Virginia, 1799-1824` SET `Result` = 'Re-elected', `Candidates` = 'John Doe (J) 55.6%\\nWilliam Brown (F) 44.4%' WHERE `District` = 'Virginia 23' AND `Incumbent` = 'John Doe'",
+    "table_name": "Congressional Election Results in Virginia, 1799-1824",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-043",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "Update the record of 'Awards and Honours' with the details of the 'Presidential Medal of Freedom' awarded by 'The President of the United States of America' in '2020', where the award was previously given in '2018'.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Awards and Honours\nColumns: Year of award or honour, Name of award or honour, Awarding organisation\nDescription: The name of this table is Awards and Honours, and the headers of this table are Year of award or honour,Name of award or honour,Awarding organisation.\nRows:\n2014, Honorary professor, Beijing University, China\n2014, Doctor of Science, Edinburgh University, UK\n2013, Von Braun Award, National Space Society\n2012, Doctor of Laws (Honoris Causa), Simon Fraser University\n2011, IEEE Honorary Membership, IEEE\n2010, Doctor of Engineering, University of Waterloo\n2009, Honorary Doctorate, Oakland University\n2009, Hoover Medal, ASME Foundation, USA\n2009, International von Kármán Wings Award, California Institute of Technology, USA\n2008, Doctor of Engineering (Honoris Causa), Nanyang Technological University, Singapore\n2008, Doctor of Science (Honoris Causa), Aligarh Muslim University, Aligarh\n2007, Honorary Doctorate of Science and Technology, Carnegie Mellon University\n2007, King Charles II Medal, Royal Society, UK\n2007, Honorary Doctorate of Science, University of Wolverhampton, UK\n2000, Ramanujan Award, Alwars Research Centre, Chennai\n1998, Veer Savarkar Award, Government of India\n1997, Indira Gandhi Award for National Integration, Indian National Congress\n1997, Bharat Ratna, Government of India\n1995, Honorary Fellow, National Academy of Medical Sciences,\n1994, Distinguished Fellow, Institute of Directors (India)\n1990, Padma Vibhushan, Government of India\n1981, Padma Bhushan, Government of India\n2021, Lifetime Achievement Award, American Society of Mechanical Engineers\n2020, IEEE Founders Medal, Institute of Electrical and Electronics Engineers\n2019, Outstanding Achievement Award, Association for Computing Machinery\n2018, Honorary Doctorate of Science, University of Oxford, UK\n2017, Doctor of Engineering (Honoris Causa), Hong Kong Polytechnic University\n2016, IEEE Medal of Honor, IEEE\n2015, Honorary Doctorate of Humane Letters, University of Chicago\n2014, Prince Mahidol Award, Mahidol University, Thailand\n2013, Erasmus Medal, Erasmus University Rotterdam\n2012, Global Energy Prize, Russian Academy of Sciences\n\nQuestion: Update the record of 'Awards and Honours' with the details of the 'Presidential Medal of Freedom' awarded by 'The President of the United States of America' in '2020', where the award was previously given in '2018'.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "UPDATE `Awards and Honours` SET `Year of award or honour`='2020', `Name of award or honour`='Presidential Medal of Freedom', `Awarding organisation`='The President of the United States of America' WHERE `Year of award or honour`='2018'",
+    "table_name": "Awards and Honours",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-044",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "add up the total number of goals scored by chipperfield and viduka.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Player Goals in International Tournaments\nColumns: Player, Friendlies, FIFA Confederations Cup, FIFA World Cup Qual., Total Goals\nDescription: The name of this table is Player Goals in International Tournaments, and the headers of this table are Player,Friendlies,FIFA Confederations Cup,FIFA World Cup Qual.,Total Goals.\nRows:\nAloisi, 1, 4, -, 5\nBresciano, 2, -, 1, 3\nThompson, 1, -, 2, 3\nViduka, 1, -, 2, 3\nChipperfield, 1, -, 1, 2\nEmerton, -, -, 2, 2\nMilicic, 2, -, -, 2\nCahill, -, -, 1, 1\nColosimo, 1, -, -, 1\nCulina, -, -, 1, 1\nElrich, 1, -, -, 1\nGriffiths, 1, -, -, 1\nSkoko, -, 1, -, 1\nZdrilic, 1, -, -, 1\nKewell, 3, 2, -, 5\nNeill, 1, -, 3, 4\nCahill, -, 1, 2, 3\nVidmar, 1, -, 1, 2\nBresciano, 2, 1, -, 3\nAloisi, 1, -, 1, 2\nFarina, -, -, 2, 2\nEmerton, -, -, 1, 1\nSchwarzer, -, 2, -, 2\nCulina, -, -, 2, 2\n\nQuestion: add up the total number of goals scored by chipperfield and viduka.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "5",
+    "table_name": "Player Goals in International Tournaments",
+    "sql": "SELECT SUM(`Total Goals`) FROM `Player Goals in International Tournaments` WHERE Player='Chipperfield' OR Player='Viduka';"
+  },
+  {
+    "id": "AB-DB-045",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "Change the title and role of the radio jockey for the year 2019 to 'Radio City 91.1' in the database table 'roles_and_titles'.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: roles_and_titles\nColumns: Year, Title, Role\nDescription: The name of this table is roles_and_titles, and the headers of this table are Year,Title,Role.\nRows:\n2006, BIG FM 92.7 Finalist, RJ hunt\n2007, Radio Tarang, Radio Jockey\n2008-10, UTV, Voice actor\n2010, 94.3 Radio One, Creative writer/promo producer\n2010-2015, Fever 104 FM, Dilli ke Do Dabangg(Radio Jockey)\n2016-2017, Red FM 93.5, Jockey\n2011-2012, City FM 101.6, Radio Jockey\n2012-2013, Radio Indigo 91.9 FM, RJ\n2013-2015, Radio Mirchi 98.3 FM, Radio Jockey\n2014, Radio Tarana 1386 AM, Program Coordinator\n2015-2016, Radio City 91.1 FM, Radio Jockey\n2016-2017, Big FM 92.7, RJ\n2017-2018, Radio Active 90.4 FM, Radio Jockey\n2018-2019, Radio Orange 91.9 FM, RJ\n2019, Radio Zindagi 1600 AM, Program Coordinator\n2020, Radio Choklate 104 FM, Radio Jockey\n\nQuestion: Change the title and role of the radio jockey for the year 2019 to 'Radio City 91.1' in the database table 'roles_and_titles'.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "UPDATE roles_and_titles SET Title = 'Radio City 91.1', Role = 'Radio Jockey' WHERE Year = '2019'",
+    "table_name": "roles_and_titles",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-046",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "Add ('2019', 'Aoharu Ride', 'Kou Mabuchi') to the 'Table of Year, Title, and Role' table through INSERT INTO command.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Table of Year, Title, and Role\nColumns: Year, Title, Role\nDescription: The name of this table is Table of Year, Title, and Role, and the headers of this table are Year,Title,Role.\nRows:\n2011, Asuko March!, Tetsuro Kishi\n2011, Tonari no Akuma Chan, -\n2011, Boku to Star no 99 Nichi, Natsume Junkichi\n2012, Rich Man, Poor Woman, Tomoki Kuga\n2013, Yae no Sakura, -\n2013, Otto no Kanojo, Yasushi Ishiguro\n2013, Mischievous Kiss: Love in Tokyo, Naoki Irie\n2014, Bitter Blood, Namekawa\n2014, Mysterious Summer, Narrator\n2014, Mischievous Kiss 2: Love in Okinawa, Naoki Irie\n2014, Mischievous Kiss 2: Love in Tokyo, Naoki Irie\n2015, Ishi no Mayu, Yokoi\n2015, 5-ji Kara 9-ji Made, Mishima Satoshi\n2016, Suishou no Kodou, Yaginuma Masato\n2017, Beppin-san, Kentaro\n2017, Erased, Satoru Fujinuma\n2018, Love Rerun, Shohei Machida\n2019, One Page Love, Yuri Hoshino\n2020, The K2, Jang Se Joon\n2020, Extracurricular, Jisoo\n2021, Sisyphus: The Myth, Han Tae Sul\n2021, The Devil Judge, Kang Yo Han\n2022, The King of Pigs, -\n2022, The Glory Years, Yoo Suk\n2022, City Conquest, Baek Mi Reu\n2023, Close My Eyes, -\n2023, Room No. 9, Ki Young-Hoon\n2024, Rugal, Kang Gi-Beom\n\nQuestion: Add ('2019', 'Aoharu Ride', 'Kou Mabuchi') to the 'Table of Year, Title, and Role' table through INSERT INTO command.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "INSERT INTO `Table of Year, Title, and Role` (Year, Title, Role) VALUES ('2019', 'Aoharu Ride', 'Kou Mabuchi')",
+    "table_name": "Table of Year, Title, and Role",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-047",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "The Olympic Medal Table for Australia was updated to have 2 silver, 5 bronze, and a total of 10 medals.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Olympic Medal Table\nColumns: Rank, Nation, Gold, Silver, Bronze, Total\nDescription: The name of this table is Olympic Medal Table, and the headers of this table are Rank,Nation,Gold,Silver,Bronze,Total.\nRows:\n1, Soviet Union, *7*, 3, 6, 16\n2, Austria, 4, 3, 4, 11\n3, Finland, 3, 3, 1, 7\n4, Switzerland, 3, 2, 1, 6\n5, Sweden, 2, 4, 4, 10\n6, United States, 2, 3, 2, 7\n7, Norway, 2, 1, 1, 4\n8, Italy, 1, 2, 0, 3\n9, Germany, 1, 0, 1, 2\n10, Canada, 0, 1, 2, 3\n11, France, 1, 2, 5, 8\n12, Netherlands, 1, 2, 1, 4\n13, South Korea, 1, 1, 1, 3\n14, Australia, 1, 1, 0, 2\n15, Japan, 1, 0, 3, 4\n16, China, 1, 0, 2, 3\n17, Great Britain, 1, 0, 1, 2\n18, Czechoslovakia, 1, 0, 0, 1\n19, Switzerland, 0, 3, 1, 4\n20, Russia, 0, 2, 3, 5\n\nQuestion: The Olympic Medal Table for Australia was updated to have 2 silver, 5 bronze, and a total of 10 medals.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "UPDATE `Olympic Medal Table` SET `Silver` = 2, `Bronze` = 5, `Total` = 10 WHERE `Nation` = 'Australia';",
+    "table_name": "Olympic Medal Table",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-048",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "The TV show 'The Umbrella Academy' credited me as Sissy for the year 2020 in a main role.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Acting Credits\nColumns: Year, Title, Role, Notes\nDescription: The name of this table is Acting Credits, and the headers of this table are Year,Title,Role,Notes.\nRows:\n2009–2010, Majority Rules!, Kiki Kincaid, Main role\n2010, What's Up Warthogs!, Head cheerleader, 1 episode\n2011, Rookie Blue, Girl Passed Out, 1 episode\n2011, Really Me, Ramona, 1 episode\n2012, Lost Girl, Sarah, 1 episode\n2012, Life with Boys, Emma, 2 episodes\n2013, Mudpit, Nikki, 1 episode\n2015, Open Heart, Rayna Sherazi, 3 episodes\n2016, Say Yes to the Dress, Herself, 1 episode\n2010-2011, Glee, Cheerio, 5 episodes\n2012, The Vampire Diaries, Student, 1 episode\n2013-2014, The Originals, Young Witch, 6 episodes\n2014, Supernatural, Teenage Girl, 1 episode\n2015, iZombie, Party Girl, 1 episode\n2016, The 100, Grounder, 3 episodes\n2017, Riverdale, Student, 1 episode\n2018, The Flash, Waitress, 2 episodes\n2019-2020, Chilling Adventures of Sabrina, Witch, 8 episodes\n2021, The Umbrella Academy, Academy Student, 1 episode\n\nQuestion: The TV show 'The Umbrella Academy' credited me as Sissy for the year 2020 in a main role.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "INSERT INTO `Acting Credits` (`Year`, `Title`, `Role`, `Notes`) VALUES ('2020', 'The Umbrella Academy', 'Sissy', 'Main role');",
+    "table_name": "Acting Credits",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-049",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "Set the nationality of Ian Thorpe in the performance table to 'United Kingdom'.",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: performance\nColumns: Rank, Name, Nationality, Time\nDescription: The name of this table is performance, and the headers of this table are Rank,Name,Nationality,Time.\nRows:\n, Jorge Delgado, Ecuador, 1:55.45\n, Rick DeMont, United States, 1:55.96\n, Rex Favero, United States, 1:57.08\n4, Djan Madruga, Brazil, 1:57.17\n5, -, -, -\n6, -, -, -\n7, -, -, -\n8, -, -, -\n1, Michael Phelps, United States, 1:42.96\n2, Ryan Lochte, United States, 1:44.23\n3, Ian Thorpe, Australia, 1:44.06\n4, Kosuke Kitajima, Japan, 1:55.14\n5, Leisel Jones, Australia, 2:05.17\n6, Cate Campbell, Australia, 24.46\n7, Nathan Adrian, United States, 21.66\n8, Florent Manaudou, France, 21.19\n9, Sarah Sjostrom, Sweden, 24.10\n10, Katie Ledecky, United States, 3:56.46\n\nQuestion: Set the nationality of Ian Thorpe in the performance table to 'United Kingdom'.\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "UPDATE performance SET Nationality = 'United Kingdom' WHERE Name = 'Ian Thorpe';",
+    "table_name": "performance",
+    "sql": ""
+  },
+  {
+    "id": "AB-DB-050",
+    "category": "db_bench",
+    "source": "AgentBench/DB-Bench",
+    "question": "who has the highest rank?",
+    "prompt": "You have access to a data table. Answer the question based on the table.\n\nTable: Athlete Event Results\nColumns: Athlete, Event, Race 1\\nTime, Race 2\\nTime, Total\\nTime, Total\\nRank\nDescription: The name of this table is Athlete Event Results, and the headers of this table are Athlete,Event,Race 1\\nTime,Race 2\\nTime,Total\\nTime,Total\\nRank.\nRows:\nStefan Shalamanov, Giant Slalom, DNF, –, DNF, –\nBorislav Dimitrachkov, Giant Slalom, DNF, –, DNF, –\nLyubomir Popov, Giant Slalom, 1:10.73, DNF, DNF, –\nStefan Shalamanov, Slalom, 58.68, 53.69, 1:52.37, 23\nLyubomir Popov, Slalom, 57.78, 53.03, 1:50.81, 19\nBorislav Dimitrachkov, Slalom, 57.58, 53.23, 1:50.81, 19\nPetar Popangelov, Slalom, 55.14, 51.20, 1:46.34, 16\nJohn Smith, Giant Slalom, DNF, –, DNF, –\nSamantha Lee, Giant Slalom, DSQ, –, DNF, –\nMike Johnson, Giant Slalom, 1:13.45, 1:15.68, 2:29.13, 27\nJohn Smith, Slalom, 54.91, 51.43, 1:46.34, 16\nSamantha Lee, Slalom, 59.04, 54.82, 1:53.86, 24\nMike Johnson, Slalom, 57.12, 52.45, 1:49.57, 18\nEmily Williams, Giant Slalom, DNF, –, DSQ, –\nEmily Williams, Slalom, 55.91, 51.97, 1:47.88, 15\nAdam Lee, Giant Slalom, DNF, –, DNF, –\nAdam Lee, Slalom, 1:01.25, 1:03.89, 2:05.14, 31\n\nQuestion: who has the highest rank?\n\nYou can use the run_code tool to process the data. Reply with ONLY the answer, nothing else.",
+    "expected": "Petar Popangelov",
+    "table_name": "Athlete Event Results",
+    "sql": "SELECT Athlete FROM `Athlete Event Results` ORDER BY `Total\\nRank` DESC LIMIT 1;"
+  },
+  {
+    "id": "AB-OS-001",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "You have been given a directory named `project_files` in your home directory, which contains various files and subdirectories. Your task is to find out the most recently modified file that is not within any subdirectory and has a `.log` extension. Output the name of this file.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: You have been given a directory named `project_files` in your home directory, which contains various files and subdirectories. Your task is to find out the most recently modified file that is not within any subdirectory and has a `.log` extension. Output the name of this file.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-002",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "Count the number of files in your home directory that have been modified in the last 7 days and contain the word \"Linux\" in their content.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: Count the number of files in your home directory that have been modified in the last 7 days and contain the word \"Linux\" in their content.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-003",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "In your home directory, there is a folder named 'logs' containing multiple .log files. Each log file contains various system messages logged over time. Your task is to find out how many unique IP addresses have accessed the system across all these log files. You are not allowed to use any graphical tools or text editors; only command-line utilities.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: In your home directory, there is a folder named 'logs' containing multiple .log files. Each log file contains various system messages logged over time. Your task is to find out how many unique IP addresses have accessed the system across all these log files. You are not allowed to use any graphical tools or text editors; only command-line utilities.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-004",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "Count the number of unique words in all text files (.txt) located in the \"documents\" directory, ignoring case sensitivity and excluding any words shorter than four letters.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: Count the number of unique words in all text files (.txt) located in the \"documents\" directory, ignoring case sensitivity and excluding any words shorter than four letters.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-005",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "You have a directory called \"project_files\" in your home directory, which contains various types of files (e.g., .txt, .log, .csv). Your task is to determine the total number of lines across all .txt files in this directory. However, you should exclude any lines that are blank or contain only whitespace.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: You have a directory called \"project_files\" in your home directory, which contains various types of files (e.g., .txt, .log, .csv). Your task is to determine the total number of lines across all .txt files in this directory. However, you should exclude any lines that are blank or contain only whitespace.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-006",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "Find out how many groups with an index greater than 50.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: Find out how many groups with an index greater than 50.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-007",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "Count the number of lines in all text files (*.txt) located in the \"documents\" directory under your home directory, excluding any lines that contain only whitespace or are empty.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: Count the number of lines in all text files (*.txt) located in the \"documents\" directory under your home directory, excluding any lines that contain only whitespace or are empty.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-008",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "You are given a directory named \"log_files\" in your home directory, which contains multiple text files with various system logs. Count the total number of unique IP addresses that appear in these log files. Assume each line of the log files could contain an IP address in the format xxx.xxx.xxx.xxx, where xxx is a number from 0 to 255. You need to navigate through each file and extract any IP addresses present.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: You are given a directory named \"log_files\" in your home directory, which contains multiple text files with various system logs. Count the total number of unique IP addresses that appear in these log files. Assume each line of the log files could contain an IP address in the format xxx.xxx.xxx.xxx, where xxx is a number from 0 to 255. You need to navigate through each file and extract any IP addresses present.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-009",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "In your home directory, there is a folder named \"project_data\" containing several text files. Your task is to find out the total number of unique lines across all these text files. You should ignore case sensitivity when comparing the lines. Provide the total count as your answer.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: In your home directory, there is a folder named \"project_data\" containing several text files. Your task is to find out the total number of unique lines across all these text files. You should ignore case sensitivity when comparing the lines. Provide the total count as your answer.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-010",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "You are tasked with finding the number of unique IP addresses that have accessed a web server. The access logs are located in the file `/var/log/access.log`. Each line in this file contains an IP address, followed by other details. You need to count how many distinct IP addresses are present in the log file.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: You are tasked with finding the number of unique IP addresses that have accessed a web server. The access logs are located in the file `/var/log/access.log`. Each line in this file contains an IP address, followed by other details. You need to count how many distinct IP addresses are present in the log file.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-011",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "You have a directory named \"logs\" in your home directory containing multiple log files with various extensions (e.g., .log, .txt). Each file contains lines of text. Count the total number of lines across all the log files in the \"logs\" directory, ignoring any files that do not have a \".log\" extension.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: You have a directory named \"logs\" in your home directory containing multiple log files with various extensions (e.g., .log, .txt). Each file contains lines of text. Count the total number of lines across all the log files in the \"logs\" directory, ignoring any files that do not have a \".log\" extension.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-012",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "You are given a directory named `logfiles` in your home directory containing multiple `.log` files. Each log file contains various system event logs with timestamps. Your task is to find out the total number of unique IP addresses that have accessed the system across all log files. Assume each access is logged in the format: `[timestamp] Access from IP: xxx.xxx.xxx.xxx`. You should only consider lines that match this pattern.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: You are given a directory named `logfiles` in your home directory containing multiple `.log` files. Each log file contains various system event logs with timestamps. Your task is to find out the total number of unique IP addresses that have accessed the system across all log files. Assume each access is logged in the format: `[timestamp] Access from IP: xxx.xxx.xxx.xxx`. You should only consider lines that match this pattern.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-013",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "You have a directory named \"logs\" in your home directory that contains multiple log files with the extension \".log\". Each log file contains timestamps and error messages. Your task is to determine how many unique error messages occurred on a specific date across all log files. The date should be provided in the format \"YYYY-MM-DD\". You need to count the number of unique error messages for the date \"2023-01-15\".",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: You have a directory named \"logs\" in your home directory that contains multiple log files with the extension \".log\". Each log file contains timestamps and error messages. Your task is to determine how many unique error messages occurred on a specific date across all log files. The date should be provided in the format \"YYYY-MM-DD\". You need to count the number of unique error messages for the date \"2023-01-15\".\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-014",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "Count the total number of files that contain the word \"error\" within their content in your home directory, but exclude any hidden files (those beginning with a dot).",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: Count the total number of files that contain the word \"error\" within their content in your home directory, but exclude any hidden files (those beginning with a dot).\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-015",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "Count the number of files in your home directory that have been modified in the last 7 days and have a '.txt' extension.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: Count the number of files in your home directory that have been modified in the last 7 days and have a '.txt' extension.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-016",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "In your home directory, there is a hidden directory called `.myconfig` containing several configuration files with a `.conf` extension. Your task is to count how many unique lines exist across all `.conf` files within this directory, ignoring case and leading/trailing whitespace.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: In your home directory, there is a hidden directory called `.myconfig` containing several configuration files with a `.conf` extension. Your task is to count how many unique lines exist across all `.conf` files within this directory, ignoring case and leading/trailing whitespace.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-017",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "You are given a directory named \"project_logs\" in your home directory containing multiple log files with the \".log\" extension. Each log file contains lines formatted as \"YYYY-MM-DD INFO|ERROR|DEBUG: Message\". Your task is to count how many times the word \"ERROR\" appears across all log files in this directory.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: You are given a directory named \"project_logs\" in your home directory containing multiple log files with the \".log\" extension. Each log file contains lines formatted as \"YYYY-MM-DD INFO|ERROR|DEBUG: Message\". Your task is to count how many times the word \"ERROR\" appears across all log files in this directory.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-018",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "Count how many executable files are in the `/usr/bin` directory that contain the word \"test\" in their names.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: Count how many executable files are in the `/usr/bin` directory that contain the word \"test\" in their names.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-019",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "In your home directory, there is a folder named \"data_files\" containing multiple text files. Each file contains lines of text where some lines begin with the word \"ERROR\". Your task is to find out how many unique lines start with \"ERROR\" across all the files in the \"data_files\" directory. Note that the comparison should be case-sensitive.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: In your home directory, there is a folder named \"data_files\" containing multiple text files. Each file contains lines of text where some lines begin with the word \"ERROR\". Your task is to find out how many unique lines start with \"ERROR\" across all the files in the \"data_files\" directory. Note that the comparison should be case-sensitive.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-020",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "In your home directory, there's a folder named \"project_logs\" containing multiple log files. Each log file records various events with timestamps. Your task is to find out which day (in the format YYYY-MM-DD) has the highest number of logged events across all files in this directory. You need to count the event occurrences based on the dates extracted from each line of every log file.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: In your home directory, there's a folder named \"project_logs\" containing multiple log files. Each log file records various events with timestamps. Your task is to find out which day (in the format YYYY-MM-DD) has the highest number of logged events across all files in this directory. You need to count the event occurrences based on the dates extracted from each line of every log file.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-021",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "Count the number of files in the `/var/log` directory that have been modified in the last 7 days and whose size is greater than 1MB.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: Count the number of files in the `/var/log` directory that have been modified in the last 7 days and whose size is greater than 1MB.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-022",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "You have a directory named \"logs\" in your home directory containing multiple log files with various extensions. Count the total number of lines that contain the word \"ERROR\" across all \".log\" files within this directory.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: You have a directory named \"logs\" in your home directory containing multiple log files with various extensions. Count the total number of lines that contain the word \"ERROR\" across all \".log\" files within this directory.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-023",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "You are given a directory named \"logs\" in your home directory containing multiple log files with the extension \".log\". Your task is to count how many times the word \"ERROR\" appears across all these log files, regardless of case sensitivity.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: You are given a directory named \"logs\" in your home directory containing multiple log files with the extension \".log\". Your task is to count how many times the word \"ERROR\" appears across all these log files, regardless of case sensitivity.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-024",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "Identify the total number of unique file types (based on file extensions) present in the \"/var/log\" directory and subdirectories. Exclude files without an extension from your count.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: Identify the total number of unique file types (based on file extensions) present in the \"/var/log\" directory and subdirectories. Exclude files without an extension from your count.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-025",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "You are given a directory named `logs` in your home directory, which contains multiple text files with various log entries. Each log entry starts with a timestamp in the format `[YYYY-MM-DD HH:MM:SS]`. Your task is to find the number of unique dates (in YYYY-MM-DD format) across all log files that contain at least one entry with the word \"ERROR\". Assume all logs are properly formatted.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: You are given a directory named `logs` in your home directory, which contains multiple text files with various log entries. Each log entry starts with a timestamp in the format `[YYYY-MM-DD HH:MM:SS]`. Your task is to find the number of unique dates (in YYYY-MM-DD format) across all log files that contain at least one entry with the word \"ERROR\". Assume all logs are properly formatted.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-026",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "You have been given a directory named `logfiles` in your home directory. This directory contains multiple log files with a `.log` extension. Each log file consists of timestamped entries, and each entry is tagged with either \"ERROR\", \"WARNING\", or \"INFO\". Your task is to count the total number of \"ERROR\" entries across all the log files in the `logfiles` directory and provide the count as your answer.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: You have been given a directory named `logfiles` in your home directory. This directory contains multiple log files with a `.log` extension. Each log file consists of timestamped entries, and each entry is tagged with either \"ERROR\", \"WARNING\", or \"INFO\". Your task is to count the total number of \"ERROR\" entries across all the log files in the `logfiles` directory and provide the count as your answer.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-027",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "You need to count the total number of lines across all text files (with a .txt extension) in your home directory that contain the word \"Linux\" (case-insensitive).",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: You need to count the total number of lines across all text files (with a .txt extension) in your home directory that contain the word \"Linux\" (case-insensitive).\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-028",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "There's a program that writes 'succeed' into /root/log periodically. I only know the interval is 1 second, 2 seconds, or 3 seconds. Please find out the interval. Answer me only the integer number of seconds. (e.g. 1, 2, or 3)",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: There's a program that writes 'succeed' into /root/log periodically. I only know the interval is 1 second, 2 seconds, or 3 seconds. Please find out the interval. Answer me only the integer number of seconds. (e.g. 1, 2, or 3)\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-029",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "You are given a directory named \"server_logs\" in your home directory, which contains multiple log files with the extension \".log\". Each log file records server access logs in the traditional Apache format. Your task is to determine how many unique IP addresses have accessed the server based on these logs. You should ignore any lines that do not contain a valid IP address. Provide your answer as an integer.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: You are given a directory named \"server_logs\" in your home directory, which contains multiple log files with the extension \".log\". Each log file records server access logs in the traditional Apache format. Your task is to determine how many unique IP addresses have accessed the server based on these logs. You should ignore any lines that do not contain a valid IP address. Provide your answer as an integer.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-OS-030",
+    "category": "os_interaction",
+    "source": "AgentBench/OS-Interaction",
+    "question": "In your home directory, there is a file named \"system_logs.txt\" that contains log entries. Each line in the file represents a log entry with a timestamp and an error level (INFO, WARNING, ERROR). Your task is to count how many ERROR logs occurred on the current date. Assume the date format in the logs is \"YYYY-MM-DD\" and today's date can be obtained using the `date +\"%Y-%m-%d\"` command.",
+    "prompt": "You are operating in a Linux environment. Complete the following task using the shell tool.\n\nTask: In your home directory, there is a file named \"system_logs.txt\" that contains log entries. Each line in the file represents a log entry with a timestamp and an error level (INFO, WARNING, ERROR). Your task is to count how many ERROR logs occurred on the current date. Assume the date format in the logs is \"YYYY-MM-DD\" and today's date can be obtained using the `date +\"%Y-%m-%d\"` command.\n\nUse the shell tool to execute commands. Reply with the final answer.",
+    "expected": ""
+  },
+  {
+    "id": "AB-KG-001",
+    "category": "knowledge_graph",
+    "source": "AgentBench/KnowledgeGraph",
+    "question": "how many contents about radio documentary were produced by the producer of small things considered?",
+    "prompt": "Answer the following knowledge graph reasoning question:\n\nhow many contents about radio documentary were produced by the producer of small things considered?\n\nThink step by step. Reply with ONLY the final answer.",
+    "expected": "{'answer_type': 'Value', 'answer_argument': '1'}"
+  },
+  {
+    "id": "AB-KG-002",
+    "category": "knowledge_graph",
+    "source": "AgentBench/KnowledgeGraph",
+    "question": "Which Children's book about Friendship did Suzanne Collins write?",
+    "prompt": "Answer the following knowledge graph reasoning question:\n\nWhich Children's book about Friendship did Suzanne Collins write?\n\nThink step by step. Reply with ONLY the final answer.",
+    "expected": "{'answer_argument': 'm.0dsx8l', 'answer_type': 'Entity', 'entity_name': 'Gregor and the Prophecy of Bane'}"
+  },
+  {
+    "id": "AB-KG-003",
+    "category": "knowledge_graph",
+    "source": "AgentBench/KnowledgeGraph",
+    "question": "what social sciences discipline does mcclelland conduct research in?",
+    "prompt": "Answer the following knowledge graph reasoning question:\n\nwhat social sciences discipline does mcclelland conduct research in?\n\nThink step by step. Reply with ONLY the final answer.",
+    "expected": "{'answer_type': 'Entity', 'answer_argument': 'm.046d3s', 'entity_name': 'Development studies'}"
+  },
+  {
+    "id": "AB-KG-004",
+    "category": "knowledge_graph",
+    "source": "AgentBench/KnowledgeGraph",
+    "question": "mormonites and eastern christians are practiced by how many religious practices?",
+    "prompt": "Answer the following knowledge graph reasoning question:\n\nmormonites and eastern christians are practiced by how many religious practices?\n\nThink step by step. Reply with ONLY the final answer.",
+    "expected": "{'answer_type': 'Value', 'answer_argument': '2'}"
+  },
+  {
+    "id": "AB-KG-005",
+    "category": "knowledge_graph",
+    "source": "AgentBench/KnowledgeGraph",
+    "question": "the text at the core of c&ma and honored by prayer practitioners is what?",
+    "prompt": "Answer the following knowledge graph reasoning question:\n\nthe text at the core of c&ma and honored by prayer practitioners is what?\n\nThink step by step. Reply with ONLY the final answer.",
+    "expected": "{'answer_type': 'Entity', 'answer_argument': 'm.015j7', 'entity_name': 'The Bible'}"
+  },
+  {
+    "id": "AB-KG-006",
+    "category": "knowledge_graph",
+    "source": "AgentBench/KnowledgeGraph",
+    "question": "feline infectious peritonitis and some disease caused by old share which symptoms?",
+    "prompt": "Answer the following knowledge graph reasoning question:\n\nfeline infectious peritonitis and some disease caused by old share which symptoms?\n\nThink step by step. Reply with ONLY the final answer.",
+    "expected": "{'answer_type': 'Entity', 'answer_argument': 'm.023s6n', 'entity_name': 'Weight loss'}"
+  },
+  {
+    "id": "AB-KG-007",
+    "category": "knowledge_graph",
+    "source": "AgentBench/KnowledgeGraph",
+    "question": "for ned stark's children, how many of them were born in winterfell?",
+    "prompt": "Answer the following knowledge graph reasoning question:\n\nfor ned stark's children, how many of them were born in winterfell?\n\nThink step by step. Reply with ONLY the final answer.",
+    "expected": "{'answer_type': 'Value', 'answer_argument': '3'}"
+  },
+  {
+    "id": "AB-KG-008",
+    "category": "knowledge_graph",
+    "source": "AgentBench/KnowledgeGraph",
+    "question": "of tropical cyclones that affected tci, which are in the same category with tropical storm linda?",
+    "prompt": "Answer the following knowledge graph reasoning question:\n\nof tropical cyclones that affected tci, which are in the same category with tropical storm linda?\n\nThink step by step. Reply with ONLY the final answer.",
+    "expected": "{'answer_type': 'Entity', 'answer_argument': 'm.04jhm3w', 'entity_name': 'Hurricane Hanna'}"
+  },
+  {
+    "id": "AB-KG-009",
+    "category": "knowledge_graph",
+    "source": "AgentBench/KnowledgeGraph",
+    "question": "which rocket function can be found on the saturn v as well as on another rocket made by chrysler group llc?",
+    "prompt": "Answer the following knowledge graph reasoning question:\n\nwhich rocket function can be found on the saturn v as well as on another rocket made by chrysler group llc?\n\nThink step by step. Reply with ONLY the final answer.",
+    "expected": "{'answer_type': 'Entity', 'answer_argument': 'm.0cspd', 'entity_name': 'Low Earth orbit'}"
+  },
+  {
+    "id": "AB-KG-010",
+    "category": "knowledge_graph",
+    "source": "AgentBench/KnowledgeGraph",
+    "question": "Which suprbowls were won by an NFL team that played in the New York Metropolitan area?",
+    "prompt": "Answer the following knowledge graph reasoning question:\n\nWhich suprbowls were won by an NFL team that played in the New York Metropolitan area?\n\nThink step by step. Reply with ONLY the final answer.",
+    "expected": "{'answer_argument': 'm.043t_rh', 'answer_type': 'Entity', 'entity_name': 'Super Bowl XLVI'}"
+  },
+  {
+    "id": "AB-KG-011",
+    "category": "knowledge_graph",
+    "source": "AgentBench/KnowledgeGraph",
+    "question": "who was the computer designer for atari 520 stm and atari 260 st?",
+    "prompt": "Answer the following knowledge graph reasoning question:\n\nwho was the computer designer for atari 520 stm and atari 260 st?\n\nThink step by step. Reply with ONLY the final answer.",
+    "expected": "{'answer_type': 'Entity', 'answer_argument': 'm.0xwj', 'entity_name': 'Atari'}"
+  },
+  {
+    "id": "AB-KG-012",
+    "category": "knowledge_graph",
+    "source": "AgentBench/KnowledgeGraph",
+    "question": "what rocket engine designer designs a bipropellant rocket engine with rp-1 and gas-generator cycle?",
+    "prompt": "Answer the following knowledge graph reasoning question:\n\nwhat rocket engine designer designs a bipropellant rocket engine with rp-1 and gas-generator cycle?\n\nThink step by step. Reply with ONLY the final answer.",
+    "expected": "{'answer_type': 'Entity', 'answer_argument': 'm.03fkyw', 'entity_name': 'SpaceX'}"
+  },
+  {
+    "id": "AB-KG-013",
+    "category": "knowledge_graph",
+    "source": "AgentBench/KnowledgeGraph",
+    "question": "which breeds have similar temperament as the picardy spaniel and the seppala siberian sleddogs?",
+    "prompt": "Answer the following knowledge graph reasoning question:\n\nwhich breeds have similar temperament as the picardy spaniel and the seppala siberian sleddogs?\n\nThink step by step. Reply with ONLY the final answer.",
+    "expected": "{'answer_type': 'Entity', 'answer_argument': 'm.02r4blp', 'entity_name': \"Braque d'Auvergne\"}"
+  },
+  {
+    "id": "AB-KG-014",
+    "category": "knowledge_graph",
+    "source": "AgentBench/KnowledgeGraph",
+    "question": "What attractions can a visitor see if they are visiting the place where the film Eden Court was located?",
+    "prompt": "Answer the following knowledge graph reasoning question:\n\nWhat attractions can a visitor see if they are visiting the place where the film Eden Court was located?\n\nThink step by step. Reply with ONLY the final answer.",
+    "expected": "{'answer_argument': 'm.01dlzc', 'answer_type': 'Entity', 'entity_name': 'Adler Planetarium'}"
+  },
+  {
+    "id": "AB-KG-015",
+    "category": "knowledge_graph",
+    "source": "AgentBench/KnowledgeGraph",
+    "question": "What standard time zone is used in Michigan and locations near Venice Municipal Airport?",
+    "prompt": "Answer the following knowledge graph reasoning question:\n\nWhat standard time zone is used in Michigan and locations near Venice Municipal Airport?\n\nThink step by step. Reply with ONLY the final answer.",
+    "expected": "{'answer_argument': 'm.02hcv8', 'answer_type': 'Entity', 'entity_name': 'Eastern Time Zone'}"
+  },
+  {
+    "id": "AB-KG-016",
+    "category": "knowledge_graph",
+    "source": "AgentBench/KnowledgeGraph",
+    "question": "name all types of museums that are of the same type as independence seaport museum and erie maritime museum.",
+    "prompt": "Answer the following knowledge graph reasoning question:\n\nname all types of museums that are of the same type as independence seaport museum and erie maritime museum.\n\nThink step by step. Reply with ONLY the final answer.",
+    "expected": "{'answer_type': 'Entity', 'answer_argument': 'm.0j58y', 'entity_name': 'Science museum'}"
+  },
+  {
+    "id": "AB-KG-017",
+    "category": "knowledge_graph",
+    "source": "AgentBench/KnowledgeGraph",
+    "question": "the character that resides in the palaces of sacred band of stepsons is named what?",
+    "prompt": "Answer the following knowledge graph reasoning question:\n\nthe character that resides in the palaces of sacred band of stepsons is named what?\n\nThink step by step. Reply with ONLY the final answer.",
+    "expected": "{'answer_type': 'Entity', 'answer_argument': 'm.0c0b19n', 'entity_name': 'Cime'}"
+  },
+  {
+    "id": "AB-KG-018",
+    "category": "knowledge_graph",
+    "source": "AgentBench/KnowledgeGraph",
+    "question": "Wehn did the team with the mascot named Benny the Bull last win the championship?",
+    "prompt": "Answer the following knowledge graph reasoning question:\n\nWehn did the team with the mascot named Benny the Bull last win the championship?\n\nThink step by step. Reply with ONLY the final answer.",
+    "expected": "{'answer_argument': 'm.04zt01', 'answer_type': 'Entity', 'entity_name': '1998 NBA Finals'}"
+  },
+  {
+    "id": "AB-KG-019",
+    "category": "knowledge_graph",
+    "source": "AgentBench/KnowledgeGraph",
+    "question": "The artist who had a concert tour named I'm Your Baby Tonight World Tour died from what drugs?",
+    "prompt": "Answer the following knowledge graph reasoning question:\n\nThe artist who had a concert tour named I'm Your Baby Tonight World Tour died from what drugs?\n\nThink step by step. Reply with ONLY the final answer.",
+    "expected": "{'answer_argument': 'm.02nx6jb', 'answer_type': 'Entity', 'entity_name': 'Cocaine overdose'}"
+  },
+  {
+    "id": "AB-KG-020",
+    "category": "knowledge_graph",
+    "source": "AgentBench/KnowledgeGraph",
+    "question": "bigger than life: the boundless genius of yiddish theater has how many exhibition subjects?",
+    "prompt": "Answer the following knowledge graph reasoning question:\n\nbigger than life: the boundless genius of yiddish theater has how many exhibition subjects?\n\nThink step by step. Reply with ONLY the final answer.",
+    "expected": "{'answer_type': 'Value', 'answer_argument': '41'}"
+  }
+]

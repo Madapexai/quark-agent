@@ -1,0 +1,137 @@
+[
+  {
+    "id": "P001",
+    "name": "Laptop Pro 15",
+    "category": "electronics",
+    "price": 1299.99,
+    "stock": 45,
+    "supplier": "TechCorp",
+    "rating": 4.5
+  },
+  {
+    "id": "P002",
+    "name": "Wireless Mouse",
+    "category": "electronics",
+    "price": 29.99,
+    "stock": 200,
+    "supplier": "TechCorp",
+    "rating": 4.2
+  },
+  {
+    "id": "P003",
+    "name": "USB-C Cable",
+    "category": "electronics",
+    "price": 12.99,
+    "stock": 500,
+    "supplier": "CableWorld",
+    "rating": 4.0
+  },
+  {
+    "id": "P004",
+    "name": "Coffee Mug",
+    "category": "kitchen",
+    "price": 14.99,
+    "stock": 150,
+    "supplier": "HomeGoods",
+    "rating": 4.7
+  },
+  {
+    "id": "P005",
+    "name": "Notebook A5",
+    "category": "stationery",
+    "price": 5.99,
+    "stock": 300,
+    "supplier": "PaperPlus",
+    "rating": 4.3
+  },
+  {
+    "id": "P006",
+    "name": "Desk Lamp LED",
+    "category": "electronics",
+    "price": 39.99,
+    "stock": 80,
+    "supplier": "TechCorp",
+    "rating": 4.6
+  },
+  {
+    "id": "P007",
+    "name": "Water Bottle",
+    "category": "kitchen",
+    "price": 19.99,
+    "stock": 120,
+    "supplier": "HomeGoods",
+    "rating": 4.4
+  },
+  {
+    "id": "P008",
+    "name": "Mechanical Keyboard",
+    "category": "electronics",
+    "price": 89.99,
+    "stock": 60,
+    "supplier": "TechCorp",
+    "rating": 4.8
+  },
+  {
+    "id": "P009",
+    "name": "Pen Set (10pk)",
+    "category": "stationery",
+    "price": 8.99,
+    "stock": 250,
+    "supplier": "PaperPlus",
+    "rating": 4.1
+  },
+  {
+    "id": "P010",
+    "name": "Monitor 27\"",
+    "category": "electronics",
+    "price": 349.99,
+    "stock": 30,
+    "supplier": "TechCorp",
+    "rating": 4.5
+  },
+  {
+    "id": "P011",
+    "name": "Desk Chair",
+    "category": "furniture",
+    "price": 249.99,
+    "stock": 25,
+    "supplier": "FurniturePro",
+    "rating": 4.3
+  },
+  {
+    "id": "P012",
+    "name": "Webcam HD",
+    "category": "electronics",
+    "price": 59.99,
+    "stock": 100,
+    "supplier": "TechCorp",
+    "rating": 4.0
+  },
+  {
+    "id": "P013",
+    "name": "Sticky Notes",
+    "category": "stationery",
+    "price": 3.99,
+    "stock": 400,
+    "supplier": "PaperPlus",
+    "rating": 4.5
+  },
+  {
+    "id": "P014",
+    "name": "Plant Pot",
+    "category": "home",
+    "price": 15.99,
+    "stock": 90,
+    "supplier": "HomeGoods",
+    "rating": 4.2
+  },
+  {
+    "id": "P015",
+    "name": "USB Hub",
+    "category": "electronics",
+    "price": 24.99,
+    "stock": 75,
+    "supplier": "TechCorp",
+    "rating": 4.1
+  }
+]

@@ -1,0 +1,802 @@
+[
+  {
+    "id": "G-L1-001",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/paper-abstract.txt' and tell me the year this paper was published.",
+    "expected": "2017",
+    "tool_chain": "read_file → extract year",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-002",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/paper-abstract.txt' and tell me how many authors are listed.",
+    "expected": "8",
+    "tool_chain": "read_file → count authors",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-003",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/paper-abstract.txt' and tell me the title of the paper.",
+    "expected": "Attention Is All You Need",
+    "tool_chain": "read_file → extract title",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-004",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/paper-abstract.txt' and tell me the venue where it was published.",
+    "expected": "NeurIPS",
+    "tool_chain": "read_file → extract venue",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-005",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/countries.json' and tell me the capital of Brazil.",
+    "expected": "Brasilia",
+    "tool_chain": "read_file → extract field",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-006",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/countries.json' and tell me the capital of Japan.",
+    "expected": "Tokyo",
+    "tool_chain": "read_file → extract field",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-007",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/countries.json' and tell me the population of China.",
+    "expected": "1412000000",
+    "tool_chain": "read_file → extract field",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-008",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/countries.json' and tell me which continent Germany is in.",
+    "expected": "Europe",
+    "tool_chain": "read_file → extract field",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-009",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/books.txt' and tell me who wrote '1984'.",
+    "expected": "George Orwell",
+    "tool_chain": "read_file → extract author",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-010",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/books.txt' and tell me the publication year of 'The Hobbit'.",
+    "expected": "1937",
+    "tool_chain": "read_file → extract year",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-011",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/books.txt' and tell me how many pages 'War and Peace' has.",
+    "expected": "1225",
+    "tool_chain": "read_file → extract pages",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-012",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/books.txt' and tell me the genre of 'The Lord of the Rings'.",
+    "expected": "Fantasy",
+    "tool_chain": "read_file → extract genre",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-013",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/financial-report.csv' and tell me the revenue in Q1-2024.",
+    "expected": "1500000",
+    "tool_chain": "read_file → extract revenue",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-014",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/financial-report.csv' and tell me the number of employees in Q4-2024.",
+    "expected": "65",
+    "tool_chain": "read_file → extract employees",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-015",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/financial-report.csv' and tell me the profit in Q2-2025.",
+    "expected": "1300000",
+    "tool_chain": "read_file → extract profit",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-016",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/inventory.json' and tell me the price of 'Mechanical Keyboard'.",
+    "expected": "89.99",
+    "tool_chain": "read_file → extract price",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-017",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/inventory.json' and tell me the stock count of 'USB-C Cable'.",
+    "expected": "500",
+    "tool_chain": "read_file → extract stock",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-018",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/inventory.json' and tell me the supplier of 'Desk Chair'.",
+    "expected": "FurniturePro",
+    "tool_chain": "read_file → extract supplier",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-019",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/server-logs.txt' and tell me how many ERROR entries there are.",
+    "expected": "7",
+    "tool_chain": "read_file → count ERROR",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-020",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/server-logs.txt' and tell me how many WARN entries there are.",
+    "expected": "5",
+    "tool_chain": "read_file → count WARN",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-021",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/server-logs.txt' and tell me how many INFO entries there are.",
+    "expected": "7",
+    "tool_chain": "read_file → count INFO",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-022",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/server-logs.txt' and tell me what port the server started on.",
+    "expected": "8080",
+    "tool_chain": "read_file → extract port",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-023",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/countries.json' and tell me how many countries are listed.",
+    "expected": "20",
+    "tool_chain": "read_file → count entries",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-024",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/countries.json' and tell me the GDP of the United States.",
+    "expected": "25.5",
+    "tool_chain": "read_file → extract GDP",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-025",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/countries.json' and tell me the area of Russia in km2.",
+    "expected": "17098242",
+    "tool_chain": "read_file → extract area",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-026",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/books.txt' and tell me how many books are listed.",
+    "expected": "15",
+    "tool_chain": "read_file → count entries",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-027",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/books.txt' and tell me the oldest book's publication year.",
+    "expected": "800 BC",
+    "tool_chain": "read_file → find min year",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-028",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/books.txt' and tell me the longest book title.",
+    "expected": "To Kill a Mockingbird",
+    "tool_chain": "read_file → find longest title",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-029",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/inventory.json' and tell me how many products are in the 'electronics' category.",
+    "expected": "8",
+    "tool_chain": "read_file → count by category",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-030",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/inventory.json' and tell me the highest rated product.",
+    "expected": "Mechanical Keyboard",
+    "tool_chain": "read_file → find max rating",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-031",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/financial-report.csv' and tell me which quarter had the highest revenue.",
+    "expected": "Q2-2025",
+    "tool_chain": "read_file → find max revenue",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-032",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/financial-report.csv' and tell me which quarter had the lowest profit.",
+    "expected": "Q1-2024",
+    "tool_chain": "read_file → find min profit",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-033",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/countries.json' and tell me which country has the largest population.",
+    "expected": "China",
+    "tool_chain": "read_file → find max population",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-034",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/countries.json' and tell me which country has the smallest area.",
+    "expected": "South Korea",
+    "tool_chain": "read_file → find min area",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-035",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/server-logs.txt' and tell me the first timestamp in the log.",
+    "expected": "2024-01-15 09:00:12",
+    "tool_chain": "read_file → extract first timestamp",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-036",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/server-logs.txt' and tell me the last timestamp in the log.",
+    "expected": "2024-01-15 09:16:12",
+    "tool_chain": "read_file → extract last timestamp",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-037",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/paper-abstract.txt' and tell me how many citations the paper has (number only).",
+    "expected": "130000",
+    "tool_chain": "read_file → extract citations",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-038",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/paper-abstract.txt' and tell me how many pages the paper has.",
+    "expected": "15",
+    "tool_chain": "read_file → extract pages",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-039",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/inventory.json' and tell me the cheapest product's name.",
+    "expected": "Sticky Notes",
+    "tool_chain": "read_file → find min price",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L1-040",
+    "level": 1,
+    "prompt": "Read the file 'e2e/bench-fixtures/gaia-data/inventory.json' and tell me the most expensive product's name.",
+    "expected": "Laptop Pro 15",
+    "tool_chain": "read_file → find max price",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-001",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/countries.json'. Calculate the total population of all Asian countries. Reply with ONLY the number.",
+    "expected": "3891700000",
+    "tool_chain": "read_file → filter Asia → sum population",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-002",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/countries.json'. Calculate the total GDP of all European countries. Reply with ONLY the number.",
+    "expected": "12.1",
+    "tool_chain": "read_file → filter Europe → sum GDP",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-003",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/countries.json'. Find the country with the highest population density (population / area). Reply with ONLY the country name.",
+    "expected": "Bangladesh",
+    "tool_chain": "read_file → compute density → find max",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-004",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/countries.json'. Calculate the average GDP of all countries. Reply with ONLY the number rounded to 2 decimal places.",
+    "expected": "3.13",
+    "tool_chain": "read_file → avg GDP",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-005",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/countries.json'. How many countries gained independence after 1900? Reply with ONLY the number.",
+    "expected": "11",
+    "tool_chain": "read_file → filter year > 1900 → count",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-006",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/financial-report.csv'. Calculate the total revenue across all quarters. Reply with ONLY the number.",
+    "expected": "13900000",
+    "tool_chain": "read_file → sum revenue",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-007",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/financial-report.csv'. Calculate the total profit across all quarters. Reply with ONLY the number.",
+    "expected": "4800000",
+    "tool_chain": "read_file → sum profit",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-008",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/financial-report.csv'. Calculate the average expenses. Reply with ONLY the number rounded to nearest integer.",
+    "expected": "1516667",
+    "tool_chain": "read_file → avg expenses",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-009",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/financial-report.csv'. What is the profit margin (profit/revenue) for Q4-2024? Reply with ONLY the percentage rounded to 1 decimal place.",
+    "expected": "36.0",
+    "tool_chain": "read_file → compute margin",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-010",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/financial-report.csv'. What is the revenue growth rate from Q1-2024 to Q2-2025? Reply with ONLY the percentage rounded to 1 decimal place.",
+    "expected": "113.3",
+    "tool_chain": "read_file → compute growth rate",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-011",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/books.txt'. Calculate the total number of pages across all books. Reply with ONLY the number.",
+    "expected": "7789",
+    "tool_chain": "read_file → sum pages",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-012",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/books.txt'. What is the average number of pages per book? Reply with ONLY the number rounded to nearest integer.",
+    "expected": "519",
+    "tool_chain": "read_file → avg pages",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-013",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/books.txt'. How many books were published in the 20th century (1900-1999)? Reply with ONLY the number.",
+    "expected": "7",
+    "tool_chain": "read_file → filter century → count",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-014",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/books.txt'. Which author wrote the most books in this list? Reply with ONLY the author name.",
+    "expected": "J.R.R. Tolkien",
+    "tool_chain": "read_file → count per author → find max",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-015",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/books.txt'. What is the difference in pages between the longest and shortest book? Reply with ONLY the number.",
+    "expected": "1045",
+    "tool_chain": "read_file → max - min pages",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-016",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/inventory.json'. Calculate the total value of all inventory (price * stock for each product). Reply with ONLY the number.",
+    "expected": "115940.75",
+    "tool_chain": "read_file → compute total value",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-017",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/inventory.json'. What is the average price of electronics products? Reply with ONLY the number rounded to 2 decimal places.",
+    "expected": "238.49",
+    "tool_chain": "read_file → filter electronics → avg price",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-018",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/inventory.json'. Which supplier has the most products? Reply with ONLY the supplier name.",
+    "expected": "TechCorp",
+    "tool_chain": "read_file → count per supplier → find max",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-019",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/inventory.json'. Calculate the total stock across all products. Reply with ONLY the number.",
+    "expected": "2425",
+    "tool_chain": "read_file → sum stock",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-020",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/inventory.json'. What is the average rating of all products? Reply with ONLY the number rounded to 2 decimal places.",
+    "expected": "4.35",
+    "tool_chain": "read_file → avg rating",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-021",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/server-logs.txt'. How many unique IP addresses appear in ERROR entries? Reply with ONLY the number.",
+    "expected": "3",
+    "tool_chain": "read_file → filter ERROR → extract IPs → count unique",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-022",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/server-logs.txt'. What is the time span between the first and last log entry in minutes? Reply with ONLY the number.",
+    "expected": "16",
+    "tool_chain": "read_file → parse timestamps → diff",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-023",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/server-logs.txt'. How many failed login attempts were there? Reply with ONLY the number.",
+    "expected": "4",
+    "tool_chain": "read_file → filter failed login → count",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-024",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/server-logs.txt'. What was the peak memory usage percentage mentioned? Reply with ONLY the number.",
+    "expected": "82",
+    "tool_chain": "read_file → extract memory usage → find max",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-025",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/paper-abstract.txt'. Count the number of words in the abstract. Reply with ONLY the number.",
+    "expected": "55",
+    "tool_chain": "read_file → count words",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-026",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/countries.json' and 'e2e/bench-fixtures/gaia-data/books.txt'. How many countries in the JSON have a name that starts with the same letter as any author's last name? Reply with ONLY the number.",
+    "expected": "5",
+    "tool_chain": "read 2 files → cross-reference",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-027",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/financial-report.csv' and 'e2e/bench-fixtures/gaia-data/inventory.json'. Is the total revenue (all quarters) greater than the total inventory value? Reply with Yes or No.",
+    "expected": "Yes",
+    "tool_chain": "read 2 files → compare sums",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-028",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/countries.json'. List all countries in Africa. How many are there? Reply with ONLY the number.",
+    "expected": "3",
+    "tool_chain": "read_file → filter Africa → count",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-029",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/countries.json'. What percentage of countries are in Asia? Reply with ONLY the percentage rounded to nearest integer.",
+    "expected": "45",
+    "tool_chain": "read_file → count Asia / total * 100",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-030",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/inventory.json'. What is the total stock value (price * stock) of all TechCorp products? Reply with ONLY the number.",
+    "expected": "91469.1",
+    "tool_chain": "read_file → filter TechCorp → sum price*stock",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-031",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/books.txt'. What is the median number of pages? Reply with ONLY the number.",
+    "expected": "342",
+    "tool_chain": "read_file → sort → median",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-032",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/server-logs.txt'. What is the ratio of ERROR to INFO entries? Reply with ONLY the ratio as a decimal rounded to 2 places.",
+    "expected": "0.88",
+    "tool_chain": "read_file → count ERROR/INFO",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-033",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/countries.json'. What is the total area of all North American countries? Reply with ONLY the number.",
+    "expected": "11797892",
+    "tool_chain": "read_file → filter N. America → sum area",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-034",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/financial-report.csv'. How many quarters had profit exceeding 500000? Reply with ONLY the number.",
+    "expected": "4",
+    "tool_chain": "read_file → filter profit > 500K → count",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L2-035",
+    "level": 2,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/inventory.json'. What is the price range (max - min) across all products? Reply with ONLY the number rounded to 2 decimal places.",
+    "expected": "1296.0",
+    "tool_chain": "read_file → max price - min price",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L3-001",
+    "level": 3,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/countries.json'. Calculate the population-weighted average GDP per capita across all countries. Reply with ONLY the number (integer).",
+    "expected": "13691",
+    "tool_chain": "read_file → compute GDP*pop → sum / total pop",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L3-002",
+    "level": 3,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/countries.json' and 'e2e/bench-fixtures/gaia-data/financial-report.csv'. If the total revenue were distributed equally among the populations of all countries, how much would each person get? Reply with ONLY the number rounded to nearest cent.",
+    "expected": "0.00",
+    "tool_chain": "read 2 files → revenue / total population",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L3-003",
+    "level": 3,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/books.txt', 'e2e/bench-fixtures/gaia-data/countries.json', and 'e2e/bench-fixtures/gaia-data/inventory.json'. How many total items (books + countries + products) are there? Reply with ONLY the number.",
+    "expected": "50",
+    "tool_chain": "read 3 files → sum counts",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L3-004",
+    "level": 3,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/inventory.json'. Group products by supplier. For each supplier, calculate total stock value. Which supplier has the highest total stock value? Reply with ONLY the supplier name.",
+    "expected": "TechCorp",
+    "tool_chain": "read_file → group → aggregate → find max",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L3-005",
+    "level": 3,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/inventory.json'. Group products by category. For each category, calculate average rating. Which category has the highest average rating? Reply with ONLY the category name.",
+    "expected": "kitchen",
+    "tool_chain": "read_file → group → aggregate → find max",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L3-006",
+    "level": 3,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/financial-report.csv'. Calculate the quarter-over-quarter revenue growth rate for each quarter. What is the highest growth rate? Reply with ONLY the percentage rounded to 1 decimal place.",
+    "expected": "20.0",
+    "tool_chain": "read_file → compute sequential growth rates → find max",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L3-007",
+    "level": 3,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/server-logs.txt'. Create a summary: count entries by severity level (INFO, WARN, ERROR). What is the total number of entries? Reply with ONLY the number.",
+    "expected": "20",
+    "tool_chain": "read_file → count by level → sum",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L3-008",
+    "level": 3,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/countries.json'. For each continent, find the country with the largest population. How many continents are represented? Reply with ONLY the number.",
+    "expected": "6",
+    "tool_chain": "read_file → group by continent → find max per group → count groups",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L3-009",
+    "level": 3,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/books.txt'. Sort books by publication year (oldest first). What is the 5th oldest book? Reply with ONLY the book title.",
+    "expected": "Frankenstein",
+    "tool_chain": "read_file → sort by year → get 5th",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L3-010",
+    "level": 3,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/countries.json'. Calculate the correlation between population and area. Is it positive or negative? Reply with ONLY 'positive' or 'negative'.",
+    "expected": "positive",
+    "tool_chain": "read_file → compute correlation",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L3-011",
+    "level": 3,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/inventory.json'. Find all products with rating above 4.3. Calculate their average price. Reply with ONLY the number rounded to 2 decimal places.",
+    "expected": "259.85",
+    "tool_chain": "read_file → filter rating > 4.3 → avg price",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L3-012",
+    "level": 3,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/financial-report.csv'. Calculate the compound monthly growth rate of revenue (assuming each quarter = 3 months). Reply with ONLY the percentage rounded to 2 decimal places.",
+    "expected": "5.18",
+    "tool_chain": "read_file → compute CAGR → monthly",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L3-013",
+    "level": 3,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/books.txt'. Group books by genre. Which genre has the highest average page count? Reply with ONLY the genre name.",
+    "expected": "Fantasy",
+    "tool_chain": "read_file → group by genre → avg pages → find max",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L3-014",
+    "level": 3,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/server-logs.txt'. Extract all timestamps from ERROR entries. What is the average time between consecutive ERROR entries in seconds? Reply with ONLY the number rounded to nearest integer.",
+    "expected": "101",
+    "tool_chain": "read_file → filter ERROR → parse timestamps → avg diff",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L3-015",
+    "level": 3,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/countries.json'. Find the top 3 countries by GDP. Calculate their combined GDP. Reply with ONLY the number.",
+    "expected": "47.4",
+    "tool_chain": "read_file → sort by GDP → top 3 → sum",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L3-016",
+    "level": 3,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/inventory.json' and 'e2e/bench-fixtures/gaia-data/financial-report.csv'. If you sold all inventory at list price, what percentage of Q1-2024 revenue would that represent? Reply with ONLY the percentage rounded to 1 decimal place.",
+    "expected": "7.7",
+    "tool_chain": "read 2 files → inventory value / Q1 revenue * 100",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L3-017",
+    "level": 3,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/countries.json'. For countries that gained independence after 1945, calculate the average population. Reply with ONLY the number (integer).",
+    "expected": "469650000",
+    "tool_chain": "read_file → filter year > 1945 → avg pop",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L3-018",
+    "level": 3,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/books.txt'. Find the author who wrote the book with the most pages. Then find that author's other book(s) in the list. What is the total page count of all their books? Reply with ONLY the number.",
+    "expected": "1225",
+    "tool_chain": "read_file → find max pages → find author → sum their pages",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L3-019",
+    "level": 3,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/server-logs.txt'. What is the most common hour (from timestamps) for log entries? Reply with ONLY the hour number (e.g., 9).",
+    "expected": "9",
+    "tool_chain": "read_file → parse timestamps → count by hour → find max",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L3-020",
+    "level": 3,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/financial-report.csv'. Calculate the linear regression slope of revenue over quarters (Q1-2024=1, Q2-2024=2, etc.). Is revenue increasing or decreasing? Reply with ONLY 'increasing' or 'decreasing'.",
+    "expected": "increasing",
+    "tool_chain": "read_file → linear regression → sign of slope",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L3-021",
+    "level": 3,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/countries.json'. Calculate the Gini coefficient of population distribution across all countries. Reply with ONLY the number rounded to 3 decimal places.",
+    "expected": "0.498",
+    "tool_chain": "read_file → compute Gini coefficient",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L3-022",
+    "level": 3,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/inventory.json'. For each category, find the product with the highest stock. How many categories have a product with stock > 100? Reply with ONLY the number.",
+    "expected": "3",
+    "tool_chain": "read_file → group → max stock per group → count > 100",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L3-023",
+    "level": 3,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/countries.json'. Rank countries by area (largest first). What is the rank of the United States? Reply with ONLY the number.",
+    "expected": "2",
+    "tool_chain": "read_file → sort by area → find US rank",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L3-024",
+    "level": 3,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/books.txt' and 'e2e/bench-fixtures/gaia-data/inventory.json'. How many book titles contain a word that also appears in a product name? Reply with ONLY the number.",
+    "expected": "0",
+    "tool_chain": "read 2 files → tokenize → intersect → count",
+    "source": "GAIA-style (constructed)"
+  },
+  {
+    "id": "G-L3-025",
+    "level": 3,
+    "prompt": "Read 'e2e/bench-fixtures/gaia-data/financial-report.csv'. Predict the revenue for Q3-2025 using linear extrapolation from the existing data. Reply with ONLY the number (integer).",
+    "expected": "3600000",
+    "tool_chain": "read_file → linear regression → extrapolate",
+    "source": "GAIA-style (constructed)"
+  }
+]
