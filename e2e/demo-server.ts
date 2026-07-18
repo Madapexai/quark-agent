@@ -898,12 +898,22 @@ function getLLMConfig() {
   const arkBaseUrl = process.env.ARK_BASE_URL || "https://ark.cn-beijing.volces.com/api/coding/v3";
   const arkModel = process.env.ARK_MODEL || "doubao-seed-code";
 
-  // Priority 2: model-proxy (Anthropic Messages API)
+  // Priority 2: Agnes AI (free, OpenAI-compatible)
+  const agnesApiKey = process.env.AGNES_API_KEY || "";
+  const agnesBaseUrl = process.env.AGNES_BASE_URL || "https://apihub.agnes-ai.com/v1";
+  const agnesModel = process.env.AGNES_MODEL || "agnes-2.0-flash";
+
+  // Priority 3: GLM / ZhipuAI (free, OpenAI-compatible)
+  const glmApiKey = process.env.GLM_API_KEY || "";
+  const glmBaseUrl = process.env.GLM_BASE_URL || "https://open.bigmodel.cn/api/paas/v4";
+  const glmModel = process.env.GLM_MODEL || "glm-4-flash";
+
+  // Priority 4: model-proxy (Anthropic Messages API)
   const modelProxyUrl = process.env.MODEL_PROXY_URL || "http://127.0.0.1:43191";
   const modelProxyKey = process.env.MODEL_PROXY_KEY || process.env.ZAI_ANTHROPIC_AUTH_TOKEN || "";
   const modelProxyModel = process.env.MODEL_PROXY_MODEL || "GLM-4.5-Air";
 
-  // Priority 3: Direct OpenAI-compatible API
+  // Priority 5: Direct OpenAI-compatible API
   const apiKey = process.env.OPENAI_API_KEY || process.env.DEEPSEEK_API_KEY;
   let baseUrl: string;
   let model: string;
@@ -916,17 +926,72 @@ function getLLMConfig() {
     model = "gpt-4o-mini";
   }
 
+  // Provider chain: Ark > Agnes > GLM > Model Proxy > Direct API
   const useArk = !!arkApiKey;
-  const useModelProxy = !useArk && !!modelProxyKey;
-  const useDirectApi = !useArk && !useModelProxy && !!apiKey;
+  const useAgnes = !useArk && !!agnesApiKey;
+  const useGlm = !useArk && !useAgnes && !!glmApiKey;
+  const useModelProxy = !useArk && !useAgnes && !useGlm && !!modelProxyKey;
+  const useDirectApi = !useArk && !useAgnes && !useGlm && !useModelProxy && !!apiKey;
+
+  // Build ordered fallback chain of OpenAI-compatible providers
+  const openAIChain: Array<{ name: string; apiKey: string; baseUrl: string; model: string }> = [];
+  if (arkApiKey) openAIChain.push({ name: "ark", apiKey: arkApiKey, baseUrl: arkBaseUrl, model: arkModel });
+  if (agnesApiKey) openAIChain.push({ name: "agnes", apiKey: agnesApiKey, baseUrl: agnesBaseUrl, model: agnesModel });
+  if (glmApiKey) openAIChain.push({ name: "glm", apiKey: glmApiKey, baseUrl: glmBaseUrl, model: glmModel });
+  if (apiKey) openAIChain.push({ name: "direct", apiKey, baseUrl, model });
+
+  // Primary = first in chain; used by existing code paths
+  const primary = openAIChain[0];
 
   return {
-    apiKey: useArk ? arkApiKey! : (useDirectApi ? apiKey! : ""),
-    baseUrl: useArk ? arkBaseUrl : baseUrl,
-    model: useArk ? arkModel : model,
-    useArk, useModelProxy, useDirectApi,
+    apiKey: useArk ? arkApiKey! : useAgnes ? agnesApiKey! : useGlm ? glmApiKey! : (useDirectApi ? apiKey! : ""),
+    baseUrl: useArk ? arkBaseUrl : useAgnes ? agnesBaseUrl : useGlm ? glmBaseUrl : baseUrl,
+    model: useArk ? arkModel : useAgnes ? agnesModel : useGlm ? glmModel : model,
+    useArk, useAgnes, useGlm, useModelProxy, useDirectApi,
     modelProxyUrl, modelProxyKey, modelProxyModel,
+    // Free fallback providers for runtime degradation
+    openAIChain,
+    primary,
   };
+}
+
+/**
+ * Probe a provider with a minimal chat request. Returns true if the provider
+ * responds with a valid chat completion. Used to pick the primary at startup
+ * and to skip dead providers in the fallback chain.
+ */
+async function probeProvider(p: { name: string; apiKey: string; baseUrl: string; model: string }): Promise<boolean> {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 10000);
+    const res = await fetch(`${p.baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${p.apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ model: p.model, messages: [{ role: "user", content: "ping" }], max_tokens: 5 }),
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+    if (!res.ok) return false;
+    const data = await res.json() as any;
+    return !!data.choices?.[0]?.message;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * At startup, probe all configured OpenAI-compatible providers and select the
+ * first healthy one as primary. Mutates the config so existing code paths use
+ * the selected provider.
+ */
+async function selectPrimaryProvider(): Promise<{ name: string; model: string } | null> {
+  const cfg = getLLMConfig();
+  for (const p of cfg.openAIChain) {
+    const ok = await probeProvider(p);
+    console.log(`  [probe] ${p.name} (${p.model}) → ${ok ? "healthy" : "unreachable"}`);
+    if (ok) return { name: p.name, model: p.model };
+  }
+  return null;
 }
 
 let _modelProxyAvailable: boolean | null = null;
@@ -1116,17 +1181,51 @@ async function callLLMStream(
     return await callLLMStreamViaModelProxy(messages, tools, _writer, send);
   }
 
-  // Direct OpenAI-compatible API (Ark / OpenAI / DeepSeek)
-  const url = `${config.baseUrl}/chat/completions`;
+  // OpenAI-compatible provider chain with automatic fallback.
+  // Tries each provider in order (Ark > Agnes > GLM > direct) until one
+  // returns a non-error response. This lets free providers back up the
+  // primary coding-plan provider at runtime.
+  const chain = config.openAIChain;
+  if (chain.length === 0) {
+    throw new Error("No LLM provider configured. Set ARK_API_KEY / AGNES_API_KEY / GLM_API_KEY / OPENAI_API_KEY in e2e/.env");
+  }
+
+  let lastErr: Error | null = null;
+  for (let i = 0; i < chain.length; i++) {
+    const provider = chain[i];
+    const isPrimary = i === 0;
+    if (!isPrimary) {
+      send("thinking", `Primary LLM failed; falling back to ${provider.name} (${provider.model})...`);
+    }
+    try {
+      const result = await callOpenAICompatibleStream(provider, messages, tools, send);
+      return result;
+    } catch (e) {
+      lastErr = e instanceof Error ? e : new Error(String(e));
+      console.error(`  [llm] ${provider.name} failed: ${lastErr.message.slice(0, 120)}`);
+      // try next provider in chain
+    }
+  }
+  throw lastErr ?? new Error("All LLM providers failed");
+}
+
+/** Single attempt against one OpenAI-compatible provider (streaming). */
+async function callOpenAICompatibleStream(
+  provider: { name: string; apiKey: string; baseUrl: string; model: string },
+  messages: LLMMessage[],
+  tools: typeof toolDefinitions,
+  send: (type: string, content: string, meta?: Record<string, any>) => void,
+): Promise<LLMResponse> {
+  const url = `${provider.baseUrl}/chat/completions`;
 
   const resp = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${config.apiKey}`,
+      "Authorization": `Bearer ${provider.apiKey}`,
     },
     body: JSON.stringify({
-      model: config.model,
+      model: provider.model,
       messages,
       tools,
       stream: true,
@@ -1135,7 +1234,7 @@ async function callLLMStream(
 
   if (!resp.ok) {
     const errText = await resp.text();
-    throw new Error(`LLM API error: ${resp.status} - ${errText.slice(0, 200)}`);
+    throw new Error(`LLM ${provider.name} API error: ${resp.status} - ${errText.slice(0, 200)}`);
   }
 
   // Parse SSE stream from LLM
@@ -1763,9 +1862,18 @@ function formatCodeReply(): string {
 
 function createStatusHandler() {
   const config = getLLMConfig();
-  const llmEnabled = config.useArk || config.useModelProxy || config.useDirectApi;
-  const modelName = config.useArk ? config.model : config.useModelProxy ? (process.env.MODEL_PROXY_MODEL || "GLM-4.5-Air") : "gpt-4o-mini";
-  const llmMode = config.useArk ? "ark" : config.useModelProxy ? "model-proxy" : config.useDirectApi ? "direct" : "fallback";
+  const llmEnabled = config.useArk || config.useAgnes || config.useGlm || config.useModelProxy || config.useDirectApi;
+  const modelName = config.useArk ? config.model
+    : config.useAgnes ? config.model
+    : config.useGlm ? config.model
+    : config.useModelProxy ? (process.env.MODEL_PROXY_MODEL || "GLM-4.5-Air")
+    : "gpt-4o-mini";
+  const llmMode = config.useArk ? "ark"
+    : config.useAgnes ? "agnes"
+    : config.useGlm ? "glm"
+    : config.useModelProxy ? "model-proxy"
+    : config.useDirectApi ? "direct"
+    : "fallback";
   const body = JSON.stringify({
     llm: llmEnabled,
     model: llmEnabled ? modelName : null,
@@ -2073,13 +2181,19 @@ async function main() {
   await new Promise<void>((resolve) => server.listen(PORT, "0.0.0.0", resolve));
   const addr = server.address() as { port: number };
   const cfg = getLLMConfig();
-  const llmStatus = cfg.useArk
-    ? `enabled (Ark · ${cfg.model})`
+
+  // Probe all configured providers and select the first healthy one as primary.
+  // This picks the coding-plan provider when available, and falls back to free
+  // providers (Agnes / GLM) if the primary is unreachable.
+  console.log(`\n[micro-agent] Probing LLM providers...`);
+  const healthy = await selectPrimaryProvider();
+
+  const chainNames = cfg.openAIChain.map((p) => `${p.name}(${p.model})`).join(" → ") || "none";
+  const llmStatus = healthy
+    ? `enabled (${healthy.name} · ${healthy.model}) [chain: ${chainNames}]`
     : cfg.useModelProxy
       ? `enabled via model-proxy (${cfg.modelProxyModel})`
-      : cfg.useDirectApi
-        ? `enabled (direct · ${cfg.model})`
-        : "disabled (rule-engine fallback; /goal runs in mock-mode)";
+      : "disabled (rule-engine fallback; /goal runs in mock-mode)";
   console.log(`\n[micro-agent] Professional Agent Server running on http://localhost:${addr.port}`);
   console.log(`  Chat (streaming): POST /api/chat/stream (SSE)`);
   console.log(`  Web UI:            http://localhost:${addr.port}`);
