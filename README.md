@@ -54,6 +54,9 @@
 | Channel entries | 7 | CLI | CLI |
 | A2A protocol | built-in | — | — |
 | Profile presets | 6 | — | — |
+| MoA routing | ✅ | ❌ | ❌ |
+| Sandbox policy | ✅ | ❌ | ❌ |
+| Setup wizard | ✅ | ❌ | ❌ |
 
 ---
 
@@ -77,12 +80,18 @@ Evaluated on the industry-standard **AgentBench (THUDM)** and **GAIA (Meta/HF)**
 ## 30-Second Quick Start
 
 ```bash
+# Option 1: Clone and run
 git clone https://github.com/Madapexai/quark-agent.git
 cd quark-agent && npm install
-cp e2e/.env.example e2e/.env   # then fill in ONE API key (see below)
-npx tsx e2e/demo-server.ts
-# → http://localhost:3456
+npx tsx bin/cli.ts setup      # Interactive setup wizard (or --non-interactive for CI)
+npx tsx bin/cli.ts chat       # Start chatting!
+
+# Option 2: npx (after npm publish)
+npx quark-agent setup         # Configure your provider
+npx quark-agent chat          # Start chatting!
 ```
+
+> **New in v0.3.0**: `quark-agent setup` walks you through choosing a provider, model, channels, and sandbox policy. No more manual `.env` editing!
 
 > **⚠️ You need to bring your own LLM API key.** Quark Agent is model-agnostic (speaks the OpenAI-compatible API) but does **not** ship with a built-in model. Grab a free key in 2 minutes — see [Get a Free API Key](#-get-a-free-api-key) below.
 
@@ -342,16 +351,30 @@ PORT=3465 node e2e/full-eval.mjs --bench all
 
 ---
 
+## What's New in v0.3.0
+
+- **Setup Wizard** — `quark-agent setup` walks you through provider, model, channels, and sandbox policy
+- **MoA Intelligent Routing** — task complexity detection (simple/medium/complex) → auto-routes to fast/medium/powerful models
+- **Sandbox Security Policy** — shell allowlist/denylist, network/filesystem control, preset policies (strict/balanced/permissive)
+- **Tool Authorization** — configurable auto-approve: `all` / `safe` (read-only auto-approved) / `none`
+- **Unified Config** — `.quark-agent.json` config file + env vars + CLI flags with priority chain
+- **Checkpoint & Long-Running Programming** — state persistence, auto-save, crash recovery, resume from checkpoint
+- **Multi-Provider** — OpenAI, Anthropic, Gemini, Ollama, OpenRouter all built-in, zero SDK dependencies
+
 ## Roadmap
 
 - [x] 5KB kernel + 16 composable tools
 - [x] 7 channels (CLI / HTTP / Feishu / WeCom / Tg / GH / Hook)
 - [x] A2A protocol + GEPA self-evolution
 - [x] 200-task benchmark suite (AgentBench + GAIA)
-- [ ] Standalone docs site (GitHub Pages, MkDocs Material)
-- [ ] `npx quark-agent` one-line installer
-- [ ] Plugin marketplace
-- [ ] Multimodal computer-use tool (Claude Computer Use style)
+- [x] Standalone docs site (GitHub Pages, MkDocs Material)
+- [x] `npx quark-agent` one-line installer + setup wizard
+- [x] Plugin marketplace (`quark-agent add`)
+- [x] MoA intelligent routing + sandbox policy + tool authorization
+- [x] Checkpoint & long-running programming support
+- [ ] Computer-use tool (screenshot + click + type)
+- [ ] Browser-use agent (Puppeteer-driven)
+- [ ] npm publish for `npx quark-agent`
 
 ---
 

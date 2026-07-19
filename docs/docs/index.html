@@ -137,6 +137,22 @@ body::before{
 .donut-legend span{display:flex;align-items:center;gap:8px}
 .donut-legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
 
+/* ===== V0.3 FEATURES ===== */
+.feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:48px}
+.feature{background:var(--glass);border:1px solid var(--line2);padding:28px 22px;border-radius:var(--radius);transition:all .4s;opacity:0;transform:translateY(24px)}
+.feature.visible{opacity:1;transform:translateY(0)}
+.feature:hover{border-color:var(--accent);background:rgba(168,85,247,.04)}
+.feature .f-icon{width:36px;height:36px;margin-bottom:14px}
+.feature .f-icon svg{width:36px;height:36px;stroke:var(--accent3);fill:none;stroke-width:1.5}
+.feature h3{font-size:14px;font-weight:700;letter-spacing:-.2px;margin-bottom:6px}
+.feature p{font-size:12px;color:var(--text2);line-height:1.6}
+.feature code{color:var(--accent3);font-family:var(--mono);font-size:11px}
+
+/* ===== COMPLETED TIMELINE ===== */
+.tl-item.completed .tl-dot{border-color:var(--accent3)}
+.tl-item.completed .tl-dot::after{background:var(--accent3);animation:none}
+.tl-item.completed .tl-version{color:var(--accent3)}
+
 /* ===== ISSUES ===== */
 .issue-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-top:48px}
 .issue{background:rgba(239,68,68,.03);border:1px solid rgba(239,68,68,.1);padding:24px;border-radius:var(--radius);transition:all .4s;opacity:0;transform:translateY(16px)}
@@ -176,6 +192,7 @@ body::before{
   .what-grid{grid-template-columns:1fr;gap:32px}
   .principle-grid{grid-template-columns:1fr 1fr}
   .stats-row{grid-template-columns:1fr 1fr}
+  .feature-grid{grid-template-columns:1fr 1fr}
   .issue-grid{grid-template-columns:1fr}
   .arch-wrap{max-width:320px;margin:0 auto}
   #particles{display:none}
@@ -199,6 +216,7 @@ body::before{
     <a href="#what"><span class="zh-only">定位</span><span class="en-only">Position</span></a>
     <a href="#principle"><span class="zh-only">原理</span><span class="en-only">Principles</span></a>
     <a href="#stats"><span class="zh-only">成果</span><span class="en-only">Results</span></a>
+    <a href="#features"><span class="zh-only">v0.3</span><span class="en-only">v0.3</span></a>
     <a href="#issues"><span class="zh-only">问题</span><span class="en-only">Issues</span></a>
     <a href="#roadmap"><span class="zh-only">路线</span><span class="en-only">Roadmap</span></a>
   </div>
@@ -221,6 +239,8 @@ body::before{
       <span class="badge"><svg viewBox="0 0 16 16"><path d="M6 2L1 7l5 5v-3h4V5H6V2z"/></svg>89% Bench</span>
       <span class="badge"><svg viewBox="0 0 16 16"><path d="M4 1l8 4-8 4V1z"/></svg>16 Tools</span>
       <span class="badge"><svg viewBox="0 0 16 16"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm3.5 9.5l-4 2A1 1 0 016 10.73V5.27a1 1 0 011.5-.86l4 2a1 1 0 010 1.73z"/></svg>7 Channels</span>
+      <span class="badge"><svg viewBox="0 0 16 16"><circle cx="8" cy="6" r="4"/><path d="M4 10h8M8 10v4"/></svg>MoA</span>
+      <span class="badge"><svg viewBox="0 0 16 16"><path d="M8 1L14 5v6l-6 4-6-4V5z"/></svg>Sandbox</span>
     </div>
     <div class="cta-row">
       <a href="quickstart/" class="cta cta-primary">
@@ -258,6 +278,8 @@ body::before{
           <tr><td class="zh-only">通道数</td><td class="en-only">Channels</td><td class="check">7</td><td class="cross">CLI</td><td class="cross">CLI</td><td class="cross">API</td></tr>
           <tr><td class="zh-only">A2A 协议</td><td class="en-only">A2A</td><td class="check">built-in</td><td class="cross">—</td><td class="cross">—</td><td class="cross">—</td></tr>
           <tr><td class="zh-only">自进化</td><td class="en-only">GEPA</td><td class="check">built-in</td><td class="cross">—</td><td class="cross">—</td><td class="cross">—</td></tr>
+          <tr><td class="zh-only">MoA 路由</td><td class="en-only">MoA</td><td class="check">v0.3</td><td class="cross">—</td><td class="cross">—</td><td class="cross">—</td></tr>
+          <tr><td class="zh-only">沙盒策略</td><td class="en-only">Sandbox</td><td class="check">v0.3</td><td class="cross">—</td><td class="cross">—</td><td class="cross">—</td></tr>
         </tbody>
       </table>
     </div>
@@ -352,6 +374,68 @@ body::before{
 
 <div class="divider" style="max-width:1200px;margin:0 auto"></div>
 
+<!-- ===== V0.3 FEATURES ===== -->
+<section class="section" id="features">
+  <div class="section-label"><span class="zh-only">03.5 / v0.3.0 新特性</span><span class="en-only">03.5 / v0.3.0 Features</span></div>
+  <h2 class="section-title"><span class="zh-only">从内核到工程体系</span><span class="en-only">From kernel to engineering system</span></h2>
+  <p class="section-desc">
+    <span class="zh-only">v0.3.0 补齐了配置、安全、持久化三大工程短板，并引入 MoA 智能路由和运行时模型切换——5KB 内核不变，能力边界指数级扩展。</span>
+    <span class="en-only">v0.3.0 fills the three engineering gaps — config, security, persistence — and adds MoA intelligent routing with runtime model switching. 5KB kernel unchanged; capability boundary exponentially expanded.</span>
+  </p>
+  <div class="feature-grid">
+    <div class="feature">
+      <div class="f-icon"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="14"/><path d="M18 10v2M18 24v2M10 18h2M24 18h2" stroke-linecap="round"/><circle cx="18" cy="18" r="4"/></svg></div>
+      <h3><span class="zh-only">环境变量管理</span><span class="en-only">Environment Variable Mgmt</span></h3>
+      <p class="zh-only">统一配置系统：<code>MICRO_API_KEY</code> <code>QUARK_API_KEY</code> <code>ANTHROPIC_API_KEY</code> <code>GEMINI_API_KEY</code> 等。支持 <code>.quark-agent.json</code> 配置文件，优先级链：CLI flag &gt; env &gt; config &gt; default。</p>
+      <p class="en-only">Unified config system: <code>MICRO_API_KEY</code> <code>QUARK_API_KEY</code> <code>ANTHROPIC_API_KEY</code> <code>GEMINI_API_KEY</code> etc. Config file <code>.quark-agent.json</code> support. Priority: CLI flag &gt; env &gt; config &gt; default.</p>
+    </div>
+    <div class="feature">
+      <div class="f-icon"><svg viewBox="0 0 36 36"><rect x="6" y="4" width="24" height="28" rx="3"/><path d="M12 12h12M12 17h8M12 22h10" stroke-linecap="round"/></svg></div>
+      <h3><span class="zh-only">Setup Wizard</span><span class="en-only">Setup Wizard</span></h3>
+      <p class="zh-only">首次运行交互向导：<code>quark-agent setup</code> 逐步引导 provider / channel / model / sandbox 配置，零文档即可启动。</p>
+      <p class="en-only">First-run interactive wizard: <code>quark-agent setup</code> walks through provider / channel / model / sandbox config step by step. Zero-doc onboarding.</p>
+    </div>
+    <div class="feature">
+      <div class="f-icon"><svg viewBox="0 0 36 36"><path d="M18 4L32 18 18 32 4 18z"/><path d="M18 10v8M18 22v1" stroke-linecap="round"/></svg></div>
+      <h3><span class="zh-only">沙盒安全策略</span><span class="en-only">Sandbox Security Policy</span></h3>
+      <p class="zh-only">Shell 命令 allowlist/denylist、network/filesystem 控制、工具自动审批模式（all/safe/none）、预设策略（strict/balanced/permissive）。</p>
+      <p class="en-only">Shell command allowlist/denylist, network/filesystem control, tool auto-approve modes (all/safe/none), preset policies (strict/balanced/permissive).</p>
+    </div>
+    <div class="feature">
+      <div class="f-icon"><svg viewBox="0 0 36 36"><rect x="6" y="14" width="20" height="16" rx="3"/><path d="M18 6v8" stroke-linecap="round"/><circle cx="18" cy="22" r="3"/></svg></div>
+      <h3><span class="zh-only">工具授权</span><span class="en-only">Tool Authorization</span></h3>
+      <p class="zh-only">可配置自动审批：<code>all</code> 全部放行、<code>safe</code> 只审批只读工具（破坏性工具需确认）、<code>none</code> 全部需确认。</p>
+      <p class="en-only">Configurable auto-approve: <code>all</code> approve everything, <code>safe</code> approve read-only (prompt for destructive), <code>none</code> prompt for all.</p>
+    </div>
+    <div class="feature">
+      <div class="f-icon"><svg viewBox="0 0 36 36"><path d="M6 12h24M6 18h24M6 24h24" stroke-linecap="round"/><circle cx="12" cy="12" r="2" fill="var(--accent3)" stroke="none"/><circle cx="22" cy="18" r="2" fill="var(--accent3)" stroke="none"/><circle cx="16" cy="24" r="2" fill="var(--accent3)" stroke="none"/></svg></div>
+      <h3><span class="zh-only">模型可配置</span><span class="en-only">Model Configurability</span></h3>
+      <p class="zh-only">运行时模型切换、temperature / max_tokens 可配、多 provider 支持。一行代码换模型，无需重启。</p>
+      <p class="en-only">Runtime model switching, temperature/max_tokens config, multi-provider support. Switch models in one line, no restart.</p>
+    </div>
+    <div class="feature">
+      <div class="f-icon"><svg viewBox="0 0 36 36"><circle cx="12" cy="14" r="6"/><circle cx="24" cy="14" r="6"/><circle cx="18" cy="26" r="6"/><path d="M15 18l3 4M21 18l-3 4" stroke-linecap="round"/></svg></div>
+      <h3><span class="zh-only">MoA + 智能路由</span><span class="en-only">MoA + Intelligent Routing</span></h3>
+      <p class="zh-only">任务复杂度检测（simple/medium/complex），自动路由到 fast/medium/powerful 模型，支持自定义路由规则。</p>
+      <p class="en-only">Task complexity detection (simple/medium/complex), auto-routes to fast/medium/powerful models, custom routing rules.</p>
+    </div>
+    <div class="feature">
+      <div class="f-icon"><svg viewBox="0 0 36 36"><path d="M8 28h20M10 28v-6h6v6M20 28v-10h6v10" stroke-linecap="round" stroke-linejoin="round"/><circle cx="13" cy="16" r="2" fill="var(--accent3)" stroke="none"/><circle cx="23" cy="12" r="2" fill="var(--accent3)" stroke="none"/><path d="M13 16v6M23 12v6" stroke-linecap="round"/></svg></div>
+      <h3><span class="zh-only">Checkpoint + 长程编程</span><span class="en-only">Checkpoint + Long-Running</span></h3>
+      <p class="zh-only">状态持久化、崩溃恢复、自动保存、从 checkpoint 恢复。长时间编程任务不再怕中断。</p>
+      <p class="en-only">State persistence, crash recovery, auto-save, resume from checkpoint. Long-running coding tasks survive interruptions.</p>
+    </div>
+    <div class="feature">
+      <div class="f-icon"><svg viewBox="0 0 36 36"><path d="M8 6h20v24H8z"/><path d="M12 12h12M12 16h8M12 20h10M12 24h6" stroke-linecap="round"/></svg></div>
+      <h3><span class="zh-only">配置文件</span><span class="en-only">Config File</span></h3>
+      <p class="zh-only"><code>.quark-agent.json</code> 或 <code>quark-agent.config.json</code>——项目级配置，provider、model、sandbox、tools 一文件搞定。</p>
+      <p class="en-only"><code>.quark-agent.json</code> or <code>quark-agent.config.json</code> — project-level config. Provider, model, sandbox, tools in one file.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider" style="max-width:1200px;margin:0 auto"></div>
+
 <!-- ===== ISSUES ===== -->
 <section class="section" id="issues">
   <div class="section-label"><span class="zh-only">04 / 已知问题</span><span class="en-only">04 / Known Issues</span></div>
@@ -372,14 +456,14 @@ body::before{
     <div class="issue">
       <div class="i-icon"><svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="11"/><path d="M14 9v5M14 18.5v.5" stroke-linecap="round"/></svg></div>
       <h3><span class="zh-only">无内置 LLM</span><span class="en-only">No built-in LLM</span></h3>
-      <p class="zh-only">Quark Agent 是模型无关的，不内置模型。用户需自备 API Key（GLM/Agnes/Ollama 等），首次使用有门槛。</p>
-      <p class="en-only">Quark Agent is model-agnostic with no built-in model. Users must bring their own API key (GLM / Agnes / Ollama etc.), which adds first-run friction.</p>
+      <p class="zh-only">Quark Agent 是模型无关的，不内置模型。用户需自备 API Key——不过 v0.3.0 的 <code style="color:var(--accent3);font-family:var(--mono)">quark-agent setup</code> 向导已大幅降低首次使用门槛。</p>
+      <p class="en-only">Quark Agent is model-agnostic with no built-in model. Users must bring their own API key — though v0.3.0's <code style="color:var(--accent3);font-family:var(--mono)">quark-agent setup</code> wizard has greatly reduced first-run friction.</p>
     </div>
     <div class="issue">
       <div class="i-icon"><svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="11"/><path d="M14 9v5M14 18.5v.5" stroke-linecap="round"/></svg></div>
       <h3><span class="zh-only">Sandbox 限制</span><span class="en-only">Sandbox limits</span></h3>
-      <p class="zh-only">Web Search 在 CI sandbox 中受限，部分 OS-Interaction 任务因网络隔离而超时。</p>
-      <p class="en-only">Web Search is limited in CI sandbox; some OS-Interaction tasks timeout due to network isolation.</p>
+      <p class="zh-only">Web Search 在 CI sandbox 中受限，部分 OS-Interaction 任务因网络隔离而超时。v0.3.0 的沙盒安全策略提供了更细粒度的控制，但 CI 环境网络隔离仍无法绕过。</p>
+      <p class="en-only">Web Search is limited in CI sandbox; some OS-Interaction tasks timeout due to network isolation. v0.3.0's sandbox security policy provides finer-grained control, but CI network isolation still cannot be bypassed.</p>
     </div>
   </div>
 </section>
@@ -391,11 +475,11 @@ body::before{
   <div class="section-label"><span class="zh-only">05 / 路线</span><span class="en-only">05 / Roadmap</span></div>
   <h2 class="section-title"><span class="zh-only">未来方向</span><span class="en-only">What's next</span></h2>
   <div class="timeline">
-    <div class="tl-item">
+    <div class="tl-item completed">
       <div class="tl-dot"></div>
-      <div class="tl-version">v0.3</div>
-      <div class="tl-title"><span class="zh-only">一行安装 + 插件市场</span><span class="en-only">One-line install + Plugin marketplace</span></div>
-      <div class="tl-desc"><span class="zh-only"><code style="color:var(--accent3);font-family:var(--mono)">npx quark-agent</code> 零配置启动。插件市场：<code style="color:var(--accent3);font-family:var(--mono)">quark-agent add @someone/slack-skill</code></span><span class="en-only"><code style="color:var(--accent3);font-family:var(--mono)">npx quark-agent</code> zero-config start. Plugin marketplace: <code style="color:var(--accent3);font-family:var(--mono)">quark-agent add @someone/slack-skill</code></span></div>
+      <div class="tl-version">v0.3.0</div>
+      <div class="tl-title"><span class="zh-only">配置 / 安全 / 持久化 / MoA 路由</span><span class="en-only">Config / Security / Persistence / MoA Routing</span></div>
+      <div class="tl-desc"><span class="zh-only">环境变量管理 + Setup Wizard + 沙盒安全策略 + 工具授权 + 模型可配置 + MoA 智能路由 + Checkpoint 长程编程 + <code style="color:var(--accent3);font-family:var(--mono)">.quark-agent.json</code> 配置文件</span><span class="en-only">Env var management + Setup Wizard + Sandbox security policy + Tool authorization + Model configurability + MoA intelligent routing + Checkpoint long-running + <code style="color:var(--accent3);font-family:var(--mono)">.quark-agent.json</code> config file</span></div>
     </div>
     <div class="tl-item">
       <div class="tl-dot"></div>
@@ -430,7 +514,7 @@ body::before{
     <div class="footer-links">
       <a href="https://github.com/Madapexai/quark-agent" target="_blank" rel="noopener">GitHub</a>
       <a href="quickstart/">Docs</a>
-      <a href="https://github.com/Madapexai/quark-agent/releases/tag/v0.2.0" target="_blank" rel="noopener">v0.2.0</a>
+      <a href="https://github.com/Madapexai/quark-agent/releases/tag/v0.3.0" target="_blank" rel="noopener">v0.3.0</a>
       <a href="https://github.com/Madapexai/quark-agent/discussions" target="_blank" rel="noopener">Discussions</a>
       <a href="https://github.com/Madapexai/quark-agent/blob/master/LICENSE" target="_blank" rel="noopener">MIT License</a>
     </div>
@@ -467,7 +551,7 @@ body::before{
 /* ===== IntersectionObserver for animations ===== */
 (function(){
   const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("visible");io.unobserve(e.target)}})},{threshold:.15});
-  document.querySelectorAll(".principle,.issue,.tl-item").forEach(el=>io.observe(el));
+  document.querySelectorAll(".principle,.feature,.issue,.tl-item").forEach(el=>io.observe(el));
 
   /* Animate bars when stats section enters viewport */
   const statsSection=document.getElementById("stats");

@@ -49,6 +49,9 @@ nav:
       - Profiles: concepts/profiles.md
       - A2A Protocol: concepts/a2a.md
       - Self-Evolution (GEPA): concepts/gepa.md
+      - Mixture of Agents (MoA): concepts/moa.md
+      - Checkpoint & Long-Running: concepts/checkpoint.md
+      - Sandbox Policy: concepts/sandbox-policy.md
   - Reference:
       - 16 Tools: reference/tools.md
       - 7 Channels: reference/channels.md

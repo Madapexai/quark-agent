@@ -63,7 +63,7 @@ async function slackApi(token: string, method: string, endpoint: string, body?: 
     },
     body: body ? JSON.stringify(body) : undefined,
   });
-  const data = await res.json();
+  const data = (await res.json()) as Record<string, unknown>;
   if (!data.ok) throw new Error(`Slack API error: ${data.error}`);
   return data;
 }

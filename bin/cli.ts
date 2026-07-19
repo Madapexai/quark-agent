@@ -19,6 +19,7 @@ import { createAgent, Runtime, CliChannel, HttpChannel, Evolver } from "../src/i
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { join } from "node:path";
+import { findConfigFile } from "../src/config/index.js";
 
 const apiKey = process.env.MICRO_API_KEY ?? "";
 const baseURL = process.env.MICRO_BASE_URL ?? "https://api.openai.com/v1";
@@ -33,6 +34,7 @@ Usage:
   quark-agent chat                         Interactive CLI
   quark-agent ask "<question>"             One-shot Q&A
   quark-agent serve [--port 8787]          Start HTTP channel
+  quark-agent setup [--non-interactive]    First-run setup wizard
   quark-agent add <package>               Install a plugin/skill
   quark-agent list                        List installed plugins
   quark-agent evolve --prompt-file <p> --eval-file <e>
@@ -47,6 +49,7 @@ Examples:
   npx quark-agent                          # zero-config CLI chat
   npx quark-agent ask "Read package.json"  # one-shot
   npx quark-agent add @someone/slack-skill # install a plugin
+  npx quark-agent setup                    # interactive setup wizard
 `);
 }
 
@@ -69,13 +72,18 @@ async function main(): Promise<void> {
     return;
   }
 
+  if (cmd === "setup") {
+    await runSetup(args.slice(1));
+    return;
+  }
+
   if (cmd === "evolve") {
     await runEvolve(args.slice(1));
     return;
   }
 
-  if (!apiKey) {
-    console.error("[error] 未设置 MICRO_API_KEY 环境变量");
+  if (!apiKey && !findConfigFile()?.apiKey) {
+    showApiKeyGuide();
     process.exit(1);
   }
 
@@ -312,6 +320,210 @@ function runList(): void {
       console.log(`  ${m.package}  (${m.source})  ${m.installedAt?.slice(0, 10) ?? ""}`);
     } catch {}
   }
+}
+
+// ============================================================================
+// Setup Wizard & API Key Guide
+// ============================================================================
+
+function showApiKeyGuide(): void {
+  console.error(`\n[error] No API key configured.
+
+To get started, you need an LLM API key. Choose one of these options:
+
+  1. Set environment variable:
+     export MICRO_API_KEY="sk-..."
+
+  2. Run the setup wizard:
+     quark-agent setup
+
+  3. Create a config file (.quark-agent.json):
+     {
+       "apiKey": "sk-...",
+       "model": "gpt-4o-mini"
+     }
+
+Supported providers:
+  - OpenAI       → MICRO_API_KEY + https://api.openai.com/v1
+  - Anthropic    → ANTHROPIC_API_KEY + https://api.anthropic.com/v1
+  - Gemini       → GEMINI_API_KEY + https://generativelanguage.googleapis.com/v1beta
+  - Ollama       → No key needed (local) + http://127.0.0.1:11434
+  - OpenRouter   → OPENROUTER_API_KEY + https://openrouter.ai/api/v1
+`);
+}
+
+const PROVIDER_CHOICES = [
+  { name: "OpenAI", envKey: "MICRO_API_KEY", defaultBase: "https://api.openai.com/v1", defaultModel: "gpt-4o-mini" },
+  { name: "Anthropic", envKey: "ANTHROPIC_API_KEY", defaultBase: "https://api.anthropic.com/v1", defaultModel: "claude-sonnet-4-5-20250929" },
+  { name: "Gemini", envKey: "GEMINI_API_KEY", defaultBase: "https://generativelanguage.googleapis.com/v1beta", defaultModel: "gemini-1.5-flash" },
+  { name: "Ollama", envKey: "", defaultBase: "http://127.0.0.1:11434", defaultModel: "llama3.1" },
+  { name: "OpenRouter", envKey: "OPENROUTER_API_KEY", defaultBase: "https://openrouter.ai/api/v1", defaultModel: "openai/gpt-4o-mini" },
+];
+
+const CHANNEL_CHOICES = ["CLI", "HTTP", "Discord", "Slack"];
+
+const SANDBOX_CHOICES = [
+  { name: "strict", desc: "No network, no filesystem, no shell, approve none" },
+  { name: "balanced", desc: "Network ok, filesystem ok, denylist only, approve safe (default)" },
+  { name: "permissive", desc: "Everything allowed, approve all" },
+];
+
+async function runSetup(setupArgs: string[]): Promise<void> {
+  const nonInteractive = setupArgs.includes("--non-interactive");
+
+  if (nonInteractive) {
+    runSetupNonInteractive();
+    return;
+  }
+
+  // Interactive setup
+  const readline = await import("node:readline/promises");
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+
+  try {
+    console.log("\n🚀 quark-agent Setup Wizard\n");
+
+    // 1. Provider
+    console.log("Which LLM provider would you like to use?\n");
+    for (let i = 0; i < PROVIDER_CHOICES.length; i++) {
+      console.log(`  ${i + 1}. ${PROVIDER_CHOICES[i].name}`);
+    }
+    const providerIdx = await rl.question("\nEnter choice (1-5): ");
+    const pIdx = Math.max(0, Math.min(PROVIDER_CHOICES.length - 1, parseInt(providerIdx, 10) - 1));
+    const provider = PROVIDER_CHOICES[pIdx];
+    console.log(`  → Selected: ${provider.name}\n`);
+
+    // 2. API Key
+    let apiKeyValue = "";
+    if (provider.envKey) {
+      apiKeyValue = await rl.question(`Enter your ${provider.name} API key (or press Enter to set via env var ${provider.envKey}): `);
+      if (!apiKeyValue) {
+        console.log(`  → Set ${provider.envKey} environment variable before running.`);
+      }
+    } else {
+      console.log(`  → ${provider.name} doesn't require an API key (local).`);
+    }
+
+    // 3. Model
+    const modelAnswer = await rl.question(`Which model? (default: ${provider.defaultModel}): `);
+    const selectedModel = modelAnswer.trim() || provider.defaultModel;
+    console.log(`  → Model: ${selectedModel}\n`);
+
+    // 4. Channels
+    console.log("Which channels would you like to configure?");
+    for (let i = 0; i < CHANNEL_CHOICES.length; i++) {
+      console.log(`  ${i + 1}. ${CHANNEL_CHOICES[i]}`);
+    }
+    const channelAnswer = await rl.question("\nEnter choices (comma-separated, e.g. 1,2): ");
+    const selectedChannels = channelAnswer
+      .split(",")
+      .map((s) => parseInt(s.trim(), 10) - 1)
+      .filter((i) => i >= 0 && i < CHANNEL_CHOICES.length)
+      .map((i) => CHANNEL_CHOICES[i]);
+    if (selectedChannels.length === 0) selectedChannels.push("CLI");
+    console.log(`  → Channels: ${selectedChannels.join(", ")}\n`);
+
+    // 5. Sandbox policy
+    console.log("Which sandbox policy?");
+    for (let i = 0; i < SANDBOX_CHOICES.length; i++) {
+      console.log(`  ${i + 1}. ${SANDBOX_CHOICES[i].name} — ${SANDBOX_CHOICES[i].desc}`);
+    }
+    const sandboxAnswer = await rl.question("\nEnter choice (1-3, default: 2): ");
+    const sandboxIdx = sandboxAnswer.trim() ? Math.max(0, Math.min(2, parseInt(sandboxAnswer, 10) - 1)) : 1;
+    const sandboxPolicy = SANDBOX_CHOICES[sandboxIdx].name;
+    console.log(`  → Sandbox: ${sandboxPolicy}\n`);
+
+    // Build config
+    const config: Record<string, unknown> = {
+      apiKey: apiKeyValue || undefined,
+      baseURL: provider.defaultBase,
+      model: selectedModel,
+      profile: "minimal",
+      sandbox: { toolAutoApprove: sandboxPolicy === "permissive" ? "all" : sandboxPolicy === "strict" ? "none" : "safe" },
+      checkpoint: { enabled: true, autoSaveInterval: 60, maxPerSession: 10 },
+    };
+
+    // Write config file
+    const configPath = join(process.cwd(), ".quark-agent.json");
+    writeFileSync(configPath, JSON.stringify(config, null, 2) + "\n", "utf8");
+
+    console.log(`\n✅ Config written to ${configPath}`);
+    console.log("\nNext steps:");
+    if (!apiKeyValue && provider.envKey) {
+      console.log(`  1. Set your API key:  export ${provider.envKey}="sk-..."`);
+      console.log(`  2. Start chatting:     quark-agent chat`);
+    } else {
+      console.log(`  1. Start chatting:     quark-agent chat`);
+    }
+    console.log(`  2. Ask a question:    quark-agent ask "Hello"`);
+    if (selectedChannels.includes("HTTP")) {
+      console.log(`  3. Start HTTP server: quark-agent serve --port 8787`);
+    }
+    console.log();
+  } finally {
+    rl.close();
+  }
+}
+
+function runSetupNonInteractive(): void {
+  console.log("\n📝 Generating template config file (.quark-agent.json)...\n");
+
+  const template = {
+    "// _comment_provider": "Choose: OpenAI / Anthropic / Gemini / Ollama / OpenRouter",
+    apiKey: "YOUR_API_KEY_HERE",
+    baseURL: "https://api.openai.com/v1",
+    model: "gpt-4o-mini",
+    temperature: 0.7,
+    maxTokens: 4096,
+    profile: "minimal",
+    dbPath: "./.data/micro-agent.sqlite",
+    maxToolRounds: 6,
+    contextTokenBudget: 8000,
+    workingMemoryRounds: 12,
+    "// _comment_sandbox": "toolAutoApprove: 'all' | 'safe' | 'none'",
+    sandbox: {
+      toolAutoApprove: "safe",
+      allowNetwork: true,
+      allowFilesystem: true,
+      maxTimeoutMs: 30000,
+    },
+    "// _comment_checkpoint": "Auto-save agent state for long-running tasks",
+    checkpoint: {
+      enabled: true,
+      autoSaveInterval: 60,
+      maxPerSession: 10,
+    },
+    "// _comment_longRunning": "Long-running programming task support",
+    longRunning: {
+      enabled: false,
+      maxConcurrent: 3,
+      timeoutMinutes: 30,
+    },
+    "// _comment_providers": "Additional providers for MoA routing",
+    providers: [
+      { name: "anthropic", apiKey: "ANTHROPIC_KEY_HERE" },
+    ],
+    "// _comment_router": "MoA intelligent router config",
+    router: {
+      fastModel: "gpt-4o-mini",
+      mediumModel: "gpt-4o",
+      powerfulModel: "o1",
+    },
+    "// _comment_channels": "Channel configuration (fill in tokens as needed)",
+    channels: {
+      discord: { token: "DISCORD_BOT_TOKEN", channelId: "CHANNEL_ID" },
+      slack: { token: "SLACK_BOT_TOKEN", signingSecret: "SIGNING_SECRET", channelId: "CHANNEL_ID" },
+    },
+  };
+
+  const configPath = join(process.cwd(), ".quark-agent.json");
+  writeFileSync(configPath, JSON.stringify(template, null, 2) + "\n", "utf8");
+
+  console.log(`✅ Template config written to ${configPath}`);
+  console.log("\nNext steps:");
+  console.log("  1. Edit .quark-agent.json and set your API key");
+  console.log("  2. Start chatting:  quark-agent chat");
+  console.log();
 }
 
 main().catch((err) => {

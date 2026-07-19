@@ -115,6 +115,22 @@ export type { Workspace, WorkspaceConfig, MemoryFactory } from "./workspace/inde
 export { AnthropicProvider, GeminiProvider, OllamaProvider, MultiProvider, consumeSSE } from "./provider/multi.js";
 export type { AnthropicProviderOptions, GeminiProviderOptions, OllamaProviderOptions, MultiProviderOptions, SSEParser } from "./provider/multi.js";
 
+// MoA router
+export { MoARouter } from "./provider/router.js";
+export type { TaskComplexity, RouterConfig, RouteResult } from "./provider/router.js";
+
+// sandbox policy
+export { DEFAULT_POLICY, isCommandAllowed, toolNeedsApproval, policyFromEnv, presetPolicy } from "./sandbox/policy.js";
+export type { SandboxPolicy } from "./sandbox/policy.js";
+
+// unified config
+export { loadConfig, findConfigFile, writeConfigFile } from "./config/index.js";
+export type { QuarkConfig } from "./config/index.js";
+
+// checkpoint v2
+export { CheckpointManager } from "./checkpoint/index.js";
+export type { CheckpointMetadata } from "./checkpoint/index.js";
+
 // plugin system
 export { PluginRegistry } from "./plugin/registry.js";
 export type { PluginRegistryOptions } from "./plugin/registry.js";

@@ -18,10 +18,19 @@
  * (see openai/codex — no discord.js dependency, raw WebSocket).
  */
 
-import { WebSocket } from "undici" // Node 18+ has ws; fallback to native
-  .catch ? undefined : undefined; // type-only import hint
-
 import type { Channel, ChannelEvent, ChannelReply } from "../core/types.js";
+
+// ============================================================================
+// WebSocket resolver — try Node 22+ built-in, then 'ws' package
+// ============================================================================
+let WSClass: any = null;
+try {
+  // @ts-ignore Node 22+ built-in WebSocket
+  WSClass = WebSocket;
+} catch {}
+if (!WSClass) {
+  try { WSClass = require("ws"); } catch {}
+}
 
 // ============================================================================
 // Minimal Discord REST helper (zero deps)
@@ -67,12 +76,12 @@ export class DiscordChannel implements Channel {
   private ws?: any; // WebSocket instance
   private heartbeatInterval?: ReturnType<typeof setInterval>;
   private seq: number | null = null;
-  private sessionId: string | null = null;
-  private resumeUrl: string | null = null;
+  private _sessionId: string | null = null;
+  private _resumeUrl: string | null = null;
   private token: string;
   private channelId: string;
   private intents: number;
-  private pendingReplies = new Map<string, (reply: ChannelReply) => void>();
+  private _pendingReplies = new Map<string, (reply: ChannelReply) => void>();
 
   constructor(opts: DiscordChannelOptions = {}) {
     this.token = opts.token ?? process.env.DISCORD_BOT_TOKEN ?? "";
@@ -87,25 +96,16 @@ export class DiscordChannel implements Channel {
 
     // Get Gateway URL
     const { url } = await discordRest(this.token, "GET", "/gateway");
-    const wsUrl = `${url}?v=10&encoding=json`;
+    const gatewayUrl = `${url}?v=10&encoding=json`;
 
-    this.connect(wsUrl, emit);
+    this.connect(gatewayUrl, emit);
   }
 
   private connect(wsUrl: string, emit: (event: ChannelEvent) => void): void {
-    // Use Node.js built-in WebSocket (Node 22+) or fall back to ws package
-    try {
-      // @ts-ignore - Node 22+ has built-in WebSocket
-      this.ws = new WebSocket(wsUrl);
-    } catch {
-      // Fallback: try importing 'ws' package
-      try {
-        const WS = require("ws");
-        this.ws = new WS(wsUrl);
-      } catch {
-        throw new Error("No WebSocket available. Node 22+ (built-in) or 'npm install ws' required.");
-      }
+    if (!WSClass) {
+      throw new Error("No WebSocket available. Node 22+ (built-in) or 'npm install ws' required.");
     }
+    this.ws = new WSClass(wsUrl);
 
     this.ws.on("message", (data: Buffer) => {
       try {
@@ -125,7 +125,7 @@ export class DiscordChannel implements Channel {
 
   private handleGatewayEvent(
     payload: any,
-    wsUrl: string,
+    _wsUrl: string,
     emit: (event: ChannelEvent) => void,
   ): void {
     const { op, t, d, s } = payload;
@@ -155,8 +155,8 @@ export class DiscordChannel implements Channel {
     if (op === 0) {
       // Ready — capture session info for resume
       if (t === "READY") {
-        this.sessionId = d.session_id;
-        this.resumeUrl = d.resume_gateway_url;
+        this._sessionId = d.session_id;
+        this._resumeUrl = d.resume_gateway_url;
         console.log(`[discord] Connected as ${d.user.username}#${d.user.discriminator}`);
       }
 
@@ -198,5 +198,17 @@ export class DiscordChannel implements Channel {
   async stop(): Promise<void> {
     if (this.heartbeatInterval) clearInterval(this.heartbeatInterval);
     this.ws?.close?.();
+  }
+
+  /** Resume gateway connection (Op 6 RESUME) — uses stored session_id + resume_url */
+  public tryResume(): void {
+    if (this._sessionId && this._resumeUrl && this.ws?.readyState === 1) {
+      this.send({ op: 6, d: { token: this.token, session_id: this._sessionId, seq: this.seq } });
+    }
+  }
+
+  /** Queue a pending reply promise (for awaitable reply pattern) */
+  public queueReply(sessionId: string, resolve: (reply: ChannelReply) => void): void {
+    this._pendingReplies.set(sessionId, resolve);
   }
 }

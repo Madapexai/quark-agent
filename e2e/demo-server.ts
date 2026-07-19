@@ -2044,12 +2044,12 @@ async function main() {
   try {
     const { BrowserUseTool } = await import("../src/tools/browser_use.js");
     const browserUse = new BrowserUseTool();
-    tools.set("browser_use", { name: "browser_use", description: browserUse.description, parameters: browserUse.parameters, execute: (a: any, c: any) => browserUse.execute(a, c) });
+    tools.set("browser_use", { name: "browser_use", description: browserUse.description, schema: browserUse.schema, execute: (a: any, c: any) => browserUse.execute(a, c) });
   } catch (e: any) { /* puppeteer not installed — skip */ }
   try {
     const { ComputerUseTool } = await import("../src/tools/computer.js");
     const computerUse = new ComputerUseTool();
-    tools.set("computer_use", { name: "computer_use", description: computerUse.description, parameters: computerUse.parameters, execute: (a: any, c: any) => computerUse.execute(a, c) });
+    tools.set("computer_use", { name: "computer_use", description: computerUse.description, schema: computerUse.schema, execute: (a: any, c: any) => computerUse.execute(a, c) });
   } catch (e: any) { /* platform not supported — skip */ }
 
   function makeSimpleProvider() {
