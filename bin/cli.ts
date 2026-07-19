@@ -16,7 +16,9 @@
  */
 
 import { createAgent, Runtime, CliChannel, HttpChannel, Evolver } from "../src/index.js";
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from "node:fs";
+import { execSync } from "node:child_process";
+import { join } from "node:path";
 
 const apiKey = process.env.MICRO_API_KEY ?? "";
 const baseURL = process.env.MICRO_BASE_URL ?? "https://api.openai.com/v1";
@@ -24,19 +26,27 @@ const model = process.env.MICRO_MODEL ?? "gpt-4o-mini";
 const dbPath = process.env.MICRO_DB ?? "./.data/micro-agent.sqlite";
 
 function usage(): void {
-  console.log(`micro-agent — 轻量级自进化 Agent 框架
+  console.log(`quark-agent — 5KB Agent Kernel
 
-用法:
-  micro-agent chat                          交互式 CLI 对话
-  micro-agent ask "<问题>"                   单次问答
-  micro-agent serve [--port 8787]           启动 HTTP 通道
-  micro-agent evolve --prompt-file <p> --eval-file <e>
+Usage:
+  quark-agent                              Interactive CLI (default)
+  quark-agent chat                         Interactive CLI
+  quark-agent ask "<question>"             One-shot Q&A
+  quark-agent serve [--port 8787]          Start HTTP channel
+  quark-agent add <package>               Install a plugin/skill
+  quark-agent list                        List installed plugins
+  quark-agent evolve --prompt-file <p> --eval-file <e>
 
-环境变量:
-  MICRO_API_KEY   LLM API Key（必需）
-  MICRO_BASE_URL  OpenAI 兼容端点
-  MICRO_MODEL     模型名
-  MICRO_DB        SQLite 路径
+Environment:
+  MICRO_API_KEY   LLM API Key (required)
+  MICRO_BASE_URL  OpenAI-compatible endpoint
+  MICRO_MODEL     Model name
+  MICRO_DB        SQLite path
+
+Examples:
+  npx quark-agent                          # zero-config CLI chat
+  npx quark-agent ask "Read package.json"  # one-shot
+  npx quark-agent add @someone/slack-skill # install a plugin
 `);
 }
 
@@ -47,6 +57,16 @@ async function main(): Promise<void> {
   if (!cmd || cmd === "-h" || cmd === "--help") {
     usage();
     process.exit(0);
+  }
+
+  if (cmd === "add") {
+    await runAdd(args.slice(1));
+    return;
+  }
+
+  if (cmd === "list") {
+    runList();
+    return;
   }
 
   if (cmd === "evolve") {
@@ -189,6 +209,109 @@ async function runEvolve(args: string[]): Promise<void> {
   }
   console.log("\n最佳 prompt:\n", result.bestPrompt);
   await close();
+}
+
+// ============================================================================
+// Plugin management: add / list
+// ============================================================================
+
+const PLUGINS_DIR = join(process.cwd(), ".quark-plugins");
+
+async function runAdd(args: string[]): Promise<void> {
+  const pkg = args[0];
+  if (!pkg) {
+    console.error("[error] Specify a package: quark-agent add @someone/skill-name");
+    process.exit(1);
+  }
+
+  mkdirSync(PLUGINS_DIR, { recursive: true });
+
+  // Check if already installed
+  const pluginDir = join(PLUGINS_DIR, pkg.replace(/^@/, "").replace(/\//, "__"));
+  if (existsSync(pluginDir)) {
+    console.log(`[skip] ${pkg} is already installed at ${pluginDir}`);
+    return;
+  }
+
+  console.log(`[install] ${pkg} ...`);
+
+  // Try npm install first (works for public packages)
+  try {
+    execSync(`npm install --no-save ${pkg}`, {
+      cwd: PLUGINS_DIR,
+      stdio: "pipe",
+      timeout: 60_000,
+    });
+    console.log(`[ok] ${pkg} installed via npm`);
+
+    // Write a manifest so `list` can find it
+    const manifest = { package: pkg, installedAt: new Date().toISOString(), source: "npm" };
+    writeFileSync(join(PLUGINS_DIR, ".manifest.json"), JSON.stringify(manifest, null, 2));
+  } catch {
+    // Fallback: try git clone for GitHub shorthands (user/repo)
+    if (pkg.includes("/")) {
+      const gitUrl = pkg.startsWith("https://") ? pkg : `https://github.com/${pkg}.git`;
+      try {
+        execSync(`git clone --depth 1 ${gitUrl} ${pluginDir}`, {
+          stdio: "pipe",
+          timeout: 60_000,
+        });
+        console.log(`[ok] ${pkg} cloned from GitHub`);
+        const manifest = { package: pkg, installedAt: new Date().toISOString(), source: "git" };
+        writeFileSync(join(pluginDir, ".manifest.json"), JSON.stringify(manifest, null, 2));
+      } catch {
+        console.error(`[error] Could not install ${pkg} — not found on npm or GitHub`);
+        process.exit(1);
+      }
+    } else {
+      console.error(`[error] Could not install ${pkg} via npm`);
+      process.exit(1);
+    }
+  }
+
+  console.log(`\nPlugin installed. To use it, import in your agent setup:`);
+  console.log(`  import "${pkg}";`);
+  console.log(`\nOr add to your agent config:`);
+  console.log(`  extraActions: [require("${pkg}")]`);
+}
+
+function runList(): void {
+  if (!existsSync(PLUGINS_DIR)) {
+    console.log("No plugins installed. Use: quark-agent add <package>");
+    return;
+  }
+
+  const entries = readdirSync(PLUGINS_DIR, { withFileTypes: true });
+  const plugins = entries.filter(e => e.isDirectory() && !e.name.startsWith("."));
+
+  if (plugins.length === 0) {
+    console.log("No plugins installed. Use: quark-agent add <package>");
+    return;
+  }
+
+  console.log("Installed plugins:\n");
+  for (const p of plugins) {
+    const manifestPath = join(PLUGINS_DIR, p.name, ".manifest.json");
+    if (existsSync(manifestPath)) {
+      try {
+        const m = JSON.parse(readFileSync(manifestPath, "utf8"));
+        console.log(`  ${m.package}  (${m.source})  ${m.installedAt?.slice(0, 10) ?? ""}`);
+      } catch {
+        console.log(`  ${p.name}  (local)`);
+      }
+    } else {
+      console.log(`  ${p.name}  (local)`);
+    }
+  }
+
+  // Also check for a root manifest
+  const rootManifest = join(PLUGINS_DIR, ".manifest.json");
+  if (existsSync(rootManifest)) {
+    try {
+      const m = JSON.parse(readFileSync(rootManifest, "utf8"));
+      console.log(`  ${m.package}  (${m.source})  ${m.installedAt?.slice(0, 10) ?? ""}`);
+    } catch {}
+  }
 }
 
 main().catch((err) => {

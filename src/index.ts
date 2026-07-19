@@ -28,7 +28,7 @@ export { VmSandbox } from "./sandbox/vm.js";
 export type { VmSandboxOptions } from "./sandbox/vm.js";
 
 // channel
-export { CliChannel, HttpChannel } from "./channel/index.js";
+export { CliChannel, HttpChannel, DiscordChannel, SlackChannel } from "./channel/index.js";
 export type { CliChannelOptions, HttpChannelOptions } from "./channel/index.js";
 export { GitHubChannel } from "./channel/github.js";
 export type { GitHubChannelOptions } from "./channel/github.js";

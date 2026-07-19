@@ -2040,6 +2040,18 @@ async function main() {
   tools.set("memory_save", memorySaveTool);
   tools.set("memory_search", memorySearchTool);
 
+  // Browser-use & Computer-use tools (Playwright-backed)
+  try {
+    const { BrowserUseTool } = await import("../src/tools/browser_use.js");
+    const browserUse = new BrowserUseTool();
+    tools.set("browser_use", { name: "browser_use", description: browserUse.description, parameters: browserUse.parameters, execute: (a: any, c: any) => browserUse.execute(a, c) });
+  } catch (e: any) { /* puppeteer not installed — skip */ }
+  try {
+    const { ComputerUseTool } = await import("../src/tools/computer.js");
+    const computerUse = new ComputerUseTool();
+    tools.set("computer_use", { name: "computer_use", description: computerUse.description, parameters: computerUse.parameters, execute: (a: any, c: any) => computerUse.execute(a, c) });
+  } catch (e: any) { /* platform not supported — skip */ }
+
   function makeSimpleProvider() {
     return {
       name: "simple",
@@ -2157,7 +2169,7 @@ async function main() {
     run: async () => ({
       status: "ok", version: "1.0.0",
       coreSize: "4.90KB gzip",
-      tools: ["read_file", "write_file", "edit_file", "list_dir", "search_files", "find_files", "shell", "web_search", "web_fetch", "run_code", "generate_image", "weather", "todo_write", "task_list", "memory_save", "memory_search"],
+      tools: ["read_file", "write_file", "edit_file", "list_dir", "search_files", "find_files", "shell", "web_search", "web_fetch", "run_code", "generate_image", "weather", "todo_write", "task_list", "memory_save", "memory_search", "browser_use", "computer_use"],
     }),
     expose: ["http", "cli"],
   });

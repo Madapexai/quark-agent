@@ -1,11 +1,16 @@
 /**
- * Channel trait 实现：CLI 与 HTTP
+ * Channel trait 实现：CLI, HTTP, Discord, Slack
  *
  * 设计（调研 §四 ZeroClaw trait 驱动）：
  * - 单一 Channel 接口，加新通道只需实现 start/reply/stop
  * - CLI：readline 流式
  * - HTTP：单端点 POST，无框架依赖（减重）
+ * - Discord：Gateway WebSocket (zero discord.js dependency)
+ * - Slack：Events API HTTP POST (zero @slack/bolt dependency)
  */
+
+export { DiscordChannel } from "./discord.js";
+export { SlackChannel } from "./slack.js";
 
 import readline from "node:readline";
 import http from "node:http";
