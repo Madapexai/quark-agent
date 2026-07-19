@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>Quark Agent - 小红书 02</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { width: 1080px; height: 1440px; overflow: hidden; font-family: -apple-system, 'PingFang SC', sans-serif; background: #0a0a0a; color: #fff; position: relative; }
+.grid-bg { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 40px 40px; }
+.orb1 { position: absolute; top: 100px; left: -150px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(168,85,247,0.25) 0%, transparent 70%); filter: blur(60px); }
+.orb2 { position: absolute; bottom: 0; right: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 70%); filter: blur(60px); }
+.content { position: relative; z-index: 2; padding: 72px 64px; }
+
+.hook { font-size: 36px; color: #f97316; font-weight: 800; margin-bottom: 12px; }
+h1 { font-size: 60px; font-weight: 900; margin-bottom: 12px; letter-spacing: -1px; }
+h1 .accent { color: #a855f7; }
+.desc { font-size: 28px; color: rgba(255,255,255,0.55); margin-bottom: 44px; line-height: 1.5; }
+.desc em { font-style: normal; color: #a855f7; font-weight: 700; }
+
+.channels { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 44px; }
+.ch { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 28px 24px; display: flex; align-items: flex-start; gap: 18px; backdrop-filter: blur(8px); }
+.ch-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.ch-icon svg { width: 26px; height: 26px; }
+.ch-icon.discord { background: rgba(88,101,242,0.2); }
+.ch-icon.slack { background: rgba(74,21,75,0.2); }
+.ch-icon.feishu { background: rgba(0,125,255,0.15); }
+.ch-icon.github { background: rgba(255,255,255,0.08); }
+.ch-icon.telegram { background: rgba(36,161,222,0.15); }
+.ch-icon.cli { background: rgba(168,85,247,0.15); }
+.ch-icon.http { background: rgba(6,182,212,0.15); }
+.ch-name { font-size: 23px; font-weight: 700; margin-bottom: 4px; }
+.ch-desc { font-size: 17px; color: rgba(255,255,255,0.4); line-height: 1.4; }
+
+.llm-title { font-size: 18px; color: rgba(255,255,255,0.3); letter-spacing: 3px; margin-bottom: 20px; }
+.llm-grid { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 44px; }
+.llm { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 14px 22px; font-size: 19px; font-weight: 600; color: rgba(255,255,255,0.65); }
+.llm.hl { border-color: rgba(168,85,247,0.3); color: #a855f7; }
+
+.layers-title { font-size: 18px; color: rgba(255,255,255,0.3); letter-spacing: 3px; margin-bottom: 24px; }
+.layers { display: flex; gap: 14px; margin-bottom: 36px; }
+.layer { flex: 1; border-radius: 14px; padding: 24px 16px; text-align: center; }
+.layer .num { font-size: 38px; font-weight: 900; margin-bottom: 6px; }
+.layer .lbl { font-size: 15px; color: rgba(255,255,255,0.45); }
+.layer.l1 { background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.3); }
+.layer.l1 .num { color: #a855f7; }
+.layer.l2 { background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.2); }
+.layer.l2 .num { color: #06b6d4; }
+.layer.l3 { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
+.layer.l3 .num { color: #fff; }
+.layer.l4 { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.15); }
+.layer.l4 .num { color: #22c55e; }
+
+.tip { background: rgba(249,115,22,0.08); border: 1px solid rgba(249,115,22,0.2); border-radius: 14px; padding: 24px 32px; font-size: 22px; color: rgba(255,255,255,0.7); line-height: 1.6; }
+.tip strong { color: #f97316; }
+
+.bottom { position: absolute; bottom: 0; left: 0; right: 0; z-index: 2; padding: 24px 64px; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); border-top: 1px solid rgba(255,255,255,0.06); }
+.gh-link { display: flex; align-items: center; gap: 10px; font-size: 20px; color: #a855f7; font-weight: 600; text-decoration: none; }
+.gh-link svg { width: 22px; height: 22px; }
+.page-num { font-size: 18px; color: rgba(255,255,255,0.25); }
+</style>
+</head>
+<body>
+<div class="grid-bg"></div><div class="orb1"></div><div class="orb2"></div>
+
+<div class="content">
+  <div class="hook">部署一次，全平台通吃！</div>
+  <h1>7 通道，<span class="accent">1 个 Agent</span></h1>
+  <div class="desc">写一次 Agent 逻辑，<em>7 个平台自动继承</em>所有工具和模型，这也太省事了吧！</div>
+
+  <div class="channels">
+    <div class="ch"><div class="ch-icon cli"><svg viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div><div><div class="ch-name">CLI Terminal</div><div class="ch-desc">交互式命令行，流式输出</div></div></div>
+    <div class="ch"><div class="ch-icon http"><svg viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div><div class="ch-name">HTTP / SSE</div><div class="ch-desc">REST API + SSE 流式</div></div></div>
+    <div class="ch"><div class="ch-icon discord"><svg viewBox="0 0 24 24" fill="#5865F2"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.441.87-.63 1.26a18.26 18.26 0 0 0-5.398 0 12.64 12.64 0 0 0-.64-1.26.077.077 0 0 0-.079-.037A19.7 19.7 0 0 0 4.41 4.37a.07.07 0 0 0-.027.02C1.747 8.23.78 12.04.46 15.8a.08.08 0 0 0 .031.063 20.02 20.02 0 0 0 5.963 3.024.08.08 0 0 0 .076-.028 14.26 14.26 0 0 0 .694-1.13.074.074 0 0 0-.041-.1 13.37 13.37 0 0 1-1.004-.475.075.075 0 0 1-.007-.128 10.3 10.3 0 0 0 .526-.478.074.074 0 0 1 .078-.02c2.008.583 4.165.583 6.15 0a.074.074 0 0 1 .079.02c.17.157.347.322.527.478a.075.075 0 0 1-.006.128 13.2 13.2 0 0 1-1.004.475.075.075 0 0 0-.041.1c.232.393.476.774.694 1.13a.075.075 0 0 0 .076.028 19.98 19.98 0 0 0 5.963-3.024.075.075 0 0 0 .032-.063c-.321-3.76-1.288-7.57-3.923-11.41a.07.07 0 0 0-.027-.025zM8.02 13.38c-.88 0-1.6-.842-1.6-1.875s.704-1.875 1.6-1.875 1.613.842 1.6 1.875c0 1.033-.704 1.875-1.6 1.875zm5.907 0c-.88 0-1.6-.842-1.6-1.875s.704-1.875 1.6-1.875 1.613.842 1.6 1.875c0 1.033-.72 1.875-1.6 1.875z"/></svg></div><div><div class="ch-name">Discord Bot</div><div class="ch-desc">Gateway WebSocket，零依赖</div></div></div>
+    <div class="ch"><div class="ch-icon slack"><svg viewBox="0 0 24 24" fill="#E01E5A"><path d="M5.042 15.165a2.042 2.042 0 1 1-2.042-2.042h2.042v2.042zm1.021 0a2.042 2.042 0 1 1 4.084 0v5.104a2.042 2.042 0 1 1-4.084 0v-5.104zM8.877 5.042a2.042 2.042 0 1 1 2.042-2.042v2.042H8.877zm0 1.021a2.042 2.042 0 1 1 0 4.084H3.773a2.042 2.042 0 1 1 0-4.084h5.104zM18.959 8.877a2.042 2.042 0 1 1 2.042 2.042h-2.042V8.877zm-1.021 0a2.042 2.042 0 1 1-4.084 0V3.773a2.042 2.042 0 1 1 4.084 0v5.104zM15.124 18.959a2.042 2.042 0 1 1-2.042 2.042v-2.042h2.042zm0-1.021a2.042 2.042 0 1 1 0-4.084h5.104a2.042 2.042 0 1 1 0 4.084h-5.104z"/></svg></div><div><div class="ch-name">Slack Events API</div><div class="ch-desc">HMAC 签名验证，安全拉满</div></div></div>
+    <div class="ch"><div class="ch-icon feishu"><svg viewBox="0 0 24 24" fill="none" stroke="#007DFF" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div><div class="ch-name">飞书 / Feishu</div><div class="ch-desc">企业 IM 集成，打工人必备</div></div></div>
+    <div class="ch"><div class="ch-icon github"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.245.54.945 1.41 1.305 2.34 1.305.585 0 1.17-.15 1.695-.42-.18-.765-.63-1.455-1.155-2.01-1.65-1.755-3-3.585-3-6.495 0-2.775 1.05-5.055 2.76-6.84-.27-.675-.48-1.95.135-3.6 0 0 1.11-.345 3.6 1.305 1.05-.3 2.16-.45 3.27-.45s2.22.15 3.27.45c2.49-1.65 3.6-1.305 3.6-1.305.615 1.65.405 2.925.135 3.6 1.71 1.785 2.76 4.065 2.76 6.84 0 2.925-1.365 4.74-3.015 6.495.48.51.945 1.515.945 3.075 0 2.22-.015 4.005-.015 4.56 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg></div><div><div class="ch-name">GitHub</div><div class="ch-desc">Issue/PR 自动化，DevOps 好帮手</div></div></div>
+    <div class="ch"><div class="ch-icon telegram"><svg viewBox="0 0 24 24" fill="#24A1DE"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.3c.12-.16.24-.16.36 0l.36.48v.16c-.12.32-.24.64-.36.8l-4.92 9.12c-.12.16-.24.16-.36 0l-3.6-4.44c-.12-.16-.12-.32 0-.48l.36-.32c.12-.16.24-.16.36 0l2.56 3.16c.12.16.24.16.36 0l3.84-7.32c.12-.32.24-.64.36-.8z"/></svg></div><div><div class="ch-name">Telegram Bot</div><div class="ch-desc">Bot API + 内联查询</div></div></div>
+  </div>
+
+  <div class="llm-title">支持的 LLM 提供商</div>
+  <div class="llm-grid">
+    <div class="llm hl">OpenAI</div><div class="llm">Anthropic</div><div class="llm">Gemini</div><div class="llm">Ollama</div><div class="llm">OpenRouter</div><div class="llm">DeepSeek</div><div class="llm">Volcengine</div>
+  </div>
+
+  <div class="layers-title">洋葱架构，由内到外</div>
+  <div class="layers">
+    <div class="layer l1"><div class="num">5KB</div><div class="lbl">内核</div></div>
+    <div class="layer l2"><div class="num">16</div><div class="lbl">工具</div></div>
+    <div class="layer l3"><div class="num">7</div><div class="lbl">通道</div></div>
+    <div class="layer l4"><div class="num">4</div><div class="lbl">协议</div></div>
+  </div>
+
+  <div class="tip">
+    <strong>划重点：</strong>全部通道零 SDK 依赖！原生 fetch 搞定，代码体积小到离谱。Discord 用 WebSocket 直连 Gateway，Slack 用 HMAC 验签，安全性直接拉满。
+  </div>
+</div>
+
+<div class="bottom">
+  <a class="gh-link" href="https://github.com/Madapexai/quark-agent">
+    <svg viewBox="0 0 24 24" fill="#a855f7"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.245.54.945 1.41 1.305 2.34 1.305.585 0 1.17-.15 1.695-.42-.18-.765-.63-1.455-1.155-2.01-1.65-1.755-3-3.585-3-6.495 0-2.775 1.05-5.055 2.76-6.84-.27-.675-.48-1.95.135-3.6 0 0 1.11-.345 3.6 1.305 1.05-.3 2.16-.45 3.27-.45s2.22.15 3.27.45c2.49-1.65 3.6-1.305 3.6-1.305.615 1.65.405 2.925.135 3.6 1.71 1.785 2.76 4.065 2.76 6.84 0 2.925-1.365 4.74-3.015 6.495.48.51.945 1.515.945 3.075 0 2.22-.015 4.005-.015 4.56 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+    github.com/Madapexai/quark-agent
+  </a>
+  <span class="page-num">2 / 4</span>
+</div>
+</body>
+</html>

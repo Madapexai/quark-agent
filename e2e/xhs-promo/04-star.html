@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>Quark Agent - 小红书 04 Star</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { width: 1080px; height: 1440px; overflow: hidden; font-family: -apple-system, 'PingFang SC', sans-serif; background: #0a0a0a; color: #fff; position: relative; }
+.grid-bg { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 40px 40px; }
+.orb1 { position: absolute; top: 200px; left: 50%; transform: translateX(-50%); width: 800px; height: 800px; background: radial-gradient(circle, rgba(168,85,247,0.2) 0%, transparent 60%); filter: blur(80px); }
+.orb2 { position: absolute; bottom: 100px; right: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(6,182,212,0.15) 0%, transparent 70%); filter: blur(60px); }
+.content { position: relative; z-index: 2; padding: 80px 64px; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: center; text-align: center; }
+
+/* GitHub star icon - big */
+.star-icon {
+  width: 180px; height: 180px; margin-bottom: 48px;
+  position: relative;
+}
+.star-icon svg { width: 100%; height: 100%; }
+.star-glow {
+  position: absolute; inset: -30px;
+  background: radial-gradient(circle, rgba(249,115,22,0.3) 0%, transparent 70%);
+  filter: blur(20px);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } }
+
+.hook { font-size: 40px; color: #f97316; font-weight: 800; margin-bottom: 24px; letter-spacing: 2px; }
+h1 { font-size: 72px; font-weight: 900; margin-bottom: 24px; letter-spacing: -2px; }
+h1 .accent { 
+  background: linear-gradient(135deg, #a855f7, #06b6d4);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+.desc { font-size: 28px; color: rgba(255,255,255,0.55); line-height: 1.6; margin-bottom: 48px; max-width: 780px; }
+.desc em { font-style: normal; color: #a855f7; font-weight: 700; }
+
+/* Star CTA button */
+.cta {
+  display: inline-flex; align-items: center; gap: 16px;
+  background: linear-gradient(135deg, #a855f7, #7c3aed);
+  border-radius: 20px; padding: 28px 64px;
+  font-size: 32px; font-weight: 800; color: #fff;
+  text-decoration: none; margin-bottom: 56px;
+  box-shadow: 0 0 40px rgba(168,85,247,0.3);
+  transition: transform 0.2s;
+}
+.cta svg { width: 32px; height: 32px; }
+
+/* Contribution cards */
+.contrib-title { font-size: 20px; color: rgba(255,255,255,0.3); letter-spacing: 4px; margin-bottom: 28px; }
+.contribs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 56px; width: 100%; }
+.contrib {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px; padding: 24px;
+  display: flex; align-items: flex-start; gap: 16px; text-align: left;
+  backdrop-filter: blur(8px);
+}
+.contrib-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.contrib-icon svg { width: 22px; height: 22px; }
+.contrib-icon.p { background: rgba(168,85,247,0.15); }
+.contrib-icon.c { background: rgba(6,182,212,0.15); }
+.contrib-icon.g { background: rgba(34,197,94,0.12); }
+.contrib-icon.o { background: rgba(249,115,22,0.12); }
+.contrib-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.contrib-desc { font-size: 16px; color: rgba(255,255,255,0.4); line-height: 1.4; }
+
+/* Hashtags */
+.hashtags { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-bottom: 36px; }
+.hashtag {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 100px; padding: 10px 20px;
+  font-size: 18px; color: rgba(255,255,255,0.4);
+}
+
+.gh-url { font-size: 24px; color: #a855f7; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+.gh-url svg { width: 24px; height: 24px; }
+.closing { font-size: 22px; color: rgba(255,255,255,0.3); }
+
+.bottom { position: absolute; bottom: 0; left: 0; right: 0; z-index: 2; padding: 24px 64px; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); border-top: 1px solid rgba(255,255,255,0.06); }
+.gh-link { display: flex; align-items: center; gap: 10px; font-size: 20px; color: #a855f7; font-weight: 600; text-decoration: none; }
+.gh-link svg { width: 22px; height: 22px; }
+.page-num { font-size: 18px; color: rgba(255,255,255,0.25); }
+</style>
+</head>
+<body>
+<div class="grid-bg"></div><div class="orb1"></div><div class="orb2"></div>
+
+<div class="content">
+  <div class="star-icon">
+    <div class="star-glow"></div>
+    <svg viewBox="0 0 24 24" fill="#f97316"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+  </div>
+
+  <div class="hook">觉得不错？给个 Star 吧！</div>
+  <h1><span class="accent">Star us on GitHub</span></h1>
+  <div class="desc">
+    你的每一个 Star 都是<em>开源社区前行的动力</em>。<br>
+    帮更多人发现这个宝藏框架，一起让 AI Agent 更好用！
+  </div>
+
+  <a class="cta" href="https://github.com/Madapexai/quark-agent">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+    Star on GitHub
+  </a>
+
+  <div class="contrib-title">4 种方式参与贡献</div>
+  <div class="contribs">
+    <div class="contrib"><div class="contrib-icon p"><svg viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><div><div class="contrib-name">写代码</div><div class="contrib-desc">认领 issue 或提交 PR</div></div></div>
+    <div class="contrib"><div class="contrib-icon c"><svg viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div><div><div class="contrib-name">写工具/插件</div><div class="contrib-desc">defineAction 写新工具</div></div></div>
+    <div class="contrib"><div class="contrib-icon g"><svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div><div><div class="contrib-name">写文档</div><div class="contrib-desc">修正/翻译/写教程</div></div></div>
+    <div class="contrib"><div class="contrib-icon o"><svg viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div><div class="contrib-name">提想法</div><div class="contrib-desc">分享用例/提需求/讨论</div></div></div>
+  </div>
+
+  <div class="hashtags">
+    <span class="hashtag">#AIAgent</span>
+    <span class="hashtag">#开源</span>
+    <span class="hashtag">#LLM</span>
+    <span class="hashtag">#开发者工具</span>
+    <span class="hashtag">#TypeScript</span>
+    <span class="hashtag">#QuarkAgent</span>
+  </div>
+
+  <div class="gh-url">
+    <svg viewBox="0 0 24 24" fill="#a855f7"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.245.54.945 1.41 1.305 2.34 1.305.585 0 1.17-.15 1.695-.42-.18-.765-.63-1.455-1.155-2.01-1.65-1.755-3-3.585-3-6.495 0-2.775 1.05-5.055 2.76-6.84-.27-.675-.48-1.95.135-3.6 0 0 1.11-.345 3.6 1.305 1.05-.3 2.16-.45 3.27-.45s2.22.15 3.27.45c2.49-1.65 3.6-1.305 3.6-1.305.615 1.65.405 2.925.135 3.6 1.71 1.785 2.76 4.065 2.76 6.84 0 2.925-1.365 4.74-3.015 6.495.48.51.945 1.515.945 3.075 0 2.22-.015 4.005-.015 4.56 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+    github.com/Madapexai/quark-agent
+  </div>
+  <div class="closing">开源免费 · MIT 协议 · 永久可用</div>
+</div>
+
+<div class="bottom">
+  <a class="gh-link" href="https://github.com/Madapexai/quark-agent">
+    <svg viewBox="0 0 24 24" fill="#a855f7"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.245.54.945 1.41 1.305 2.34 1.305.585 0 1.17-.15 1.695-.42-.18-.765-.63-1.455-1.155-2.01-1.65-1.755-3-3.585-3-6.495 0-2.775 1.05-5.055 2.76-6.84-.27-.675-.48-1.95.135-3.6 0 0 1.11-.345 3.6 1.305 1.05-.3 2.16-.45 3.27-.45s2.22.15 3.27.45c2.49-1.65 3.6-1.305 3.6-1.305.615 1.65.405 2.925.135 3.6 1.71 1.785 2.76 4.065 2.76 6.84 0 2.925-1.365 4.74-3.015 6.495.48.51.945 1.515.945 3.075 0 2.22-.015 4.005-.015 4.56 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+    github.com/Madapexai/quark-agent
+  </a>
+  <span class="page-num">4 / 4</span>
+</div>
+</body>
+</html>

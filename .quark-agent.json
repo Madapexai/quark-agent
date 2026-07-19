@@ -1,0 +1,57 @@
+{
+  "// _comment_provider": "Choose: OpenAI / Anthropic / Gemini / Ollama / OpenRouter",
+  "apiKey": "YOUR_API_KEY_HERE",
+  "baseURL": "https://api.openai.com/v1",
+  "model": "gpt-4o-mini",
+  "temperature": 0.7,
+  "maxTokens": 4096,
+  "profile": "minimal",
+  "dbPath": "./.data/micro-agent.sqlite",
+  "maxToolRounds": 6,
+  "contextTokenBudget": 8000,
+  "workingMemoryRounds": 12,
+  "// _comment_sandbox": "toolAutoApprove: 'all' | 'safe' | 'none'",
+  "sandbox": {
+    "toolAutoApprove": "safe",
+    "allowNetwork": true,
+    "allowFilesystem": true,
+    "maxTimeoutMs": 30000
+  },
+  "// _comment_checkpoint": "Auto-save agent state for long-running tasks",
+  "checkpoint": {
+    "enabled": true,
+    "autoSaveInterval": 60,
+    "maxPerSession": 10
+  },
+  "// _comment_longRunning": "Long-running programming task support",
+  "longRunning": {
+    "enabled": false,
+    "maxConcurrent": 3,
+    "timeoutMinutes": 30
+  },
+  "// _comment_providers": "Additional providers for MoA routing",
+  "providers": [
+    {
+      "name": "anthropic",
+      "apiKey": "ANTHROPIC_KEY_HERE"
+    }
+  ],
+  "// _comment_router": "MoA intelligent router config",
+  "router": {
+    "fastModel": "gpt-4o-mini",
+    "mediumModel": "gpt-4o",
+    "powerfulModel": "o1"
+  },
+  "// _comment_channels": "Channel configuration (fill in tokens as needed)",
+  "channels": {
+    "discord": {
+      "token": "DISCORD_BOT_TOKEN",
+      "channelId": "CHANNEL_ID"
+    },
+    "slack": {
+      "token": "SLACK_BOT_TOKEN",
+      "signingSecret": "SIGNING_SECRET",
+      "channelId": "CHANNEL_ID"
+    }
+  }
+}

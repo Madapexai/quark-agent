@@ -13,6 +13,8 @@
     "dist",
     "bin",
     "src",
+    "packages",
+    "tsconfig.json",
     "e2e/.env.example",
     "LICENSE",
     "README.md"

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>Quark Agent - 小红书 03</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { width: 1080px; height: 1440px; overflow: hidden; font-family: -apple-system, 'PingFang SC', sans-serif; background: #0a0a0a; color: #fff; position: relative; }
+.grid-bg { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 40px 40px; }
+.orb1 { position: absolute; top: -200px; right: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(168,85,247,0.25) 0%, transparent 70%); filter: blur(60px); }
+.orb2 { position: absolute; bottom: 200px; left: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 70%); filter: blur(60px); }
+.content { position: relative; z-index: 2; padding: 72px 64px; }
+
+.hook { font-size: 36px; color: #f97316; font-weight: 800; margin-bottom: 12px; }
+h1 { font-size: 60px; font-weight: 900; margin-bottom: 12px; }
+h1 .accent { color: #a855f7; }
+.desc { font-size: 26px; color: rgba(255,255,255,0.5); margin-bottom: 40px; line-height: 1.5; }
+.desc em { font-style: normal; color: #a855f7; font-weight: 700; }
+
+.big-stats { display: flex; gap: 24px; margin-bottom: 40px; }
+.big-stat { flex: 1; text-align: center; padding: 32px 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; backdrop-filter: blur(8px); }
+.big-stat .num { font-size: 72px; font-weight: 900; line-height: 1; margin-bottom: 8px; }
+.big-stat .num.p { background: linear-gradient(135deg, #a855f7, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.big-stat .num.c { background: linear-gradient(135deg, #06b6d4, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.big-stat .num.w { color: #fff; }
+.big-stat .label { font-size: 20px; color: rgba(255,255,255,0.4); }
+.big-stat .sub { font-size: 16px; color: rgba(255,255,255,0.2); margin-top: 4px; }
+
+.bars { margin-bottom: 40px; }
+.bar-item { margin-bottom: 16px; }
+.bar-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.bar-name { font-size: 20px; font-weight: 600; }
+.bar-pct { font-size: 20px; font-weight: 700; color: #a855f7; }
+.bar-track { height: 10px; background: rgba(255,255,255,0.06); border-radius: 5px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 5px; }
+.bar-fill.p { background: linear-gradient(90deg, #a855f7, #c084fc); }
+.bar-fill.c { background: linear-gradient(90deg, #06b6d4, #22d3ee); }
+
+.features-title { font-size: 18px; color: rgba(255,255,255,0.3); letter-spacing: 3px; margin-bottom: 20px; }
+.features { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.feat { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; display: flex; gap: 14px; align-items: flex-start; }
+.feat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.feat-icon svg { width: 20px; height: 20px; }
+.feat-icon.p { background: rgba(168,85,247,0.15); }
+.feat-icon.c { background: rgba(6,182,212,0.15); }
+.feat-icon.g { background: rgba(34,197,94,0.12); }
+.feat-text .name { font-size: 19px; font-weight: 700; margin-bottom: 3px; }
+.feat-text .desc { font-size: 15px; color: rgba(255,255,255,0.4); line-height: 1.4; }
+
+.bottom { position: absolute; bottom: 0; left: 0; right: 0; z-index: 2; padding: 24px 64px; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); border-top: 1px solid rgba(255,255,255,0.06); }
+.gh-link { display: flex; align-items: center; gap: 10px; font-size: 20px; color: #a855f7; font-weight: 600; text-decoration: none; }
+.gh-link svg { width: 22px; height: 22px; }
+.page-num { font-size: 18px; color: rgba(255,255,255,0.25); }
+</style>
+</head>
+<body>
+<div class="grid-bg"></div><div class="orb1"></div><div class="orb2"></div>
+
+<div class="content">
+  <div class="hook">200 道题硬核评测，结果绝绝子！</div>
+  <h1>业界评测，<span class="accent">89% 通过</span></h1>
+  <div class="desc">AgentBench (清华) + GAIA (Meta) 双 benchmark，<em>真实 LLM + 真实工具调用</em>，不掺水！</div>
+
+  <div class="big-stats">
+    <div class="big-stat"><div class="num p">89%</div><div class="label">总通过率</div><div class="sub">178 / 200</div></div>
+    <div class="big-stat"><div class="num c">93%</div><div class="label">GAIA</div><div class="sub">Meta / HF</div></div>
+    <div class="big-stat"><div class="num w">85%</div><div class="label">AgentBench</div><div class="sub">THUDM</div></div>
+  </div>
+
+  <div class="bars">
+    <div class="bar-item"><div class="bar-header"><span class="bar-name">GAIA Level 1</span><span class="bar-pct">97.5%</span></div><div class="bar-track"><div class="bar-fill p" style="width:97.5%"></div></div></div>
+    <div class="bar-item"><div class="bar-header"><span class="bar-name">GAIA Level 2</span><span class="bar-pct">94.3%</span></div><div class="bar-track"><div class="bar-fill p" style="width:94.3%"></div></div></div>
+    <div class="bar-item"><div class="bar-header"><span class="bar-name">GAIA Level 3</span><span class="bar-pct">84.0%</span></div><div class="bar-track"><div class="bar-fill p" style="width:84%"></div></div></div>
+    <div class="bar-item"><div class="bar-header"><span class="bar-name">OS-Interaction</span><span class="bar-pct">93.3%</span></div><div class="bar-track"><div class="bar-fill c" style="width:93.3%"></div></div></div>
+    <div class="bar-item"><div class="bar-header"><span class="bar-name">Knowledge-Graph</span><span class="bar-pct">95.0%</span></div><div class="bar-track"><div class="bar-fill c" style="width:95%"></div></div></div>
+  </div>
+
+  <div class="features-title">8 大差异化特点，别人家没有的</div>
+  <div class="features">
+    <div class="feat"><div class="feat-icon p"><svg viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></div><div class="feat-text"><div class="name">5KB 微内核</div><div class="desc">工具/通道/模型即插即用</div></div></div>
+    <div class="feat"><div class="feat-icon c"><svg viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div><div class="feat-text"><div class="name">16 可组合工具</div><div class="desc">7 类，defineAction 自由拼</div></div></div>
+    <div class="feat"><div class="feat-icon p"><svg viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div class="feat-text"><div class="name">MoA 智能路由</div><div class="desc">复杂度检测 → 自动选模型</div></div></div>
+    <div class="feat"><div class="feat-icon c"><svg viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><div class="feat-text"><div class="name">沙箱安全策略</div><div class="desc">3 档预设，工具自动授权</div></div></div>
+    <div class="feat"><div class="feat-icon g"><svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></div><div class="feat-text"><div class="name">GEPA 自进化</div><div class="desc">遗传编程自动优化 prompt</div></div></div>
+    <div class="feat"><div class="feat-icon g"><svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="feat-text"><div class="name">A2A 协议</div><div class="desc">Agent 间发现与通信</div></div></div>
+    <div class="feat"><div class="feat-icon p"><svg viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div><div class="feat-text"><div class="name">Checkpoint 断点续跑</div><div class="desc">崩溃恢复 + 自动保存</div></div></div>
+    <div class="feat"><div class="feat-icon c"><svg viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><div class="feat-text"><div class="name">零 SDK 依赖</div><div class="desc">原生 fetch，无 axios/SDK</div></div></div>
+  </div>
+</div>
+
+<div class="bottom">
+  <a class="gh-link" href="https://github.com/Madapexai/quark-agent">
+    <svg viewBox="0 0 24 24" fill="#a855f7"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.245.54.945 1.41 1.305 2.34 1.305.585 0 1.17-.15 1.695-.42-.18-.765-.63-1.455-1.155-2.01-1.65-1.755-3-3.585-3-6.495 0-2.775 1.05-5.055 2.76-6.84-.27-.675-.48-1.95.135-3.6 0 0 1.11-.345 3.6 1.305 1.05-.3 2.16-.45 3.27-.45s2.22.15 3.27.45c2.49-1.65 3.6-1.305 3.6-1.305.615 1.65.405 2.925.135 3.6 1.71 1.785 2.76 4.065 2.76 6.84 0 2.925-1.365 4.74-3.015 6.495.48.51.945 1.515.945 3.075 0 2.22-.015 4.005-.015 4.56 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+    github.com/Madapexai/quark-agent
+  </a>
+  <span class="page-num">3 / 4</span>
+</div>
+</body>
+</html>
