@@ -77,12 +77,18 @@
 ## 30 秒跑起来
 
 ```bash
+# 零安装 — 直接从 GitHub 运行
+npx github:Madapexai/quark-agent setup   # 交互式配置向导
+npx github:Madapexai/quark-agent chat    # 开始对话！
+
+# 或克隆到本地
 git clone https://github.com/Madapexai/quark-agent.git
 cd quark-agent && npm install
-cp e2e/.env.example e2e/.env   # 然后填入一个 API Key（见下方）
-npx tsx e2e/demo-server.ts
-# → http://localhost:3456
+npx tsx bin/cli.ts setup                 # 配置向导
+npx tsx bin/cli.ts chat                  # 开始对话！
 ```
+
+> **v0.3.0 新增**：`quark-agent setup` 引导你选择 provider、模型、通道和沙箱策略，无需手动编辑 `.env`！
 
 > **⚠️ 需要自备大模型 API Key。** Quark Agent 是模型无关的（讲 OpenAI 兼容协议），但**不内置**模型。2 分钟拿一个免费 Key,见下方[获取免费 API Key](#-获取免费-api-key)。
 

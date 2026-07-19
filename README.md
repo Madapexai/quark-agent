@@ -80,15 +80,15 @@ Evaluated on the industry-standard **AgentBench (THUDM)** and **GAIA (Meta/HF)**
 ## 30-Second Quick Start
 
 ```bash
-# Option 1: Clone and run
+# Zero install — run directly from GitHub
+npx github:Madapexai/quark-agent setup   # Interactive setup wizard
+npx github:Madapexai/quark-agent chat    # Start chatting!
+
+# Or clone and run locally
 git clone https://github.com/Madapexai/quark-agent.git
 cd quark-agent && npm install
-npx tsx bin/cli.ts setup      # Interactive setup wizard (or --non-interactive for CI)
-npx tsx bin/cli.ts chat       # Start chatting!
-
-# Option 2: npx (after npm publish)
-npx quark-agent setup         # Configure your provider
-npx quark-agent chat          # Start chatting!
+npx tsx bin/cli.ts setup                 # Setup wizard
+npx tsx bin/cli.ts chat                  # Start chatting!
 ```
 
 > **New in v0.3.0**: `quark-agent setup` walks you through choosing a provider, model, channels, and sandbox policy. No more manual `.env` editing!

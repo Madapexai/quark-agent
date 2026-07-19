@@ -6,20 +6,22 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "quark-agent": "./dist/bin/cli.js",
-    "micro-agent": "./dist/bin/cli.js"
+    "quark-agent": "./bin/run-cli.cjs",
+    "micro-agent": "./bin/run-cli.cjs"
   },
   "files": [
     "dist",
     "bin",
+    "src",
     "e2e/.env.example",
     "LICENSE",
     "README.md"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "postinstall": "node -e \"try{require('child_process').execSync('npx tsx -e 0',{stdio:'pipe'})}catch{}\"",
     "dev": "tsx bin/cli.ts",
-    "start": "node dist/bin/cli.js",
+    "start": "node bin/run-cli.js",
     "typecheck": "tsc --noEmit",
     "example": "tsx examples/basic.ts",
     "prepublishOnly": "npm run build"
@@ -29,12 +31,12 @@
   },
   "dependencies": {
     "better-sqlite3": "^12.11.1",
-    "puppeteer-core": "^25.3.0"
+    "puppeteer-core": "^25.3.0",
+    "tsx": "^4.19.0"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.11",
     "@types/node": "^26.1.1",
-    "tsx": "^4.19.0",
     "typescript": "^5.5.0"
   },
   "keywords": [
