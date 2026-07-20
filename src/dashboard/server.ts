@@ -19,6 +19,7 @@ import * as http from "node:http";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import * as fs from "node:fs";
 import * as path from "node:path";
+import * as crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { exec } from "node:child_process";
 
@@ -41,6 +42,7 @@ import { LangfuseClient, type LangfuseConfig } from "../observe/langfuse.js";
 import { ModelManager } from "../config/model-manager.js";
 import { ChatRoomManager } from "../chatroom/index.js";
 import { DreamingEngine, type DreamingConfig } from "../dreaming/index.js";
+import { AuthManager, AuthError } from "../auth/index.js";
 
 // ============================================================================
 // 常量
@@ -135,6 +137,803 @@ interface AgentInstance {
   agent: Agent;
   close: () => Promise<void>;
   tracer: InMemoryTracer;
+}
+
+/** 聊天会话数据结构 */
+interface ChatSession {
+  id: string;
+  userId: string;
+  name: string;
+  model: string;
+  provider: string;
+  systemPrompt?: string;
+  createdAt: number;
+  updatedAt: number;
+  messageCount: number;
+  totalTokens: number;
+  totalCost: number;
+}
+
+/** 会话消息 */
+interface ChatMessage {
+  id: string;
+  role: "user" | "assistant" | "system";
+  content: string;
+  tokens: number;
+  ts: number;
+}
+
+/** 聊天会话存储（内存 + 定期写盘 .data/sessions.json） */
+class ChatSessionStore {
+  private sessions = new Map<string, ChatSession>();
+  private messages = new Map<string, ChatMessage[]>();
+  private dirty = false;
+  private readonly dataDir: string;
+  private readonly dbPath: string;
+
+  constructor() {
+    this.dataDir = path.join(process.cwd(), ".data");
+    this.dbPath = path.join(this.dataDir, "sessions.json");
+    this.load();
+    // 每 30 秒写盘一次（保持引用防止 GC）
+    const _saveTimer = setInterval(() => this.flush(), 30_000);
+    void _saveTimer;
+    // 进程退出前写盘
+    process.on("beforeExit", () => this.flush());
+  }
+
+  /** 列出指定用户的会话 */
+  list(userId: string): ChatSession[] {
+    return Array.from(this.sessions.values())
+      .filter((s) => s.userId === userId)
+      .sort((a, b) => b.updatedAt - a.updatedAt);
+  }
+
+  /** 创建新会话 */
+  create(userId: string, opts?: { name?: string; model?: string; provider?: string; systemPrompt?: string }): ChatSession {
+    const id = `sess-${Date.now()}-${crypto.randomBytes(4).toString("hex")}`;
+    const now = Date.now();
+    const cfg = loadConfig();
+    const s: ChatSession = {
+      id,
+      userId,
+      name: opts?.name ?? "新对话",
+      model: opts?.model ?? cfg.model ?? "gpt-4o-mini",
+      provider: opts?.provider ?? "",
+      systemPrompt: opts?.systemPrompt,
+      createdAt: now,
+      updatedAt: now,
+      messageCount: 0,
+      totalTokens: 0,
+      totalCost: 0,
+    };
+    this.sessions.set(id, s);
+    this.messages.set(id, []);
+    this.dirty = true;
+    return s;
+  }
+
+  /** 获取会话 */
+  get(id: string): ChatSession | undefined {
+    return this.sessions.get(id);
+  }
+
+  /** 更新会话 */
+  update(id: string, opts: { name?: string; model?: string; provider?: string; systemPrompt?: string }): ChatSession | undefined {
+    const s = this.sessions.get(id);
+    if (!s) return undefined;
+    if (opts.name !== undefined) s.name = opts.name;
+    if (opts.model !== undefined) s.model = opts.model;
+    if (opts.provider !== undefined) s.provider = opts.provider;
+    if (opts.systemPrompt !== undefined) s.systemPrompt = opts.systemPrompt;
+    s.updatedAt = Date.now();
+    this.dirty = true;
+    return s;
+  }
+
+  /** 删除会话 */
+  delete(id: string): boolean {
+    const removed = this.sessions.delete(id);
+    this.messages.delete(id);
+    if (removed) this.dirty = true;
+    return removed;
+  }
+
+  /** 添加消息 */
+  addMessage(sessionId: string, role: "user" | "assistant" | "system", content: string, tokens = 0): ChatMessage | undefined {
+    const s = this.sessions.get(sessionId);
+    const msgs = this.messages.get(sessionId);
+    if (!s || !msgs) return undefined;
+    const msg: ChatMessage = {
+      id: `msg-${Date.now()}-${crypto.randomBytes(2).toString("hex")}`,
+      role,
+      content,
+      tokens,
+      ts: Date.now(),
+    };
+    msgs.push(msg);
+    s.messageCount = msgs.length;
+    s.totalTokens += tokens;
+    s.updatedAt = Date.now();
+    this.dirty = true;
+    return msg;
+  }
+
+  /** 获取消息（分页） */
+  getMessages(sessionId: string, opts?: { limit?: number; offset?: number; before?: number }): ChatMessage[] {
+    const msgs = this.messages.get(sessionId);
+    if (!msgs) return [];
+    let result = [...msgs];
+    if (opts?.before) result = result.filter((m) => m.ts < opts.before!);
+    const offset = opts?.offset ?? 0;
+    const limit = opts?.limit ?? 50;
+    return result.slice(offset, offset + limit);
+  }
+
+  /** 清空会话消息 */
+  clearMessages(sessionId: string): boolean {
+    const s = this.sessions.get(sessionId);
+    const msgs = this.messages.get(sessionId);
+    if (!s || !msgs) return false;
+    msgs.length = 0;
+    s.messageCount = 0;
+    s.totalTokens = 0;
+    s.totalCost = 0;
+    s.updatedAt = Date.now();
+    this.dirty = true;
+    return true;
+  }
+
+  /** 从磁盘加载 */
+  private load(): void {
+    try {
+      if (!fs.existsSync(this.dbPath)) return;
+      const raw = fs.readFileSync(this.dbPath, "utf8");
+      const data = JSON.parse(raw) as { sessions: ChatSession[]; messages: Record<string, ChatMessage[]> };
+      for (const s of data.sessions ?? []) {
+        this.sessions.set(s.id, s);
+      }
+      for (const [id, msgs] of Object.entries(data.messages ?? {})) {
+        this.messages.set(id, msgs);
+      }
+    } catch {
+      // 文件不存在或格式错误，从空开始
+    }
+  }
+
+  /** 写盘 */
+  flush(): void {
+    if (!this.dirty) return;
+    try {
+      if (!fs.existsSync(this.dataDir)) {
+        fs.mkdirSync(this.dataDir, { recursive: true });
+      }
+      const sessions = Array.from(this.sessions.values());
+      const msgObj: Record<string, ChatMessage[]> = {};
+      for (const [id, msgs] of this.messages) {
+        msgObj[id] = msgs;
+      }
+      fs.writeFileSync(this.dbPath, JSON.stringify({ sessions, messages: msgObj }), "utf8");
+      this.dirty = false;
+    } catch (err) {
+      console.error("[dashboard] 写入会话数据失败:", err);
+    }
+  }
+}
+
+/** i18n 翻译表 */
+const I18N_TRANSLATIONS: Record<string, Record<string, string>> = {
+  zh: {
+    // ---- sidebar ----
+    "sidebar.chat": "对话",
+    "sidebar.rooms": "聊天室",
+    "sidebar.dashboard": "仪表盘",
+    "sidebar.skills": "技能",
+    "sidebar.tools": "工具",
+    "sidebar.settings": "设置",
+    "sidebar.sessions": "会话",
+    "sidebar.analytics": "分析",
+    "sidebar.dreaming": "自进化",
+    "sidebar.models": "模型",
+    "sidebar.profile": "配置",
+    "sidebar.env": "环境变量",
+    "sidebar.logs": "日志",
+    "sidebar.trace": "追踪",
+    "sidebar.langfuse": "Langfuse",
+    "sidebar.relay": "转发",
+    "sidebar.sandbox": "沙盒",
+    "sidebar.checkpoint": "检查点",
+    "sidebar.channels": "频道",
+    "sidebar.provider": "供应商",
+    "sidebar.catalog": "目录",
+    "sidebar.team": "团队",
+    "sidebar.computer": "计算机",
+    "sidebar.browser": "浏览器",
+    "sidebar.plugins": "插件",
+    "sidebar.about": "关于",
+    "sidebar.help": "帮助",
+    "sidebar.logout": "退出登录",
+    "sidebar.theme": "主题",
+    "sidebar.language": "语言",
+    "sidebar.search": "搜索",
+    "sidebar.expand": "展开",
+    "sidebar.collapse": "收起",
+    // ---- chat ----
+    "chat.newSession": "新建对话",
+    "chat.sendMessage": "发送消息",
+    "chat.thinking": "思考中...",
+    "chat.noSessions": "暂无会话",
+    "chat.deleteSession": "删除会话",
+    "chat.renameSession": "重命名会话",
+    "chat.inputPlaceholder": "输入消息...",
+    "chat.send": "发送",
+    "chat.cancel": "取消",
+    "chat.retry": "重试",
+    "chat.copy": "复制",
+    "chat.clear": "清空",
+    "chat.history": "历史记录",
+    "chat.export": "导出",
+    "chat.model": "模型",
+    "chat.provider": "供应商",
+    "chat.systemPrompt": "系统提示",
+    "chat.temperature": "温度",
+    "chat.maxTokens": "最大令牌数",
+    "chat.contextWindow": "上下文窗口",
+    "chat.toolCalls": "工具调用",
+    "chat.reply": "回复",
+    "chat.error": "出错了",
+    "chat.empty": "暂无消息",
+    "chat.welcome": "欢迎使用",
+    "chat.sessions": "会话列表",
+    "chat.selectSession": "选择或创建一个会话",
+    "chat.deleteConfirm": "确认删除此会话？",
+    "chat.clearConfirm": "确认清空所有消息？",
+    "chat.nameRequired": "请输入会话名称",
+    "chat.nameUpdated": "会话名称已更新",
+    "chat.sessionDeleted": "会话已删除",
+    "chat.sessionCreated": "会话已创建",
+    "chat.noMessages": "暂无消息",
+    "chat.loadMore": "加载更多",
+    "chat.streaming": "流式输出中",
+    "chat.paused": "已暂停",
+    "chat.resumed": "已恢复",
+    "chat.tokenCount": "令牌数",
+    "chat.cost": "费用",
+    "chat.rounds": "轮次",
+    "chat.duration": "持续时间",
+    // ---- rooms ----
+    "rooms.createRoom": "创建房间",
+    "rooms.joinRoom": "加入房间",
+    "rooms.leaveRoom": "离开房间",
+    "rooms.bindTeam": "绑定团队",
+    "rooms.askAgent": "询问 Agent",
+    "rooms.roomName": "房间名称",
+    "rooms.description": "描述",
+    "rooms.members": "成员",
+    "rooms.messages": "消息",
+    "rooms.noRooms": "暂无房间",
+    "rooms.deleteRoom": "删除房间",
+    "rooms.roomCreated": "房间已创建",
+    "rooms.roomDeleted": "房间已删除",
+    "rooms.joined": "已加入",
+    "rooms.left": "已离开",
+    "rooms.sendMessage": "发送消息",
+    "rooms.streamConnected": "流已连接",
+    "rooms.stats": "统计",
+    "rooms.role.admin": "管理员",
+    "rooms.role.member": "成员",
+    "rooms.role.observer": "观察者",
+    // ---- dashboard ----
+    "dashboard.usage": "用量",
+    "dashboard.cost": "费用",
+    "dashboard.tokens": "令牌",
+    "dashboard.sessions": "会话",
+    "dashboard.traces": "追踪",
+    "dashboard.logs": "日志",
+    "dashboard.inputTokens": "输入令牌",
+    "dashboard.outputTokens": "输出令牌",
+    "dashboard.totalCost": "总费用",
+    "dashboard.cacheHitRate": "缓存命中率",
+    "dashboard.modelUsage": "模型使用",
+    "dashboard.dailyTrend": "每日趋势",
+    "dashboard.overview": "概览",
+    "dashboard.activity": "活动",
+    "dashboard.performance": "性能",
+    "dashboard.errors": "错误",
+    "dashboard.uptime": "运行时间",
+    "dashboard.version": "版本",
+    "dashboard.status": "状态",
+    "dashboard.healthy": "正常",
+    "dashboard.degraded": "降级",
+    "dashboard.down": "宕机",
+    // ---- skills ----
+    "skills.installed": "已安装",
+    "skills.search": "搜索",
+    "skills.install": "安装",
+    "skills.dreaming": "自进化",
+    "skills.learn": "学习",
+    "skills.evolve": "进化",
+    "skills.autoWatch": "自动监视",
+    "skills.uninstall": "卸载",
+    "skills.update": "更新",
+    "skills.enabled": "已启用",
+    "skills.disabled": "已禁用",
+    "skills.noSkills": "暂无技能",
+    "skills.searchPlaceholder": "搜索技能...",
+    "skills.installFromNpm": "从 npm 安装",
+    "skills.installFromUrl": "从 URL 安装",
+    "skills.installing": "安装中...",
+    "skills.installSuccess": "安装成功",
+    "skills.installFailed": "安装失败",
+    "skills.uninstallConfirm": "确认卸载此技能？",
+    "skills.noResults": "无搜索结果",
+    "skills.history": "进化历史",
+    "skills.strategy": "策略",
+    "skills.depth": "深度",
+    "skills.startWatch": "开始监视",
+    "skills.stopWatch": "停止监视",
+    "skills.analyze": "分析",
+    "skills.fingerprint": "指纹",
+    "skills.trigger": "触发",
+    "skills.record": "记录",
+    // ---- tools ----
+    "tools.computerUse": "计算机控制",
+    "tools.relay": "转发",
+    "tools.screenshot": "截图",
+    "tools.click": "点击",
+    "tools.type": "输入",
+    "tools.browser": "浏览器",
+    "tools.key": "按键",
+    "tools.hotkey": "快捷键",
+    "tools.windows": "窗口",
+    "tools.launch": "启动",
+    "tools.clipboard": "剪贴板",
+    "tools.history": "历史",
+    "tools.browserOpen": "打开浏览器",
+    "tools.browserEval": "执行 JS",
+    "tools.browserScreenshot": "浏览器截图",
+    "tools.region": "区域",
+    "tools.coordinates": "坐标",
+    "tools.text": "文本",
+    "tools.keys": "按键",
+    "tools.appName": "应用名称",
+    "tools.url": "网址",
+    "tools.script": "脚本",
+    // ---- settings ----
+    "settings.provider": "供应商",
+    "settings.models": "模型",
+    "settings.channels": "频道",
+    "settings.sandbox": "沙盒",
+    "settings.checkpoint": "检查点",
+    "settings.env": "环境变量",
+    "settings.langfuse": "Langfuse",
+    "settings.apiKey": "API Key",
+    "settings.baseURL": "Base URL",
+    "settings.model": "模型",
+    "settings.temperature": "温度",
+    "settings.maxTokens": "最大令牌数",
+    "settings.profile": "配置方案",
+    "settings.dbPath": "数据库路径",
+    "settings.maxToolRounds": "最大工具轮次",
+    "settings.contextTokenBudget": "上下文令牌预算",
+    "settings.workingMemoryRounds": "工作记忆轮次",
+    "settings.sandboxPolicy": "沙盒策略",
+    "settings.toolAutoApprove": "工具自动批准",
+    "settings.allowNetwork": "允许网络",
+    "settings.allowFilesystem": "允许文件系统",
+    "settings.maxTimeoutMs": "最大超时(ms)",
+    "settings.checkpointEnabled": "检查点启用",
+    "settings.autoSaveInterval": "自动保存间隔(秒)",
+    "settings.maxPerSession": "每会话最大数",
+    "settings.longRunningEnabled": "长时任务启用",
+    "settings.maxConcurrent": "最大并发",
+    "settings.timeoutMinutes": "超时(分钟)",
+    "settings.relayRules": "转发规则",
+    "settings.addRule": "添加规则",
+    "settings.removeRule": "删除规则",
+    "settings.toggleRule": "切换规则",
+    "settings.testRelay": "测试转发",
+    "settings.auth": "认证",
+    "settings.authEnabled": "认证启用",
+    "settings.jwtSecret": "JWT 密钥",
+    "settings.tokenExpiry": "令牌有效期",
+    "settings.users": "用户",
+    "settings.addUser": "添加用户",
+    "settings.removeUser": "删除用户",
+    "settings.changePassword": "修改密码",
+    "settings.language": "语言",
+    "settings.theme": "主题",
+    "settings.reset": "重置",
+    "settings.resetConfirm": "确认重置所有配置？",
+    "settings.dreaming": "自进化",
+    "settings.dreamingEnabled": "自进化启用",
+    "settings.dreamingStrategy": "进化策略",
+    "settings.dreamingMaxDepth": "最大深度",
+    // ---- auth ----
+    "auth.login": "登录",
+    "auth.logout": "退出登录",
+    "auth.register": "注册",
+    "auth.username": "用户名",
+    "auth.password": "密码",
+    "auth.welcome": "欢迎",
+    "auth.loginFailed": "用户名或密码错误",
+    "auth.registerFailed": "注册失败",
+    "auth.alreadyLoggedIn": "已登录",
+    "auth.notLoggedIn": "未登录",
+    "auth.sessionExpired": "会话已过期",
+    "auth.forbidden": "无权限",
+    "auth.changePassword": "修改密码",
+    "auth.oldPassword": "旧密码",
+    "auth.newPassword": "新密码",
+    "auth.confirmPassword": "确认密码",
+    "auth.passwordMismatch": "两次密码不一致",
+    "auth.passwordChanged": "密码已修改",
+    "auth.defaultPassword": "默认密码为 admin，请及时修改",
+    "auth.role.admin": "管理员",
+    "auth.role.user": "用户",
+    "auth.noAccount": "没有账号？",
+    "auth.hasAccount": "已有账号？",
+    "auth.registerDisabled": "注册已禁用",
+    // ---- common ----
+    "common.save": "保存",
+    "common.cancel": "取消",
+    "common.delete": "删除",
+    "common.edit": "编辑",
+    "common.add": "添加",
+    "common.remove": "移除",
+    "common.search": "搜索",
+    "common.reset": "重置",
+    "common.enabled": "已启用",
+    "common.disabled": "已禁用",
+    "common.loading": "加载中...",
+    "common.error": "出错了",
+    "common.success": "成功",
+    "common.confirm": "确认",
+    "common.close": "关闭",
+    "common.back": "返回",
+    "common.next": "下一步",
+    "common.previous": "上一步",
+    "common.refresh": "刷新",
+    "common.download": "下载",
+    "common.upload": "上传",
+    "common.import": "导入",
+    "common.export": "导出",
+    "common.yes": "是",
+    "common.no": "否",
+    "common.all": "全部",
+    "common.none": "无",
+    "common.other": "其他",
+    "common.name": "名称",
+    "common.description": "描述",
+    "common.status": "状态",
+    "common.actions": "操作",
+    "common.details": "详情",
+    "common.createdAt": "创建时间",
+    "common.updatedAt": "更新时间",
+    "common.noData": "暂无数据",
+    "common.total": "总计",
+    "common.count": "数量",
+    "common.type": "类型",
+    "common.value": "值",
+    "common.key": "键",
+    "common.id": "ID",
+    "common.online": "在线",
+    "common.offline": "离线",
+    "common.connecting": "连接中",
+    "common.connected": "已连接",
+    "common.disconnected": "已断开",
+  },
+  en: {
+    // ---- sidebar ----
+    "sidebar.chat": "Chat",
+    "sidebar.rooms": "Rooms",
+    "sidebar.dashboard": "Dashboard",
+    "sidebar.skills": "Skills",
+    "sidebar.tools": "Tools",
+    "sidebar.settings": "Settings",
+    "sidebar.sessions": "Sessions",
+    "sidebar.analytics": "Analytics",
+    "sidebar.dreaming": "Dreaming",
+    "sidebar.models": "Models",
+    "sidebar.profile": "Profile",
+    "sidebar.env": "Env Vars",
+    "sidebar.logs": "Logs",
+    "sidebar.trace": "Traces",
+    "sidebar.langfuse": "Langfuse",
+    "sidebar.relay": "Relay",
+    "sidebar.sandbox": "Sandbox",
+    "sidebar.checkpoint": "Checkpoint",
+    "sidebar.channels": "Channels",
+    "sidebar.provider": "Provider",
+    "sidebar.catalog": "Catalog",
+    "sidebar.team": "Team",
+    "sidebar.computer": "Computer",
+    "sidebar.browser": "Browser",
+    "sidebar.plugins": "Plugins",
+    "sidebar.about": "About",
+    "sidebar.help": "Help",
+    "sidebar.logout": "Logout",
+    "sidebar.theme": "Theme",
+    "sidebar.language": "Language",
+    "sidebar.search": "Search",
+    "sidebar.expand": "Expand",
+    "sidebar.collapse": "Collapse",
+    // ---- chat ----
+    "chat.newSession": "New Chat",
+    "chat.sendMessage": "Send Message",
+    "chat.thinking": "Thinking...",
+    "chat.noSessions": "No sessions",
+    "chat.deleteSession": "Delete Session",
+    "chat.renameSession": "Rename Session",
+    "chat.inputPlaceholder": "Type a message...",
+    "chat.send": "Send",
+    "chat.cancel": "Cancel",
+    "chat.retry": "Retry",
+    "chat.copy": "Copy",
+    "chat.clear": "Clear",
+    "chat.history": "History",
+    "chat.export": "Export",
+    "chat.model": "Model",
+    "chat.provider": "Provider",
+    "chat.systemPrompt": "System Prompt",
+    "chat.temperature": "Temperature",
+    "chat.maxTokens": "Max Tokens",
+    "chat.contextWindow": "Context Window",
+    "chat.toolCalls": "Tool Calls",
+    "chat.reply": "Reply",
+    "chat.error": "Error",
+    "chat.empty": "No messages",
+    "chat.welcome": "Welcome",
+    "chat.sessions": "Sessions",
+    "chat.selectSession": "Select or create a session",
+    "chat.deleteConfirm": "Delete this session?",
+    "chat.clearConfirm": "Clear all messages?",
+    "chat.nameRequired": "Session name required",
+    "chat.nameUpdated": "Session renamed",
+    "chat.sessionDeleted": "Session deleted",
+    "chat.sessionCreated": "Session created",
+    "chat.noMessages": "No messages",
+    "chat.loadMore": "Load more",
+    "chat.streaming": "Streaming",
+    "chat.paused": "Paused",
+    "chat.resumed": "Resumed",
+    "chat.tokenCount": "Token count",
+    "chat.cost": "Cost",
+    "chat.rounds": "Rounds",
+    "chat.duration": "Duration",
+    // ---- rooms ----
+    "rooms.createRoom": "Create Room",
+    "rooms.joinRoom": "Join Room",
+    "rooms.leaveRoom": "Leave Room",
+    "rooms.bindTeam": "Bind Team",
+    "rooms.askAgent": "Ask Agent",
+    "rooms.roomName": "Room Name",
+    "rooms.description": "Description",
+    "rooms.members": "Members",
+    "rooms.messages": "Messages",
+    "rooms.noRooms": "No rooms",
+    "rooms.deleteRoom": "Delete Room",
+    "rooms.roomCreated": "Room created",
+    "rooms.roomDeleted": "Room deleted",
+    "rooms.joined": "Joined",
+    "rooms.left": "Left",
+    "rooms.sendMessage": "Send Message",
+    "rooms.streamConnected": "Stream connected",
+    "rooms.stats": "Stats",
+    "rooms.role.admin": "Admin",
+    "rooms.role.member": "Member",
+    "rooms.role.observer": "Observer",
+    // ---- dashboard ----
+    "dashboard.usage": "Usage",
+    "dashboard.cost": "Cost",
+    "dashboard.tokens": "Tokens",
+    "dashboard.sessions": "Sessions",
+    "dashboard.traces": "Traces",
+    "dashboard.logs": "Logs",
+    "dashboard.inputTokens": "Input Tokens",
+    "dashboard.outputTokens": "Output Tokens",
+    "dashboard.totalCost": "Total Cost",
+    "dashboard.cacheHitRate": "Cache Hit Rate",
+    "dashboard.modelUsage": "Model Usage",
+    "dashboard.dailyTrend": "Daily Trend",
+    "dashboard.overview": "Overview",
+    "dashboard.activity": "Activity",
+    "dashboard.performance": "Performance",
+    "dashboard.errors": "Errors",
+    "dashboard.uptime": "Uptime",
+    "dashboard.version": "Version",
+    "dashboard.status": "Status",
+    "dashboard.healthy": "Healthy",
+    "dashboard.degraded": "Degraded",
+    "dashboard.down": "Down",
+    // ---- skills ----
+    "skills.installed": "Installed",
+    "skills.search": "Search",
+    "skills.install": "Install",
+    "skills.dreaming": "Dreaming",
+    "skills.learn": "Learn",
+    "skills.evolve": "Evolve",
+    "skills.autoWatch": "Auto Watch",
+    "skills.uninstall": "Uninstall",
+    "skills.update": "Update",
+    "skills.enabled": "Enabled",
+    "skills.disabled": "Disabled",
+    "skills.noSkills": "No skills",
+    "skills.searchPlaceholder": "Search skills...",
+    "skills.installFromNpm": "Install from npm",
+    "skills.installFromUrl": "Install from URL",
+    "skills.installing": "Installing...",
+    "skills.installSuccess": "Installed",
+    "skills.installFailed": "Install failed",
+    "skills.uninstallConfirm": "Uninstall this skill?",
+    "skills.noResults": "No results",
+    "skills.history": "History",
+    "skills.strategy": "Strategy",
+    "skills.depth": "Depth",
+    "skills.startWatch": "Start Watch",
+    "skills.stopWatch": "Stop Watch",
+    "skills.analyze": "Analyze",
+    "skills.fingerprint": "Fingerprint",
+    "skills.trigger": "Trigger",
+    "skills.record": "Record",
+    // ---- tools ----
+    "tools.computerUse": "Computer Use",
+    "tools.relay": "Relay",
+    "tools.screenshot": "Screenshot",
+    "tools.click": "Click",
+    "tools.type": "Type",
+    "tools.browser": "Browser",
+    "tools.key": "Key",
+    "tools.hotkey": "Hotkey",
+    "tools.windows": "Windows",
+    "tools.launch": "Launch",
+    "tools.clipboard": "Clipboard",
+    "tools.history": "History",
+    "tools.browserOpen": "Open Browser",
+    "tools.browserEval": "Execute JS",
+    "tools.browserScreenshot": "Browser Screenshot",
+    "tools.region": "Region",
+    "tools.coordinates": "Coordinates",
+    "tools.text": "Text",
+    "tools.keys": "Keys",
+    "tools.appName": "App Name",
+    "tools.url": "URL",
+    "tools.script": "Script",
+    // ---- settings ----
+    "settings.provider": "Provider",
+    "settings.models": "Models",
+    "settings.channels": "Channels",
+    "settings.sandbox": "Sandbox",
+    "settings.checkpoint": "Checkpoint",
+    "settings.env": "Environment Variables",
+    "settings.langfuse": "Langfuse",
+    "settings.apiKey": "API Key",
+    "settings.baseURL": "Base URL",
+    "settings.model": "Model",
+    "settings.temperature": "Temperature",
+    "settings.maxTokens": "Max Tokens",
+    "settings.profile": "Profile",
+    "settings.dbPath": "Database Path",
+    "settings.maxToolRounds": "Max Tool Rounds",
+    "settings.contextTokenBudget": "Context Token Budget",
+    "settings.workingMemoryRounds": "Working Memory Rounds",
+    "settings.sandboxPolicy": "Sandbox Policy",
+    "settings.toolAutoApprove": "Tool Auto Approve",
+    "settings.allowNetwork": "Allow Network",
+    "settings.allowFilesystem": "Allow Filesystem",
+    "settings.maxTimeoutMs": "Max Timeout (ms)",
+    "settings.checkpointEnabled": "Checkpoint Enabled",
+    "settings.autoSaveInterval": "Auto Save Interval (s)",
+    "settings.maxPerSession": "Max Per Session",
+    "settings.longRunningEnabled": "Long Running Enabled",
+    "settings.maxConcurrent": "Max Concurrent",
+    "settings.timeoutMinutes": "Timeout (min)",
+    "settings.relayRules": "Relay Rules",
+    "settings.addRule": "Add Rule",
+    "settings.removeRule": "Remove Rule",
+    "settings.toggleRule": "Toggle Rule",
+    "settings.testRelay": "Test Relay",
+    "settings.auth": "Authentication",
+    "settings.authEnabled": "Auth Enabled",
+    "settings.jwtSecret": "JWT Secret",
+    "settings.tokenExpiry": "Token Expiry",
+    "settings.users": "Users",
+    "settings.addUser": "Add User",
+    "settings.removeUser": "Remove User",
+    "settings.changePassword": "Change Password",
+    "settings.language": "Language",
+    "settings.theme": "Theme",
+    "settings.reset": "Reset",
+    "settings.resetConfirm": "Reset all settings?",
+    "settings.dreaming": "Dreaming",
+    "settings.dreamingEnabled": "Dreaming Enabled",
+    "settings.dreamingStrategy": "Strategy",
+    "settings.dreamingMaxDepth": "Max Depth",
+    // ---- auth ----
+    "auth.login": "Login",
+    "auth.logout": "Logout",
+    "auth.register": "Register",
+    "auth.username": "Username",
+    "auth.password": "Password",
+    "auth.welcome": "Welcome",
+    "auth.loginFailed": "Invalid username or password",
+    "auth.registerFailed": "Registration failed",
+    "auth.alreadyLoggedIn": "Already logged in",
+    "auth.notLoggedIn": "Not logged in",
+    "auth.sessionExpired": "Session expired",
+    "auth.forbidden": "Forbidden",
+    "auth.changePassword": "Change Password",
+    "auth.oldPassword": "Old Password",
+    "auth.newPassword": "New Password",
+    "auth.confirmPassword": "Confirm Password",
+    "auth.passwordMismatch": "Passwords do not match",
+    "auth.passwordChanged": "Password changed",
+    "auth.defaultPassword": "Default password is admin, please change it",
+    "auth.role.admin": "Admin",
+    "auth.role.user": "User",
+    "auth.noAccount": "No account?",
+    "auth.hasAccount": "Have an account?",
+    "auth.registerDisabled": "Registration is disabled",
+    // ---- common ----
+    "common.save": "Save",
+    "common.cancel": "Cancel",
+    "common.delete": "Delete",
+    "common.edit": "Edit",
+    "common.add": "Add",
+    "common.remove": "Remove",
+    "common.search": "Search",
+    "common.reset": "Reset",
+    "common.enabled": "Enabled",
+    "common.disabled": "Disabled",
+    "common.loading": "Loading...",
+    "common.error": "Error",
+    "common.success": "Success",
+    "common.confirm": "Confirm",
+    "common.close": "Close",
+    "common.back": "Back",
+    "common.next": "Next",
+    "common.previous": "Previous",
+    "common.refresh": "Refresh",
+    "common.download": "Download",
+    "common.upload": "Upload",
+    "common.import": "Import",
+    "common.export": "Export",
+    "common.yes": "Yes",
+    "common.no": "No",
+    "common.all": "All",
+    "common.none": "None",
+    "common.other": "Other",
+    "common.name": "Name",
+    "common.description": "Description",
+    "common.status": "Status",
+    "common.actions": "Actions",
+    "common.details": "Details",
+    "common.createdAt": "Created At",
+    "common.updatedAt": "Updated At",
+    "common.noData": "No data",
+    "common.total": "Total",
+    "common.count": "Count",
+    "common.type": "Type",
+    "common.value": "Value",
+    "common.key": "Key",
+    "common.id": "ID",
+    "common.online": "Online",
+    "common.offline": "Offline",
+    "common.connecting": "Connecting",
+    "common.connected": "Connected",
+    "common.disconnected": "Disconnected",
+  },
+};
+
+/** 用量分析数据（内存累计） */
+interface UsageData {
+  totalInputTokens: number;
+  totalOutputTokens: number;
+  totalSessions: number;
+  totalCost: number;
+  cacheHitRate: number;
+  modelUsage: Record<string, number>;
+  dailyTrend: Array<{ date: string; input: number; output: number; sessions: number }>;
 }
 
 // ============================================================================
@@ -254,6 +1053,20 @@ export class DashboardServer {
   private chatroomManager: ChatRoomManager | null = null;
   /** 自进化引擎 */
   private dreamingEngine: DreamingEngine | null = null;
+  /** 用户认证管理器 */
+  private readonly authManager = new AuthManager();
+  /** 聊天会话存储（持久化 .data/sessions.json） */
+  private readonly chatSessionStore = new ChatSessionStore();
+  /** 用量分析数据 */
+  private readonly usageData: UsageData = {
+    totalInputTokens: 0,
+    totalOutputTokens: 0,
+    totalSessions: 0,
+    totalCost: 0,
+    cacheHitRate: 0,
+    modelUsage: {},
+    dailyTrend: [],
+  };
 
   constructor(opts: DashboardServerOptions = {}) {
     this.port = opts.port ?? 8788;
@@ -294,6 +1107,11 @@ export class DashboardServer {
         enabled: lf.enabled ?? false,
       });
     }
+
+    // 首次启动：自动创建 admin 用户（密码 admin）并提示修改
+    this.ensureDefaultAdmin();
+    // 首次启动：自动生成 jwtSecret
+    this.ensureJwtSecret();
 
     // 优雅关闭
     const shutdown = async () => {
@@ -396,6 +1214,15 @@ export class DashboardServer {
     const method = req.method ?? "GET";
 
     try {
+      // ---- 认证检查：受保护端点需要登录 ----
+      if (this.isAuthEnabled() && this.isProtectedPath(pathname)) {
+        const user = this.authenticateRequest(req);
+        if (!user) {
+          this.writeJSON(res, 401, { error: "未认证，请先登录" });
+          return;
+        }
+      }
+
       // ---- 配置管理 ----
       if (pathname === "/api/config" && method === "GET") {
         await this.handleGetConfig(res);
@@ -794,6 +1621,86 @@ export class DashboardServer {
       }
       if (pathname === "/api/dreaming/watch/stop" && method === "POST") {
         await this.handleDreamingWatchStop(res);
+        return;
+      }
+
+      // ---- Auth API ----
+      if (pathname === "/api/auth/register" && method === "POST") {
+        await this.handleAuthRegister(req, res);
+        return;
+      }
+      if (pathname === "/api/auth/login" && method === "POST") {
+        await this.handleAuthLogin(req, res);
+        return;
+      }
+      if (pathname === "/api/auth/logout" && method === "POST") {
+        this.writeJSON(res, 200, { ok: true });
+        return;
+      }
+      if (pathname === "/api/auth/me" && method === "GET") {
+        await this.handleAuthMe(req, res);
+        return;
+      }
+      if (pathname === "/api/auth/users" && method === "GET") {
+        await this.handleAuthUsers(req, res);
+        return;
+      }
+
+      // ---- Sessions API ----
+      if (pathname === "/api/sessions" && method === "GET") {
+        await this.handleSessionsList(req, res);
+        return;
+      }
+      if (pathname === "/api/sessions" && method === "POST") {
+        await this.handleSessionsCreate(req, res);
+        return;
+      }
+      const sessionMatch = pathname.match(/^\/api\/sessions\/([^/]+)$/);
+      const sessionMessagesMatch = pathname.match(/^\/api\/sessions\/([^/]+)\/messages$/);
+      const sessionChatMatch = pathname.match(/^\/api\/sessions\/([^/]+)\/chat$/);
+      if (sessionChatMatch && method === "POST") {
+        await this.handleSessionChat(sessionChatMatch[1], req, res);
+        return;
+      }
+      if (sessionMessagesMatch && method === "GET") {
+        await this.handleSessionMessages(sessionMessagesMatch[1], url, req, res);
+        return;
+      }
+      if (sessionMessagesMatch && method === "DELETE") {
+        await this.handleSessionMessagesClear(sessionMessagesMatch[1], req, res);
+        return;
+      }
+      if (sessionMatch && method === "GET") {
+        await this.handleSessionGet(sessionMatch[1], req, res);
+        return;
+      }
+      if (sessionMatch && method === "PUT") {
+        await this.handleSessionUpdate(sessionMatch[1], req, res);
+        return;
+      }
+      if (sessionMatch && method === "DELETE") {
+        await this.handleSessionDelete(sessionMatch[1], req, res);
+        return;
+      }
+
+      // ---- i18n API ----
+      const i18nMatch = pathname.match(/^\/api\/i18n\/([^/]+)$/);
+      if (i18nMatch && method === "GET") {
+        this.handleI18n(i18nMatch[1], res);
+        return;
+      }
+
+      // ---- Analytics API ----
+      if (pathname === "/api/analytics/usage" && method === "GET") {
+        await this.handleAnalyticsUsage(res);
+        return;
+      }
+      if (pathname === "/api/analytics/models" && method === "GET") {
+        await this.handleAnalyticsModels(res);
+        return;
+      }
+      if (pathname === "/api/analytics/trend" && method === "GET") {
+        await this.handleAnalyticsTrend(url, res);
         return;
       }
 
@@ -2308,6 +3215,378 @@ export class DashboardServer {
     const engine = this.getDreamingEngine();
     engine.stopAutoWatch();
     this.writeJSON(res, 200, { ok: true });
+  }
+
+  // ===========================================================================
+  // Auth API
+  // ===========================================================================
+
+  /** 从请求头提取 Bearer token 并验证，返回用户信息或 null */
+  private authenticateRequest(req: IncomingMessage): { id: string; username: string; role: "admin" | "user" } | null {
+    const auth = req.headers.authorization;
+    if (!auth || !auth.startsWith("Bearer ")) return null;
+    const token = auth.slice(7);
+    return this.authManager.verify(token);
+  }
+
+  /** 判断认证是否启用 */
+  private isAuthEnabled(): boolean {
+    try {
+      const raw = findConfigFile();
+      if (!raw) return false;
+      const auth = (raw as Record<string, unknown>).auth as { enabled?: boolean } | undefined;
+      return auth?.enabled === true;
+    } catch {
+      return false;
+    }
+  }
+
+  /** 判断路径是否需要认证保护 */
+  private isProtectedPath(pathname: string): boolean {
+    // /api/config、/api/catalog、/api/auth/* 不需要认证
+    if (pathname.startsWith("/api/config")) return false;
+    if (pathname.startsWith("/api/catalog")) return false;
+    if (pathname.startsWith("/api/auth/")) return false;
+    if (pathname === "/api/providers") return false;
+    if (pathname === "/api/profiles") return false;
+    if (pathname.startsWith("/api/profiles/")) return false;
+    if (pathname.startsWith("/api/sandbox/")) return false;
+    if (pathname.startsWith("/api/channels/")) return false;
+    if (pathname.startsWith("/api/env")) return false;
+    if (pathname.startsWith("/api/skills")) return false;
+    if (pathname.startsWith("/api/i18n/")) return false;
+    // 受保护端点
+    if (pathname.startsWith("/api/chat")) return true;
+    if (pathname.startsWith("/api/chatrooms")) return true;
+    if (pathname.startsWith("/api/computer/")) return true;
+    if (pathname.startsWith("/api/team/")) return true;
+    if (pathname.startsWith("/api/dreaming/")) return true;
+    if (pathname.startsWith("/api/sessions")) return true;
+    if (pathname.startsWith("/api/relay/")) return true;
+    if (pathname.startsWith("/api/logs")) return true;
+    if (pathname.startsWith("/api/langfuse/")) return true;
+    if (pathname.startsWith("/api/models")) return true;
+    if (pathname.startsWith("/api/trace")) return true;
+    if (pathname.startsWith("/api/analytics/")) return true;
+    if (pathname.startsWith("/api/probe")) return true;
+    // 其他路径默认不保护
+    return false;
+  }
+
+  /** 首次启动时自动创建 admin 用户（密码 admin） */
+  private ensureDefaultAdmin(): void {
+    const users = this.authManager.listUsers();
+    if (users.length === 0) {
+      try {
+        this.authManager.register("admin", "admin");
+        console.warn("[dashboard] 已自动创建默认管理员用户（用户名: admin, 密码: admin），请尽快修改密码");
+      } catch {
+        // 注册失败忽略（可能并发）
+      }
+    }
+  }
+
+  /** 首次启动时自动生成 jwtSecret */
+  private ensureJwtSecret(): void {
+    try {
+      const raw = findConfigFile();
+      if (!raw) return;
+      const auth = (raw as Record<string, unknown>).auth as { jwtSecret?: string } | undefined;
+      if (!auth?.jwtSecret) {
+        const existing = (raw ?? {}) as Record<string, unknown>;
+        const authSection = (existing.auth ?? {}) as Record<string, unknown>;
+        authSection.jwtSecret = crypto.randomBytes(32).toString("hex");
+        authSection.enabled = authSection.enabled ?? true;
+        authSection.tokenExpiry = (authSection.tokenExpiry as string) ?? "7d";
+        existing.auth = authSection;
+        writeConfigFile(existing as Partial<QuarkConfig>);
+        console.log("[dashboard] 已自动生成 JWT 密钥");
+      }
+    } catch {
+      // 忽略
+    }
+  }
+
+  /** POST /api/auth/register → 注册 */
+  private async handleAuthRegister(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    // 注册权限：auth.enabled=false 或已登录用户是 admin
+    const authEnabled = this.isAuthEnabled();
+    if (authEnabled) {
+      const currentUser = this.authenticateRequest(req);
+      if (!currentUser || currentUser.role !== "admin") {
+        this.writeJSON(res, 403, { error: "仅管理员可注册新用户" });
+        return;
+      }
+    }
+    const body = await this.readJSON(req);
+    if (!body || typeof body.username !== "string" || typeof body.password !== "string") {
+      this.writeJSON(res, 400, { error: "Missing 'username' or 'password'" });
+      return;
+    }
+    try {
+      const result = this.authManager.register(body.username as string, body.password as string);
+      this.writeJSON(res, 200, result);
+    } catch (err) {
+      if (err instanceof AuthError) {
+        this.writeJSON(res, 400, { error: err.message, code: err.code });
+      } else {
+        const msg = err instanceof Error ? err.message : String(err);
+        this.writeJSON(res, 500, { error: msg });
+      }
+    }
+  }
+
+  /** POST /api/auth/login → 登录 */
+  private async handleAuthLogin(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readJSON(req);
+    if (!body || typeof body.username !== "string" || typeof body.password !== "string") {
+      this.writeJSON(res, 400, { error: "Missing 'username' or 'password'" });
+      return;
+    }
+    const result = this.authManager.login(body.username as string, body.password as string);
+    if (!result) {
+      this.writeJSON(res, 401, { error: "用户名或密码错误" });
+      return;
+    }
+    // 如果是 admin/admin 首次登录，提示修改密码
+    const headers: Record<string, string> = {};
+    this.applyCORS(headers);
+    if (body.username === "admin" && body.password === "admin") {
+      headers["X-Warning"] = "Default password not changed, please update";
+    }
+    res.writeHead(200, { "Content-Type": "application/json; charset=utf-8", ...headers });
+    res.end(JSON.stringify(result));
+  }
+
+  /** GET /api/auth/me → 当前用户信息 */
+  private async handleAuthMe(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const user = this.authenticateRequest(req);
+    if (!user) {
+      this.writeJSON(res, 401, { error: "未认证" });
+      return;
+    }
+    this.writeJSON(res, 200, { user });
+  }
+
+  /** GET /api/auth/users → 列出所有用户（admin only） */
+  private async handleAuthUsers(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const user = this.authenticateRequest(req);
+    if (!user) {
+      this.writeJSON(res, 401, { error: "未认证" });
+      return;
+    }
+    if (user.role !== "admin") {
+      this.writeJSON(res, 403, { error: "仅管理员可查看用户列表" });
+      return;
+    }
+    this.writeJSON(res, 200, this.authManager.listUsers());
+  }
+
+  // ===========================================================================
+  // Sessions API
+  // ===========================================================================
+
+  /** GET /api/sessions → 列出当前用户的会话 */
+  private async handleSessionsList(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const user = this.authenticateRequest(req);
+    const userId = user?.id ?? "anonymous";
+    const sessions = this.chatSessionStore.list(userId);
+    this.writeJSON(res, 200, sessions.map((s) => ({
+      id: s.id, name: s.name, model: s.model, provider: s.provider,
+      createdAt: s.createdAt, updatedAt: s.updatedAt,
+      messageCount: s.messageCount, totalTokens: s.totalTokens, totalCost: s.totalCost,
+    })));
+  }
+
+  /** POST /api/sessions → 创建新会话 */
+  private async handleSessionsCreate(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const user = this.authenticateRequest(req);
+    const userId = user?.id ?? "anonymous";
+    const body = await this.readJSON(req);
+    const s = this.chatSessionStore.create(userId, {
+      name: body?.name as string | undefined,
+      model: body?.model as string | undefined,
+      provider: body?.provider as string | undefined,
+      systemPrompt: body?.systemPrompt as string | undefined,
+    });
+    this.usageData.totalSessions++;
+    this.writeJSON(res, 200, {
+      sessionId: s.id, name: s.name, model: s.model, provider: s.provider,
+      createdAt: s.createdAt,
+    });
+  }
+
+  /** GET /api/sessions/:id → 获取会话信息 + 历史消息 */
+  private async handleSessionGet(id: string, req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const user = this.authenticateRequest(req);
+    const userId = user?.id ?? "anonymous";
+    const s = this.chatSessionStore.get(id);
+    if (!s || s.userId !== userId) { this.writeJSON(res, 404, { error: "Session not found" }); return; }
+    const messages = this.chatSessionStore.getMessages(id, { limit: 100 });
+    this.writeJSON(res, 200, {
+      id: s.id, name: s.name, model: s.model, provider: s.provider,
+      systemPrompt: s.systemPrompt, createdAt: s.createdAt, updatedAt: s.updatedAt,
+      messageCount: s.messageCount, totalTokens: s.totalTokens, totalCost: s.totalCost,
+      messages,
+    });
+  }
+
+  /** PUT /api/sessions/:id → 更新会话 */
+  private async handleSessionUpdate(id: string, req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const user = this.authenticateRequest(req);
+    const userId = user?.id ?? "anonymous";
+    const s = this.chatSessionStore.get(id);
+    if (!s || s.userId !== userId) { this.writeJSON(res, 404, { error: "Session not found" }); return; }
+    const body = await this.readJSON(req);
+    if (!body) { this.writeJSON(res, 400, { error: "Invalid JSON body" }); return; }
+    const updated = this.chatSessionStore.update(id, {
+      name: body.name as string | undefined,
+      model: body.model as string | undefined,
+      provider: body.provider as string | undefined,
+      systemPrompt: body.systemPrompt as string | undefined,
+    });
+    this.writeJSON(res, 200, { ok: true, session: updated });
+  }
+
+  /** DELETE /api/sessions/:id → 删除会话 */
+  private async handleSessionDelete(id: string, req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const user = this.authenticateRequest(req);
+    const userId = user?.id ?? "anonymous";
+    const s = this.chatSessionStore.get(id);
+    if (!s || s.userId !== userId) { this.writeJSON(res, 404, { error: "Session not found" }); return; }
+    this.chatSessionStore.delete(id);
+    this.writeJSON(res, 200, { ok: true });
+  }
+
+  /** GET /api/sessions/:id/messages → 获取消息历史（分页） */
+  private async handleSessionMessages(id: string, url: URL, req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const user = this.authenticateRequest(req);
+    const userId = user?.id ?? "anonymous";
+    const s = this.chatSessionStore.get(id);
+    if (!s || s.userId !== userId) { this.writeJSON(res, 404, { error: "Session not found" }); return; }
+    const limit = parseInt(url.searchParams.get("limit") ?? "50", 10);
+    const offset = parseInt(url.searchParams.get("offset") ?? "0", 10);
+    const before = url.searchParams.get("before") ? parseInt(url.searchParams.get("before")!, 10) : undefined;
+    const messages = this.chatSessionStore.getMessages(id, { limit, offset, before });
+    this.writeJSON(res, 200, { messages, total: s.messageCount });
+  }
+
+  /** DELETE /api/sessions/:id/messages → 清空会话消息 */
+  private async handleSessionMessagesClear(id: string, req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const user = this.authenticateRequest(req);
+    const userId = user?.id ?? "anonymous";
+    const s = this.chatSessionStore.get(id);
+    if (!s || s.userId !== userId) { this.writeJSON(res, 404, { error: "Session not found" }); return; }
+    this.chatSessionStore.clearMessages(id);
+    this.writeJSON(res, 200, { ok: true });
+  }
+
+  /** POST /api/sessions/:id/chat → 发送消息（SSE 流式返回） */
+  private async handleSessionChat(id: string, req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const user = this.authenticateRequest(req);
+    const userId = user?.id ?? "anonymous";
+    const s = this.chatSessionStore.get(id);
+    if (!s || s.userId !== userId) { this.writeJSON(res, 404, { error: "Session not found" }); return; }
+
+    const body = await this.readJSON(req);
+    if (!body || typeof body.text !== "string") {
+      this.writeJSON(res, 400, { error: "Missing 'text' in body" });
+      return;
+    }
+
+    // 记录用户消息
+    this.chatSessionStore.addMessage(id, "user", body.text as string);
+
+    let instance: AgentInstance;
+    try {
+      instance = await this.getAgent();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.writeJSON(res, 400, { error: msg });
+      return;
+    }
+
+    // SSE headers
+    const headers: Record<string, string> = {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      "Connection": "keep-alive",
+      "X-Accel-Buffering": "no",
+    };
+    this.applyCORS(headers);
+    res.writeHead(200, headers);
+    res.write(": connected\n\n");
+
+    try {
+      const result = await instance.agent.run(body.text as string, {
+        sessionId: id,
+        userId,
+        channel: "dashboard",
+      });
+      // 记录助手回复
+      this.chatSessionStore.addMessage(id, "assistant", result.reply, result.contextTokens);
+      // 累计用量
+      this.usageData.totalInputTokens += result.contextTokens ?? 0;
+      this.usageData.totalOutputTokens += (result.reply?.length ?? 0) / 4; // 粗估
+      const cfg = loadConfig();
+      const model = cfg.model ?? "unknown";
+      this.usageData.modelUsage[model] = (this.usageData.modelUsage[model] ?? 0) + 1;
+      // 推送最终结果
+      res.write(
+        `event: done\ndata: ${JSON.stringify({
+          reply: result.reply,
+          rounds: result.rounds,
+          toolCalls: result.toolCalls,
+          contextTokens: result.contextTokens,
+          recovered: result.recovered,
+        })}\n\n`,
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      res.write(`event: error\ndata: ${JSON.stringify({ error: msg })}\n\n`);
+    } finally {
+      try { res.end(); } catch { /* already ended */ }
+    }
+  }
+
+  // ===========================================================================
+  // i18n API
+  // ===========================================================================
+
+  /** GET /api/i18n/:locale → 返回对应语言的翻译 JSON */
+  private handleI18n(locale: string, res: ServerResponse): void {
+    const translations = I18N_TRANSLATIONS[locale];
+    if (!translations) {
+      this.writeJSON(res, 404, { error: `不支持的语言: ${locale}`, supported: Object.keys(I18N_TRANSLATIONS) });
+      return;
+    }
+    this.writeJSON(res, 200, { locale, translations });
+  }
+
+  // ===========================================================================
+  // Analytics API
+  // ===========================================================================
+
+  /** GET /api/analytics/usage → token 用量 + 会话数 + 费用 */
+  private async handleAnalyticsUsage(res: ServerResponse): Promise<void> {
+    this.writeJSON(res, 200, {
+      totalInputTokens: this.usageData.totalInputTokens,
+      totalOutputTokens: this.usageData.totalOutputTokens,
+      totalSessions: this.usageData.totalSessions,
+      totalCost: this.usageData.totalCost,
+      cacheHitRate: this.usageData.cacheHitRate,
+    });
+  }
+
+  /** GET /api/analytics/models → 模型使用分布 */
+  private async handleAnalyticsModels(res: ServerResponse): Promise<void> {
+    this.writeJSON(res, 200, this.usageData.modelUsage);
+  }
+
+  /** GET /api/analytics/trend?days=30 → N 天趋势 */
+  private async handleAnalyticsTrend(url: URL, res: ServerResponse): Promise<void> {
+    const days = Math.min(parseInt(url.searchParams.get("days") ?? "30", 10) || 30, 90);
+    this.writeJSON(res, 200, this.usageData.dailyTrend.slice(-days));
   }
 
   // ===========================================================================
