@@ -696,7 +696,7 @@ body {
 }
 .trace-row {
   display: grid;
-  grid-template-columns: 200px 100px 80px 1fr 40px;
+  grid-template-columns: 200px 100px 80px 80px 1fr 40px;
   gap: 10px;
   padding: 8px 12px;
   border-bottom: 1px solid var(--border-light);
@@ -1041,6 +1041,101 @@ body {
   width: 100%;
 }
 
+.trace-row .cost { color: var(--text-secondary); font-family: var(--font-mono); text-align: right; }
+
+/* Trace tree */
+.trace-tree-node {
+  margin-left: 20px;
+  border-left: 2px solid var(--border);
+  padding-left: 10px;
+  margin-bottom: 6px;
+}
+.trace-tree-node:first-child { margin-left: 0; }
+.trace-tree-header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 12px;
+}
+.trace-tree-header:hover { background: var(--bg-hover); }
+.trace-tree-header .ttn-name { font-weight: 600; color: var(--text-primary); }
+.trace-tree-header .ttn-kind { color: var(--text-secondary); }
+.trace-tree-header .ttn-dur { color: var(--text-tertiary); margin-left: auto; }
+.trace-tree-header .ttn-status { font-weight: 600; }
+.trace-tree-header .ttn-status.ok { color: var(--green); }
+.trace-tree-header .ttn-status.err { color: var(--red); }
+.trace-tree-header .ttn-tokens { color: var(--text-tertiary); font-size: 11px; }
+.trace-tree-header .ttn-cost { color: var(--orange); font-size: 11px; }
+.trace-tree-children { display: none; }
+.trace-tree-children.open { display: block; }
+
+/* Log entry */
+.log-entry {
+  display: grid;
+  grid-template-columns: 160px 60px 80px 1fr;
+  gap: 8px;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--border-light);
+  align-items: baseline;
+}
+.log-entry:hover { background: var(--bg-hover); }
+.log-entry .le-ts { color: var(--text-tertiary); font-size: 11px; }
+.log-entry .le-level { display: inline-block; padding: 1px 6px; border-radius: 999px; font-size: 10px; font-weight: 600; text-align: center; }
+.log-entry .le-level.debug { background: var(--bg-tertiary); color: var(--text-tertiary); }
+.log-entry .le-level.info { background: var(--blue-bg); color: var(--blue); }
+.log-entry .le-level.warn { background: var(--orange-bg); color: var(--orange); }
+.log-entry .le-level.error { background: var(--red-bg); color: var(--red); }
+.log-entry .le-source { color: var(--text-secondary); font-size: 11px; }
+.log-entry .le-msg { color: var(--text-primary); word-break: break-word; white-space: pre-wrap; }
+
+/* Tag */
+.tag { display: inline-block; padding: 1px 6px; border-radius: 999px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+.tag.green { background: var(--green-bg); color: var(--green); }
+.tag.red { background: var(--red-bg); color: var(--red); }
+
+/* Hint text */
+.hint { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
+
+/* Field row (inline label + control) */
+.field-row { display: flex; align-items: center; gap: 8px; }
+.field-row.full { grid-column: 1 / -1; }
+
+/* Timeline */
+.timeline { display: flex; flex-direction: column; gap: 8px; }
+.timeline-step { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 10px 12px; }
+
+/* Card grid */
+.card-grid { display: grid; gap: 10px; }
+.card-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+/* Card selected state */
+.card.selected { border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
+
+/* List item */
+.list-item { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 8px 12px; }
+.list-item .name { font-weight: 600; font-size: 13px; }
+.list-item .meta { font-size: 11px; color: var(--text-tertiary); font-family: var(--font-mono); }
+
+/* Toggle */
+.toggle { position: relative; display: inline-block; width: 36px; height: 20px; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle .slider { position: absolute; cursor: pointer; inset: 0; background: var(--bg-tertiary); border-radius: 20px; transition: background 0.2s; }
+.toggle .slider::before { content: ''; position: absolute; width: 16px; height: 16px; left: 2px; top: 2px; background: var(--text-primary); border-radius: 50%; transition: transform 0.2s; }
+.toggle input:checked + .slider { background: var(--blue); }
+.toggle input:checked + .slider::before { transform: translateX(16px); }
+
+/* Recommend card */
+.recommend-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 10px 12px; cursor: pointer; }
+.recommend-card:hover { border-color: var(--blue); }
+.recommend-card .rc-provider { font-size: 11px; color: var(--text-tertiary); text-transform: uppercase; }
+.recommend-card .rc-model { font-size: 13px; font-weight: 600; margin-top: 2px; }
+
+/* Member form */
+.member-form { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; margin-top: 12px; }
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -1078,16 +1173,20 @@ body {
 
   <nav class="tabs" id="tabs">
     <button class="tab active" data-tab="provider">Provider</button>
-    <button class="tab" data-tab="model">Model</button>
+    <button class="tab" data-tab="models">Models</button>
     <button class="tab" data-tab="profile">Profile &amp; Skills</button>
     <button class="tab" data-tab="sandbox">Sandbox</button>
     <button class="tab" data-tab="channels">Channels</button>
     <button class="tab" data-tab="checkpoint">Checkpoint</button>
     <button class="tab" data-tab="env">Env</button>
+    <button class="tab" data-tab="langfuse">Langfuse</button>
     <button class="tab" data-tab="team">Team</button>
+    <button class="tab" data-tab="dreaming">Dreaming</button>
     <button class="tab" data-tab="chat">Chat</button>
+    <button class="tab" data-tab="chatroom">Chatroom</button>
     <button class="tab" data-tab="computer">Computer Use</button>
     <button class="tab" data-tab="relay">Relay</button>
+    <button class="tab" data-tab="logs">Logs</button>
     <button class="tab" data-tab="trace">Trace</button>
   </nav>
 
@@ -1140,13 +1239,57 @@ body {
       </div>
     </section>
 
-    <!-- ============ Model ============ -->
-    <section class="panel" data-panel="model">
-      <div class="panel-title">Model</div>
-      <div class="panel-subtitle">Generation parameters and runtime budgets.</div>
+    <!-- ============ Models（模型配置管理 + 参数调节） ============ -->
+    <section class="panel" data-panel="models">
+      <div class="panel-title">Models</div>
+      <div class="panel-subtitle">Manage model configurations, switch active, and tune generation parameters.</div>
 
+      <!-- 模型配置列表 -->
       <div class="section">
-        <div class="section-title">Generation</div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
+          <div class="section-title" style="margin-bottom:0;">Configurations</div>
+          <div class="spacer" style="flex:1;"></div>
+          <select class="select" id="modelRecMode" style="width:100px;">
+            <option value="price">by Price</option>
+            <option value="efficient">by Quality</option>
+          </select>
+          <button class="btn small" id="btnModelRecommend">Recommend</button>
+          <button class="btn primary small" id="btnModelAdd">+ Add Model</button>
+        </div>
+        <div id="modelConfigList"><div class="empty">Loading...</div></div>
+      </div>
+
+      <!-- 添加模型表单 -->
+      <div class="member-form" id="modelAddForm" style="display:none;">
+        <div class="section-title">Add Model Configuration</div>
+        <div class="form-grid">
+          <div class="field"><label>Name</label><input class="input" id="mafName" type="text" placeholder="My GPT-4o"></div>
+          <div class="field"><label>Provider</label><input class="input mono" id="mafProvider" type="text" placeholder="openai"></div>
+          <div class="field"><label>Model ID</label><input class="input mono" id="mafModelId" type="text" placeholder="gpt-4o"></div>
+          <div class="field"><label>API Key</label><input class="input mono" id="mafApiKey" type="password" placeholder="sk-..." autocomplete="off"></div>
+          <div class="field"><label>Base URL</label><input class="input mono" id="mafBaseURL" type="text" placeholder="https://api.openai.com/v1"></div>
+        </div>
+        <div style="margin-top:12px; display:flex; gap:8px;">
+          <button class="btn primary" id="btnModelAddSave">Save</button>
+          <button class="btn" id="btnModelAddCancel">Cancel</button>
+        </div>
+      </div>
+
+      <!-- 对比面板 -->
+      <div class="section" id="modelCompareSection" style="display:none;">
+        <div class="section-title">Compare</div>
+        <div id="modelCompareResult"></div>
+      </div>
+
+      <!-- 推荐面板 -->
+      <div class="section" id="modelRecommendSection" style="display:none;">
+        <div class="section-title" id="modelRecommendTitle">Recommendations</div>
+        <div class="card-grid cols-3" id="modelRecommendCards"></div>
+      </div>
+
+      <!-- 当前模型参数调节（合并原 Model Tab） -->
+      <div class="section">
+        <div class="section-title">Active Model Parameters</div>
         <div class="form-grid">
           <div class="field full">
             <label for="mModel">Model name</label>
@@ -1367,6 +1510,32 @@ body {
       </div>
     </section>
 
+    <!-- ============ Langfuse ============ -->
+    <section class="panel" data-panel="langfuse">
+      <div class="panel-title">Langfuse</div>
+      <div class="panel-subtitle">Configure Langfuse observability integration for trace export.</div>
+
+      <div class="section">
+        <div class="section-title">Configuration</div>
+        <div class="form-grid">
+          <div class="field"><label>Public Key</label><input class="input mono" id="lfPublicKey" type="text" placeholder="pk-..."></div>
+          <div class="field"><label>Secret Key</label><input class="input mono" id="lfSecretKey" type="password" placeholder="sk-..." autocomplete="off"></div>
+          <div class="field"><label>Base URL</label><input class="input mono" id="lfBaseUrl" type="text" placeholder="https://cloud.langfuse.com"></div>
+          <div class="field-row full">
+            <div><label>Enabled</label><div class="hint">Enable Langfuse trace export</div></div>
+            <label class="toggle"><input type="checkbox" id="lfEnabled"><span class="slider"></span></label>
+          </div>
+        </div>
+        <div style="margin-top:12px; display:flex; gap:8px; align-items:center;">
+          <button class="btn primary" id="btnLfSave">Save Config</button>
+          <button class="btn" id="btnLfTest">Test Connection</button>
+          <button class="btn" id="btnLfFlush">Flush</button>
+          <button class="btn" id="btnLfSendTraces">Send Current Traces</button>
+          <div id="lfStatus" style="margin-left:auto; font-size:12px; color:var(--text-tertiary);"></div>
+        </div>
+      </div>
+    </section>
+
     <!-- ============ Team ============ -->
     <section class="panel" data-panel="team">
       <div class="panel-title">Agent Team</div>
@@ -1445,6 +1614,49 @@ body {
       </div>
     </section>
 
+    <!-- ============ Dreaming ============ -->
+    <section class="panel" data-panel="dreaming">
+      <div class="panel-title">Dreaming</div>
+      <div class="panel-subtitle">Self-evolution engine: learn from successes, analyze failures, auto-evolve prompts and skills.</div>
+
+      <div class="section">
+        <div class="section-title">Configuration</div>
+        <div class="form-grid">
+          <div class="field-row full">
+            <div><label>Enabled</label><div class="hint">Enable auto-evolution</div></div>
+            <label class="toggle"><input type="checkbox" id="drEnabled" checked><span class="slider"></span></label>
+          </div>
+          <div class="field"><label>Strategy</label>
+            <select class="select" id="drStrategy">
+              <option value="auto">auto</option>
+              <option value="manual">manual</option>
+              <option value="both" selected>both</option>
+            </select>
+          </div>
+          <div class="field"><label>Max Depth</label><input class="input mono" id="drMaxDepth" type="number" min="1" value="3"></div>
+          <div class="field"><label>Failure Threshold</label><input class="input mono" id="drFailThreshold" type="number" min="1" value="3"></div>
+        </div>
+        <div style="margin-top:12px; display:flex; gap:8px; align-items:center;">
+          <button class="btn primary" id="btnDrSaveConfig">Save Config</button>
+          <button class="btn" id="btnDrLearn">/learn</button>
+          <button class="btn" id="btnDrAnalyze">Analyze Failure</button>
+          <div style="flex:1;"></div>
+          <button class="btn small" id="btnDrWatchStart">Start Watch</button>
+          <button class="btn small" id="btnDrWatchStop">Stop Watch</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Stats</div>
+        <div class="trace-stats" id="dreamingStats"><div class="empty">No stats yet.</div></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Evolution History</div>
+        <div class="timeline" id="dreamingHistory"><div class="empty">No evolution records.</div></div>
+      </div>
+    </section>
+
     <!-- ============ Chat ============ -->
     <section class="panel" data-panel="chat">
       <div class="panel-title">Chat</div>
@@ -1463,6 +1675,45 @@ body {
         <div class="chat-input">
           <textarea id="chatInput" placeholder="Send a message... (Enter to send, Shift+Enter for newline)" rows="1"></textarea>
           <button class="btn primary" id="btnChatSend">Send</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Chatroom ============ -->
+    <section class="panel" data-panel="chatroom">
+      <div class="panel-title">Chatroom</div>
+      <div class="panel-subtitle">Multi-user chat rooms with Agent Team integration.</div>
+
+      <div style="display:grid; grid-template-columns:220px 1fr; gap:16px; height:calc(100vh - 200px); min-height:400px;">
+        <!-- 左侧：房间列表 -->
+        <div style="border:1px solid var(--border); border-radius:var(--radius-md); background:var(--bg-secondary); display:flex; flex-direction:column; overflow:hidden;">
+          <div style="padding:10px 12px; border-bottom:1px solid var(--border-light); display:flex; gap:8px; align-items:center;">
+            <div style="font-size:12px; font-weight:600; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.06em; flex:1;">Rooms</div>
+            <button class="btn primary small" id="btnCrNewRoom">+ New</button>
+          </div>
+          <div id="crRoomList" style="flex:1; overflow-y:auto; padding:8px;"><div class="empty">No rooms</div></div>
+        </div>
+        <!-- 右侧：房间内容 -->
+        <div id="crRoomContent" style="border:1px solid var(--border); border-radius:var(--radius-md); background:var(--bg-secondary); display:flex; flex-direction:column; overflow:hidden;">
+          <div id="crRoomHeader" style="padding:10px 14px; border-bottom:1px solid var(--border-light); display:flex; gap:8px; align-items:center;">
+            <span id="crRoomName" style="font-weight:600;">Select a room</span>
+            <span id="crRoomMembers" style="font-size:11px; color:var(--text-tertiary); font-family:var(--font-mono);"></span>
+            <span id="crTeamStatus" style="font-size:11px; color:var(--purple);"></span>
+            <div style="flex:1;"></div>
+            <button class="btn small" id="btnCrBindTeam" style="display:none;">Bind Team</button>
+            <button class="btn small" id="btnCrAsk" style="display:none;">Ask Agent</button>
+          </div>
+          <div id="crMessages" style="flex:1; overflow-y:auto; padding:12px;"><div class="empty" id="crMsgEmpty">Select a room to start</div></div>
+          <div id="crStats" style="display:flex; gap:12px; padding:4px 10px; background:var(--bg-primary); border-top:1px solid var(--border-light); font-size:11px; color:var(--text-tertiary); font-family:var(--font-mono);">
+            <span>msgs: <strong id="crStatMsgs" style="color:var(--text-primary);">0</strong></span>
+            <span>agent: <strong id="crStatAgent" style="color:var(--text-primary);">0</strong></span>
+            <span>tokens: <strong id="crStatTokens" style="color:var(--text-primary);">0</strong></span>
+          </div>
+          <div style="border-top:1px solid var(--border); padding:8px; background:var(--bg-primary); display:flex; gap:8px;">
+            <input class="input mono" id="crUserId" type="text" placeholder="Your user ID" style="width:120px;">
+            <input class="input" id="crInput" type="text" placeholder="Type a message..." style="flex:1;">
+            <button class="btn primary" id="btnCrSend">Send</button>
+          </div>
         </div>
       </div>
     </section>
@@ -1645,6 +1896,38 @@ body {
       </div>
     </section>
 
+    <!-- ============ Logs ============ -->
+    <section class="panel" data-panel="logs">
+      <div class="panel-title">Logs</div>
+      <div class="panel-subtitle">Real-time log viewer with filtering and search.</div>
+
+      <div class="trace-toolbar">
+        <div style="display:flex; gap:4px;">
+          <button class="btn small active" data-log-level="info" id="logLevelInfo">Info</button>
+          <button class="btn small" data-log-level="warn" id="logLevelWarn">Warn</button>
+          <button class="btn small" data-log-level="error" id="logLevelError">Error</button>
+          <button class="btn small" data-log-level="debug" id="logLevelDebug">Debug</button>
+        </div>
+        <select class="select" id="logSourceFilter" style="width:120px; font-size:12px; padding:4px 8px;">
+          <option value="">All sources</option>
+        </select>
+        <input class="input mono" id="logSearch" type="text" placeholder="Search..." style="width:200px; font-size:12px; padding:4px 8px;">
+        <div class="spacer"></div>
+        <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-tertiary);cursor:pointer;">
+          <input type="checkbox" id="logAutoScroll" checked> Auto-scroll
+        </label>
+        <button class="btn danger small" id="btnLogClear">Clear</button>
+      </div>
+
+      <div class="trace-stats" id="logStats">
+        <div class="empty">No stats yet.</div>
+      </div>
+
+      <div id="logList" style="border:1px solid var(--border); border-radius:var(--radius-md); background:var(--bg-secondary); max-height:calc(100vh - 360px); overflow-y:auto; font-family:var(--font-mono); font-size:12px;">
+        <div class="empty">No logs yet. Connect to SSE for real-time stream.</div>
+      </div>
+    </section>
+
     <!-- ============ Trace ============ -->
     <section class="panel" data-panel="trace">
       <div class="panel-title">Trace</div>
@@ -1653,6 +1936,7 @@ body {
       <div class="trace-toolbar">
         <button class="btn" id="btnTraceRefresh">Refresh</button>
         <button class="btn danger" id="btnTraceClear">Clear</button>
+        <button class="btn" id="btnTraceSendLangfuse">Send to Langfuse</button>
         <div class="spacer"></div>
         <span class="auto" id="traceAuto">auto-refresh: on (2s)</span>
       </div>
@@ -1666,10 +1950,19 @@ body {
           <div>name</div>
           <div>kind</div>
           <div>dur</div>
+          <div>cost</div>
           <div>error</div>
           <div>st</div>
         </div>
         <div class="empty">No spans recorded.</div>
+      </div>
+
+      <!-- Langfuse 风格 trace 树视图 -->
+      <div class="section" id="traceTreeSection">
+        <div class="section-title">Trace Tree</div>
+        <div id="traceTree" style="border:1px solid var(--border); border-radius:var(--radius-md); background:var(--bg-secondary); padding:12px; font-size:12px; font-family:var(--font-mono);">
+          <div class="empty">No traces to display.</div>
+        </div>
       </div>
     </section>
 
@@ -1715,6 +2008,24 @@ body {
     // Relay
     relayRules: [],
     relayEditingId: null,
+    // Models
+    modelConfigs: [],
+    modelRecommendItems: [],
+    // Chatroom
+    chatrooms: [],
+    activeChatroomId: null,
+    chatroomMessages: [],
+    chatroomSSE: null,
+    // Logs
+    logEntries: [],
+    logLevels: ['info', 'warn', 'error'],
+    logSSE: null,
+    // Dreaming
+    dreamingConfig: {},
+    dreamingHistory: [],
+    dreamingStats: {},
+    // Langfuse
+    langfuseConfig: {},
   };
 
   // ---------------------------------------------------------------------------
@@ -1792,6 +2103,12 @@ body {
     if (name === 'team' && state.teamPresets.length === 0) loadTeamPresets();
     if (name === 'computer') loadComputerWindows();
     if (name === 'relay' && state.relayRules.length === 0) loadRelayRules();
+    if (name === 'models' && state.modelConfigs.length === 0) loadModelConfigs();
+    if (name === 'langfuse') loadLangfuseConfig();
+    if (name === 'dreaming') loadDreamingData();
+    if (name === 'chatroom') loadChatrooms();
+    if (name === 'logs') connectLogSSE();
+    else disconnectLogSSE();
   }
 
   // ---------------------------------------------------------------------------
@@ -3226,6 +3543,7 @@ body {
       state.traces = spans || [];
       renderTraceStats();
       renderTraceTimeline();
+      renderTraceTree();
     } catch (e) {
       $('#traceStats').innerHTML = '<div class="empty">Failed to load trace: ' + escapeHtml(e.message) + '</div>';
     }
@@ -3260,7 +3578,7 @@ body {
     if (spans.length === 0) {
       wrap.innerHTML = `
         <div class="trace-row header">
-          <div>name</div><div>kind</div><div>dur</div><div>error</div><div>st</div>
+          <div>name</div><div>kind</div><div>dur</div><div>cost</div><div>error</div><div>st</div>
         </div>
         <div class="empty">No spans recorded.</div>
       `;
@@ -3275,11 +3593,15 @@ body {
       }
       const ok = !s.error && s.status !== 'error';
       const statusMark = ok ? '\u2713' : '\u2717';
+      // 计算 cost（从 generation 的 usage 推算）
+      const cost = s.attributes?.cost ?? s.attributes?.costDetails?.total ?? null;
+      const costStr = cost != null ? '$' + Number(cost).toFixed(4) : '';
       return `
         <div class="trace-row">
           <div class="name">${escapeHtml(s.name || '')}</div>
           <div class="kind">${escapeHtml(s.kind || '')}</div>
           <div class="dur">${escapeHtml(dur)}</div>
+          <div class="cost">${escapeHtml(costStr)}</div>
           <div class="err">${escapeHtml(s.error || '')}</div>
           <div class="status ${ok ? 'ok' : 'err'}">${statusMark}</div>
         </div>
@@ -3287,7 +3609,7 @@ body {
     }).join('');
     wrap.innerHTML = `
       <div class="trace-row header">
-        <div>name</div><div>kind</div><div>dur</div><div>error</div><div>st</div>
+        <div>name</div><div>kind</div><div>dur</div><div>cost</div><div>error</div><div>st</div>
       </div>
       ${rows}
     `;
@@ -3314,6 +3636,573 @@ body {
     } catch (e) {
       showToast('Clear failed: ' + e.message, 'err');
     }
+  });
+
+  // "Send to Langfuse" 按钮
+  $('#btnTraceSendLangfuse').addEventListener('click', async () => {
+    try {
+      const r = await apiPost('/api/langfuse/send-traces');
+      showToast('Sent ' + (r.sentSpans ?? 0) + ' spans to Langfuse', 'ok');
+    } catch (e) {
+      showToast('Send failed: ' + e.message, 'err');
+    }
+  });
+
+  // Trace 树视图渲染
+  function renderTraceTree() {
+    const wrap = $('#traceTree');
+    const spans = state.traces || [];
+    if (spans.length === 0) {
+      wrap.innerHTML = '<div class="empty">No traces to display.</div>';
+      return;
+    }
+    // 按 traceId 分组
+    const groups = {};
+    spans.forEach(s => {
+      const tid = s.traceId || 'default';
+      if (!groups[tid]) groups[tid] = [];
+      groups[tid].push(s);
+    });
+    let html = '';
+    Object.keys(groups).forEach(tid => {
+      const groupSpans = groups[tid];
+      // 找根 span（没有 parentId 或 parentId 为空）
+      const roots = groupSpans.filter(s => !s.parentId);
+      html += `<div class="trace-tree-node">`;
+      html += `<div class="trace-tree-header" data-trace-id="${escapeHtml(tid)}"><span class="ttn-name">Trace: ${escapeHtml(tid.slice(0, 12))}</span><span class="ttn-dur">${groupSpans.length} spans</span></div>`;
+      html += `<div class="trace-tree-children">`;
+      roots.forEach(s => { html += renderSpanNode(s, groupSpans, 0); });
+      html += `</div></div>`;
+    });
+    wrap.innerHTML = html;
+    // 点击折叠
+    wrap.querySelectorAll('.trace-tree-header').forEach(h => {
+      h.addEventListener('click', () => {
+        const children = h.nextElementSibling;
+        if (children) children.classList.toggle('open');
+      });
+    });
+  }
+
+  function renderSpanNode(span, allSpans, depth) {
+    const start = span.startedAt ? new Date(span.startedAt) : null;
+    const end = span.endedAt ? new Date(span.endedAt) : null;
+    const dur = (start && end) ? (end.getTime() - start.getTime()) + 'ms' : '';
+    const ok = !span.error && span.status !== 'error';
+    const usage = span.attributes?.usage;
+    const tokens = usage ? ((usage.promptTokens || 0) + (usage.completionTokens || 0)) : 0;
+    const cost = span.attributes?.cost ?? span.attributes?.costDetails?.total ?? 0;
+    const children = allSpans.filter(s => s.parentId === span.spanId);
+    let html = `<div class="trace-tree-node">`;
+    html += `<div class="trace-tree-header">`;
+    html += `<span class="ttn-name">${escapeHtml(span.name || '')}</span>`;
+    html += `<span class="ttn-kind">${escapeHtml(span.kind || '')}</span>`;
+    if (tokens) html += `<span class="ttn-tokens">${tokens}tok</span>`;
+    if (cost) html += `<span class="ttn-cost">$${Number(cost).toFixed(4)}</span>`;
+    html += `<span class="ttn-dur">${escapeHtml(dur)}</span>`;
+    html += `<span class="ttn-status ${ok ? 'ok' : 'err'}">${ok ? '✓' : '✗'}</span>`;
+    html += `</div>`;
+    if (children.length > 0) {
+      html += `<div class="trace-tree-children open">`;
+      children.forEach(c => { html += renderSpanNode(c, allSpans, depth + 1); });
+      html += `</div>`;
+    }
+    html += `</div>`;
+    return html;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Models tab（模型配置管理）
+  // ---------------------------------------------------------------------------
+  async function loadModelConfigs() {
+    try {
+      state.modelConfigs = await apiGet('/api/models');
+    } catch (e) {
+      state.modelConfigs = [];
+    }
+    renderModelConfigs();
+  }
+
+  function renderModelConfigs() {
+    const wrap = $('#modelConfigList');
+    const configs = state.modelConfigs || [];
+    if (configs.length === 0) {
+      wrap.innerHTML = '<div class="empty">No model configurations. Add one or get recommendations.</div>';
+      return;
+    }
+    wrap.innerHTML = configs.map(c => {
+      const activeTag = c.active ? '<span class="tag green">ACTIVE</span>' : '';
+      const stats = c.stats || {};
+      return `
+        <div class="list-item" style="display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:center;">
+          <div>
+            <div class="name">${escapeHtml(c.name || '')} ${activeTag}</div>
+            <div class="meta">${escapeHtml(c.providerId || '')} / ${escapeHtml(c.modelId || '')} · reqs: ${stats.totalRequests ?? 0} · err: ${(stats.errorRate * 100).toFixed(1)}%</div>
+          </div>
+          <button class="btn small" data-model-probe="${escapeHtml(c.id)}">Probe</button>
+          <button class="btn small" data-model-activate="${escapeHtml(c.id)}" ${c.active ? 'disabled' : ''}>Activate</button>
+          <button class="btn danger small" data-model-del="${escapeHtml(c.id)}">Delete</button>
+        </div>
+      `;
+    }).join('');
+    wrap.querySelectorAll('[data-model-probe]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.modelProbe;
+        btn.textContent = '...';
+        try {
+          const r = await apiPost('/api/models/' + id + '/probe');
+          btn.textContent = r.ok ? '✓ ' + r.latencyMs + 'ms' : '✗ ' + (r.error || '');
+          btn.className = 'btn small ' + (r.ok ? 'primary' : 'danger');
+        } catch (e) { btn.textContent = '✗'; }
+      });
+    });
+    wrap.querySelectorAll('[data-model-activate]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        try {
+          await apiPost('/api/models/switch', { id: btn.dataset.modelActivate });
+          showToast('Activated', 'ok');
+          await loadModelConfigs();
+        } catch (e) { showToast('Failed: ' + e.message, 'err'); }
+      });
+    });
+    wrap.querySelectorAll('[data-model-del]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('Delete this model configuration?')) return;
+        try {
+          await apiDelete('/api/models/' + btn.dataset.modelDel);
+          showToast('Deleted', 'ok');
+          await loadModelConfigs();
+        } catch (e) { showToast('Delete failed: ' + e.message, 'err'); }
+      });
+    });
+  }
+
+  $('#btnModelAdd').addEventListener('click', () => { $('#modelAddForm').style.display = ''; });
+  $('#btnModelAddCancel').addEventListener('click', () => { $('#modelAddForm').style.display = 'none'; });
+  $('#btnModelAddSave').addEventListener('click', async () => {
+    const body = {
+      name: $('#mafName').value.trim(),
+      providerId: $('#mafProvider').value.trim(),
+      modelId: $('#mafModelId').value.trim(),
+      apiKey: $('#mafApiKey').value.trim() || undefined,
+      baseURL: $('#mafBaseURL').value.trim() || undefined,
+      parameters: {},
+    };
+    if (!body.name) { showToast('Name required', 'err'); return; }
+    try {
+      await apiPost('/api/models', body);
+      showToast('Added: ' + body.name, 'ok');
+      $('#modelAddForm').style.display = 'none';
+      await loadModelConfigs();
+    } catch (e) { showToast('Add failed: ' + e.message, 'err'); }
+  });
+
+  $('#btnModelRecommend').addEventListener('click', async () => {
+    const mode = $('#modelRecMode').value;
+    try {
+      state.modelRecommendItems = await apiGet('/api/models/recommend?mode=' + mode);
+      $('#modelRecommendSection').style.display = '';
+      $('#modelRecommendTitle').textContent = mode === 'price' ? 'Top by Price' : 'Top by Quality';
+      const wrap = $('#modelRecommendCards');
+      const items = state.modelRecommendItems || [];
+      wrap.innerHTML = items.map((r, i) => `
+        <div class="recommend-card" data-rec-idx="${i}">
+          <div class="rc-provider">${escapeHtml(r.providerId || '')}</div>
+          <div class="rc-model">${escapeHtml(r.modelId || r.name || '')}</div>
+        </div>
+      `).join('');
+    } catch (e) { showToast('Recommend failed: ' + e.message, 'err'); }
+  });
+
+  // ---------------------------------------------------------------------------
+  // Langfuse tab
+  // ---------------------------------------------------------------------------
+  async function loadLangfuseConfig() {
+    try {
+      state.langfuseConfig = await apiGet('/api/langfuse/config');
+      $('#lfPublicKey').value = state.langfuseConfig.publicKey || '';
+      $('#lfSecretKey').value = state.langfuseConfig.secretKey || '';
+      $('#lfBaseUrl').value = state.langfuseConfig.baseUrl || 'https://cloud.langfuse.com';
+      $('#lfEnabled').checked = !!state.langfuseConfig.enabled;
+      const st = $('#lfStatus');
+      if (state.langfuseConfig.enabled && state.langfuseConfig.publicKey) {
+        st.textContent = '● connected';
+        st.style.color = 'var(--green)';
+      } else if (state.langfuseConfig.publicKey) {
+        st.textContent = '○ disabled';
+        st.style.color = 'var(--text-tertiary)';
+      } else {
+        st.textContent = '— not configured';
+        st.style.color = 'var(--text-tertiary)';
+      }
+    } catch (e) { /* ignore */ }
+  }
+
+  $('#btnLfSave').addEventListener('click', async () => {
+    const body = {
+      publicKey: $('#lfPublicKey').value.trim(),
+      secretKey: $('#lfSecretKey').value.trim(),
+      baseUrl: $('#lfBaseUrl').value.trim() || 'https://cloud.langfuse.com',
+      enabled: $('#lfEnabled').checked,
+    };
+    if (!body.publicKey || !body.secretKey) { showToast('Public and secret keys required', 'err'); return; }
+    try {
+      await apiPost('/api/langfuse/config', body);
+      showToast('Langfuse config saved', 'ok');
+      await loadLangfuseConfig();
+    } catch (e) { showToast('Save failed: ' + e.message, 'err'); }
+  });
+
+  $('#btnLfTest').addEventListener('click', async () => {
+    try {
+      const r = await apiPost('/api/langfuse/test');
+      showToast(r.ok ? 'Connection OK' : 'Connection failed: ' + (r.error || ''), r.ok ? 'ok' : 'err');
+    } catch (e) { showToast('Test failed: ' + e.message, 'err'); }
+  });
+
+  $('#btnLfFlush').addEventListener('click', async () => {
+    try { await apiPost('/api/langfuse/flush'); showToast('Flushed', 'ok'); }
+    catch (e) { showToast('Flush failed: ' + e.message, 'err'); }
+  });
+
+  $('#btnLfSendTraces').addEventListener('click', async () => {
+    try {
+      const r = await apiPost('/api/langfuse/send-traces');
+      showToast('Sent ' + (r.sentSpans ?? 0) + ' spans', 'ok');
+    } catch (e) { showToast('Send failed: ' + e.message, 'err'); }
+  });
+
+  // ---------------------------------------------------------------------------
+  // Dreaming tab
+  // ---------------------------------------------------------------------------
+  async function loadDreamingData() {
+    try {
+      const [cfg, history, stats] = await Promise.all([
+        apiGet('/api/dreaming/config').catch(() => ({})),
+        apiGet('/api/dreaming/history').catch(() => []),
+        apiGet('/api/dreaming/stats').catch(() => ({})),
+      ]);
+      state.dreamingConfig = cfg;
+      state.dreamingHistory = history;
+      state.dreamingStats = stats;
+      $('#drEnabled').checked = !!cfg.enabled;
+      $('#drStrategy').value = cfg.strategy || 'both';
+      $('#drMaxDepth').value = cfg.maxDepth ?? 3;
+      $('#drFailThreshold').value = cfg.trigger?.sameFingerprintFailures ?? 3;
+      renderDreamingStats();
+      renderDreamingHistory();
+    } catch (e) { /* ignore */ }
+  }
+
+  function renderDreamingStats() {
+    const wrap = $('#dreamingStats');
+    const s = state.dreamingStats || {};
+    const byTrigger = s.byTriggerType || {};
+    wrap.innerHTML = `
+      <div class="trace-stat"><div class="kind">Total Evolutions</div><div class="nums"><strong>${s.totalEvolutions ?? 0}</strong></div></div>
+      <div class="trace-stat"><div class="kind">Success Rate</div><div class="nums"><strong>${((s.successRate ?? 0) * 100).toFixed(0)}%</strong></div></div>
+      ${Object.entries(byTrigger).map(([k, v]) => `<div class="trace-stat"><div class="kind">${escapeHtml(k)}</div><div class="nums"><strong>${v}</strong></div></div>`).join('')}
+    `;
+  }
+
+  function renderDreamingHistory() {
+    const wrap = $('#dreamingHistory');
+    const items = state.dreamingHistory || [];
+    if (items.length === 0) { wrap.innerHTML = '<div class="empty">No evolution records.</div>'; return; }
+    wrap.innerHTML = items.map(r => {
+      const v = r.verification || {};
+      return `
+        <div class="timeline-step">
+          <div class="ts-header">
+            <span class="ts-id">${escapeHtml(r.trigger || '')}</span>
+            <span class="ts-role">${escapeHtml(r.action?.type || '')}</span>
+            <span style="color:var(--text-tertiary);font-size:11px;">fp: ${escapeHtml(r.fingerprint?.slice(0, 12) || '')}</span>
+            <span class="ts-ms">${v.passed === true ? '✓' : v.passed === false ? '✗' : '?'}</span>
+          </div>
+          <div class="ts-body" style="font-size:11px;">
+            <div>${escapeHtml(r.analysis?.rootCause || '')}</div>
+            <div style="margin-top:4px;color:var(--text-tertiary);">${escapeHtml(r.action?.description || '')}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  $('#btnDrSaveConfig').addEventListener('click', async () => {
+    const body = {
+      enabled: $('#drEnabled').checked,
+      strategy: $('#drStrategy').value,
+      maxDepth: parseInt($('#drMaxDepth').value, 10),
+      trigger: { sameFingerprintFailures: parseInt($('#drFailThreshold').value, 10), retrySuccessRate: 0.3, errorPatternConsistency: 0.8 },
+    };
+    try {
+      await apiPost('/api/dreaming/config', body);
+      showToast('Dreaming config saved', 'ok');
+    } catch (e) { showToast('Save failed: ' + e.message, 'err'); }
+  });
+
+  $('#btnDrLearn').addEventListener('click', async () => {
+    const sessionId = prompt('Enter session ID to learn from:');
+    if (!sessionId) return;
+    try {
+      const r = await apiPost('/api/dreaming/learn', { sessionId });
+      showToast('Learn complete: ' + (r.id || ''), 'ok');
+      await loadDreamingData();
+    } catch (e) { showToast('Learn failed: ' + e.message, 'err'); }
+  });
+
+  $('#btnDrAnalyze').addEventListener('click', async () => {
+    const fingerprint = prompt('Enter failure fingerprint:');
+    if (!fingerprint) return;
+    try {
+      const r = await apiPost('/api/dreaming/analyze', { fingerprint });
+      showToast(r.ok === false ? 'No evolution triggered' : 'Analysis complete', 'ok');
+      await loadDreamingData();
+    } catch (e) { showToast('Analyze failed: ' + e.message, 'err'); }
+  });
+
+  $('#btnDrWatchStart').addEventListener('click', async () => {
+    try { await apiPost('/api/dreaming/watch/start'); showToast('Auto-watch started', 'ok'); }
+    catch (e) { showToast('Start failed: ' + e.message, 'err'); }
+  });
+
+  $('#btnDrWatchStop').addEventListener('click', async () => {
+    try { await apiPost('/api/dreaming/watch/stop'); showToast('Auto-watch stopped', 'ok'); }
+    catch (e) { showToast('Stop failed: ' + e.message, 'err'); }
+  });
+
+  // ---------------------------------------------------------------------------
+  // Chatroom tab
+  // ---------------------------------------------------------------------------
+  async function loadChatrooms() {
+    try { state.chatrooms = await apiGet('/api/chatrooms'); }
+    catch (e) { state.chatrooms = []; }
+    renderChatroomList();
+  }
+
+  function renderChatroomList() {
+    const wrap = $('#crRoomList');
+    const rooms = state.chatrooms || [];
+    if (rooms.length === 0) { wrap.innerHTML = '<div class="empty">No rooms</div>'; return; }
+    wrap.innerHTML = rooms.map(r => `
+      <div class="card${state.activeChatroomId === r.id ? ' selected' : ''}" data-cr-id="${escapeHtml(r.id)}" style="margin-bottom:6px;padding:8px 10px;">
+        <div class="card-title" style="font-size:13px;">${escapeHtml(r.name || '')}</div>
+        <div class="card-desc" style="font-size:11px;">${escapeHtml(r.description || '')} · ${r.messageCount ?? 0} msgs</div>
+      </div>
+    `).join('');
+    wrap.querySelectorAll('[data-cr-id]').forEach(card => {
+      card.addEventListener('click', () => selectChatroom(card.dataset.crId));
+    });
+  }
+
+  async function selectChatroom(id) {
+    state.activeChatroomId = id;
+    renderChatroomList();
+    const room = state.chatrooms.find(r => r.id === id);
+    if (room) {
+      $('#crRoomName').textContent = room.name || id;
+      $('#crRoomMembers').textContent = (room.members || []).map(m => m.name).join(', ');
+      $('#crTeamStatus').textContent = room.teamConfig ? 'Team: ' + room.teamConfig.mode : '';
+      $('#btnCrBindTeam').style.display = '';
+      $('#btnCrAsk').style.display = room.teamConfig ? '' : 'none';
+    }
+    // 加载消息
+    try { state.chatroomMessages = await apiGet('/api/chatrooms/' + id + '/messages?limit=100'); }
+    catch (e) { state.chatroomMessages = []; }
+    renderChatroomMessages();
+    // 加载统计
+    try {
+      const stats = await apiGet('/api/chatrooms/' + id + '/stats');
+      $('#crStatMsgs').textContent = String(stats.messageCount ?? 0);
+      $('#crStatAgent').textContent = String(stats.agentReplyCount ?? 0);
+      $('#crStatTokens').textContent = String(stats.totalTokens ?? 0);
+    } catch (e) { /* ignore */ }
+    // 连接 SSE
+    disconnectChatroomSSE();
+    connectChatroomSSE(id);
+  }
+
+  function renderChatroomMessages() {
+    const wrap = $('#crMessages');
+    const msgs = state.chatroomMessages || [];
+    if (msgs.length === 0) { wrap.innerHTML = '<div class="empty">No messages yet</div>'; return; }
+    wrap.innerHTML = msgs.map(m => {
+      const isSystem = m.type === 'system' || m.userId === 'system';
+      const cls = isSystem ? 'chat-msg assistant' : 'chat-msg user';
+      return `<div class="${cls}" style="max-width:90%;"><div class="role">${escapeHtml(m.userId || '')} · ${escapeHtml(m.type || '')}</div><div class="bubble">${escapeHtml(m.content || '')}</div></div>`;
+    }).join('');
+    wrap.scrollTop = wrap.scrollHeight;
+  }
+
+  function connectChatroomSSE(id) {
+    try {
+      const es = new EventSource('/api/chatrooms/' + id + '/stream');
+      es.addEventListener('message', (e) => {
+        try {
+          const msg = JSON.parse(e.data);
+          state.chatroomMessages.push(msg);
+          // 保留最近 500 条
+          if (state.chatroomMessages.length > 500) state.chatroomMessages = state.chatroomMessages.slice(-500);
+          renderChatroomMessages();
+        } catch (ex) { /* ignore */ }
+      });
+      state.chatroomSSE = es;
+    } catch (e) { /* SSE not available */ }
+  }
+
+  function disconnectChatroomSSE() {
+    if (state.chatroomSSE) { state.chatroomSSE.close(); state.chatroomSSE = null; }
+  }
+
+  $('#btnCrNewRoom').addEventListener('click', async () => {
+    const name = prompt('Room name:');
+    if (!name) return;
+    try {
+      await apiPost('/api/chatrooms', { name });
+      showToast('Created: ' + name, 'ok');
+      await loadChatrooms();
+    } catch (e) { showToast('Create failed: ' + e.message, 'err'); }
+  });
+
+  $('#btnCrSend').addEventListener('click', async () => {
+    const content = $('#crInput').value.trim();
+    const userId = $('#crUserId').value.trim() || 'dashboard-user';
+    if (!content || !state.activeChatroomId) return;
+    try {
+      await apiPost('/api/chatrooms/' + state.activeChatroomId + '/messages', { userId, content });
+      $('#crInput').value = '';
+    } catch (e) { showToast('Send failed: ' + e.message, 'err'); }
+  });
+
+  $('#crInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('#btnCrSend').click(); }
+  });
+
+  $('#btnCrBindTeam').addEventListener('click', async () => {
+    if (!state.activeChatroomId) return;
+    if (state.teamMembers.length === 0) { showToast('Add team members first (Team tab)', 'err'); return; }
+    const mode = document.querySelector('input[name="teamMode"]:checked')?.value || 'sequential';
+    try {
+      await apiPost('/api/chatrooms/' + state.activeChatroomId + '/bind-team', { mode, members: state.teamMembers });
+      showToast('Team bound', 'ok');
+      await loadChatrooms();
+      if (state.activeChatroomId) await selectChatroom(state.activeChatroomId);
+    } catch (e) { showToast('Bind failed: ' + e.message, 'err'); }
+  });
+
+  $('#btnCrAsk').addEventListener('click', async () => {
+    if (!state.activeChatroomId) return;
+    // 找最后一条用户消息
+    const lastUserMsg = [...(state.chatroomMessages || [])].reverse().find(m => m.type !== 'system');
+    if (!lastUserMsg) { showToast('No user message to process', 'err'); return; }
+    try {
+      const r = await apiPost('/api/chatrooms/' + state.activeChatroomId + '/ask', { messageId: lastUserMsg.id });
+      showToast('Agent processing: ' + (r.messages?.length ?? 0) + ' replies', 'ok');
+      await selectChatroom(state.activeChatroomId);
+    } catch (e) { showToast('Ask failed: ' + e.message, 'err'); }
+  });
+
+  // ---------------------------------------------------------------------------
+  // Logs tab
+  // ---------------------------------------------------------------------------
+  function connectLogSSE() {
+    if (state.logSSE) return;
+    try {
+      const es = new EventSource('/api/logs/stream');
+      es.addEventListener('log', (e) => {
+        try {
+          const entry = JSON.parse(e.data);
+          state.logEntries.push(entry);
+          // 保留最近 500 条
+          if (state.logEntries.length > 500) state.logEntries = state.logEntries.slice(-500);
+          if (state.activeTab === 'logs') renderLogEntries();
+        } catch (ex) { /* ignore */ }
+      });
+      state.logSSE = es;
+    } catch (e) { /* SSE not available */ }
+    // 加载历史 + 统计
+    loadLogHistory();
+  }
+
+  function disconnectLogSSE() {
+    if (state.logSSE) { state.logSSE.close(); state.logSSE = null; }
+  }
+
+  async function loadLogHistory() {
+    try {
+      const [result, stats] = await Promise.all([
+        apiGet('/api/logs?limit=200'),
+        apiGet('/api/logs/stats'),
+      ]);
+      state.logEntries = result.entries || [];
+      renderLogEntries();
+      renderLogStats(stats);
+    } catch (e) { /* ignore */ }
+  }
+
+  function renderLogStats(stats) {
+    const wrap = $('#logStats');
+    if (!stats) { wrap.innerHTML = '<div class="empty">No stats yet.</div>'; return; }
+    const byLevel = stats.byLevel || {};
+    wrap.innerHTML = `
+      <div class="trace-stat"><div class="kind">Total</div><div class="nums"><strong>${stats.total ?? 0}</strong></div></div>
+      <div class="trace-stat"><div class="kind">Errors (24h)</div><div class="nums" style="color:var(--red);"><strong>${stats.errorsLast24h ?? 0}</strong></div></div>
+      ${Object.entries(byLevel).map(([k, v]) => `<div class="trace-stat"><div class="kind">${escapeHtml(k)}</div><div class="nums"><strong>${v}</strong></div></div>`).join('')}
+    `;
+    // 更新来源过滤
+    const sel = $('#logSourceFilter');
+    const sources = Object.keys(stats.bySource || {});
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">All sources</option>' + sources.map(s => `<option value="${escapeHtml(s)}"${s === cur ? ' selected' : ''}>${escapeHtml(s)}</option>`).join('');
+  }
+
+  function renderLogEntries() {
+    const wrap = $('#logList');
+    const entries = state.logEntries || [];
+    // 过滤
+    const levels = state.logLevels;
+    const sourceFilter = $('#logSourceFilter')?.value || '';
+    const search = ($('#logSearch')?.value || '').toLowerCase();
+    let filtered = entries;
+    if (levels.length > 0) filtered = filtered.filter(e => levels.includes(e.level));
+    if (sourceFilter) filtered = filtered.filter(e => e.source === sourceFilter);
+    if (search) filtered = filtered.filter(e => (e.message || '').toLowerCase().includes(search));
+    if (filtered.length === 0) { wrap.innerHTML = '<div class="empty">No matching logs.</div>'; return; }
+    wrap.innerHTML = filtered.map(e => {
+      const ts = e.timestamp ? new Date(e.timestamp).toLocaleTimeString() : '';
+      return `<div class="log-entry"><span class="le-ts">${escapeHtml(ts)}</span><span class="le-level ${escapeHtml(e.level || 'info')}">${escapeHtml(e.level || 'info')}</span><span class="le-source">${escapeHtml(e.source || '')}</span><span class="le-msg">${escapeHtml(e.message || '')}</span></div>`;
+    }).join('');
+    if ($('#logAutoScroll')?.checked) wrap.scrollTop = wrap.scrollHeight;
+  }
+
+  // 日志级别按钮切换
+  ['logLevelInfo', 'logLevelWarn', 'logLevelError', 'logLevelDebug'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const level = btn.dataset.logLevel;
+      if (state.logLevels.includes(level)) {
+        state.logLevels = state.logLevels.filter(l => l !== level);
+        btn.classList.remove('active');
+      } else {
+        state.logLevels.push(level);
+        btn.classList.add('active');
+      }
+      renderLogEntries();
+    });
+  });
+
+  $('#logSearch')?.addEventListener('input', debounce(() => renderLogEntries(), 300));
+  $('#logSourceFilter')?.addEventListener('change', () => renderLogEntries());
+
+  $('#btnLogClear').addEventListener('click', async () => {
+    if (!confirm('Clear all logs?')) return;
+    try {
+      await apiPost('/api/logs/clear');
+      state.logEntries = [];
+      renderLogEntries();
+      showToast('Logs cleared', 'ok');
+    } catch (e) { showToast('Clear failed: ' + e.message, 'err'); }
   });
 
   // ---------------------------------------------------------------------------

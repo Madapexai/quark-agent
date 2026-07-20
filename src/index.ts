@@ -87,6 +87,10 @@ export type { EvalCase, EvolveConfig, EvolveResult } from "./evolve/gepa.js";
 
 // observe
 export { InMemoryTracer, printSpanTree } from "./observe/tracing.js";
+export { LogViewer, logger } from "./observe/logviewer.js";
+export type { LogEntry, LogViewerOptions, LogQueryFilter } from "./observe/logviewer.js";
+export { LangfuseClient } from "./observe/langfuse.js";
+export type { LangfuseConfig, LangfuseTrace, LangfuseSpan, LangfuseGeneration } from "./observe/langfuse.js";
 
 // tools
 export { CodeExecTool, MemoryRecallTool, HttpGetTool, builtinTools } from "./tools/builtin.js";
@@ -147,6 +151,14 @@ export type { TeamMode, TeamConfig, TeamRunResult, TeamStep, AgentFactory } from
 // 注意：team/index.js 的 TeamMember 与 workflows.js 的 TeamMember 不同，
 // 需要时请直接 import type { TeamMember } from "./team/index.js"
 
+// 聊天室：多用户 + Agent Team 协作
+export { ChatRoomManager } from "./chatroom/index.js";
+export type { ChatUser, ChatMessage, ChatRoom, ChatRoomOptions } from "./chatroom/index.js";
+
+// 自进化引擎（Dreaming）：从失败中学习，从成功中提炼
+export { DreamingEngine } from "./dreaming/index.js";
+export type { DreamingConfig, TraceEntry, EvolutionRecord, WatchableTracer } from "./dreaming/index.js";
+
 // sandbox policy
 export { DEFAULT_POLICY, isCommandAllowed, toolNeedsApproval, policyFromEnv, presetPolicy } from "./sandbox/policy.js";
 export type { SandboxPolicy } from "./sandbox/policy.js";
@@ -154,6 +166,8 @@ export type { SandboxPolicy } from "./sandbox/policy.js";
 // unified config
 export { loadConfig, findConfigFile, writeConfigFile } from "./config/index.js";
 export type { QuarkConfig } from "./config/index.js";
+export { ModelManager } from "./config/model-manager.js";
+export type { ModelConfig } from "./config/model-manager.js";
 
 // checkpoint v2
 export { CheckpointManager } from "./checkpoint/index.js";

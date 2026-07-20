@@ -36,6 +36,11 @@ import { SkillInstaller } from "../skills/installer.js";
 import { AgentTeam, type TeamConfig, type AgentFactory } from "../team/index.js";
 import { ComputerService, type ClickOptions, type TypeOptions, type KeyCombo } from "../tools/computer_service.js";
 import { RelayRouter, type RelayRule } from "../channel/relay.js";
+import { logger } from "../observe/logviewer.js";
+import { LangfuseClient, type LangfuseConfig } from "../observe/langfuse.js";
+import { ModelManager } from "../config/model-manager.js";
+import { ChatRoomManager } from "../chatroom/index.js";
+import { DreamingEngine, type DreamingConfig } from "../dreaming/index.js";
 
 // ============================================================================
 // 常量
@@ -241,6 +246,14 @@ export class DashboardServer {
   private relay: RelayRouter | null = null;
   /** Agent Team 工厂（lazy 初始化） */
   private teamFactory: AgentFactory | null = null;
+  /** Langfuse 客户端 */
+  private langfuseClient: LangfuseClient | null = null;
+  /** 模型管理器 */
+  private modelManager: ModelManager | null = null;
+  /** 聊天室管理器 */
+  private chatroomManager: ChatRoomManager | null = null;
+  /** 自进化引擎 */
+  private dreamingEngine: DreamingEngine | null = null;
 
   constructor(opts: DashboardServerOptions = {}) {
     this.port = opts.port ?? 8788;
@@ -265,6 +278,22 @@ export class DashboardServer {
     console.log(`[dashboard] 配置文件：${this.configPath}`);
     console.log(`[dashboard] 插件目录：${PLUGINS_DIR}`);
     console.log(`[dashboard] 静态文件：${WEB_DIR}`);
+
+    // 初始化新模块实例
+    this.modelManager = new ModelManager();
+    this.chatroomManager = new ChatRoomManager();
+    this.dreamingEngine = new DreamingEngine({ enabled: true });
+    // Langfuse 从配置文件读取
+    const cfg = loadConfig();
+    const lf = (cfg as unknown as Record<string, unknown>).langfuse as Partial<LangfuseConfig> | undefined;
+    if (lf && lf.publicKey && lf.secretKey) {
+      this.langfuseClient = new LangfuseClient({
+        publicKey: lf.publicKey,
+        secretKey: lf.secretKey,
+        baseUrl: lf.baseUrl,
+        enabled: lf.enabled ?? false,
+      });
+    }
 
     // 优雅关闭
     const shutdown = async () => {
@@ -581,6 +610,190 @@ export class DashboardServer {
       }
       if (pathname === "/api/relay/test" && method === "POST") {
         await this.handleRelayTest(req, res);
+        return;
+      }
+
+      // ---- 日志 API ----
+      if (pathname === "/api/logs" && method === "GET") {
+        await this.handleLogsQuery(url, res);
+        return;
+      }
+      if (pathname === "/api/logs/stats" && method === "GET") {
+        await this.handleLogsStats(res);
+        return;
+      }
+      if (pathname === "/api/logs/clear" && method === "POST") {
+        await this.handleLogsClear(res);
+        return;
+      }
+      if (pathname === "/api/logs/stream" && method === "GET") {
+        await this.handleLogsStream(res);
+        return;
+      }
+
+      // ---- Langfuse 配置 API ----
+      if (pathname === "/api/langfuse/config" && method === "GET") {
+        await this.handleLangfuseGetConfig(res);
+        return;
+      }
+      if (pathname === "/api/langfuse/config" && method === "POST") {
+        await this.handleLangfuseSetConfig(req, res);
+        return;
+      }
+      if (pathname === "/api/langfuse/test" && method === "POST") {
+        await this.handleLangfuseTest(res);
+        return;
+      }
+      if (pathname === "/api/langfuse/flush" && method === "POST") {
+        await this.handleLangfuseFlush(res);
+        return;
+      }
+      if (pathname === "/api/langfuse/send-traces" && method === "POST") {
+        await this.handleLangfuseSendTraces(res);
+        return;
+      }
+
+      // ---- 模型管理 API ----
+      if (pathname === "/api/models" && method === "GET") {
+        await this.handleModelsList(res);
+        return;
+      }
+      if (pathname === "/api/models/active" && method === "GET") {
+        await this.handleModelsActive(res);
+        return;
+      }
+      if (pathname === "/api/models/switch" && method === "POST") {
+        await this.handleModelsSwitch(req, res);
+        return;
+      }
+      if (pathname === "/api/models" && method === "POST") {
+        await this.handleModelsAdd(req, res);
+        return;
+      }
+      const modelsProbeMatch = pathname.match(/^\/api\/models\/([^/]+)\/probe$/);
+      if (modelsProbeMatch && method === "POST") {
+        await this.handleModelsProbe(modelsProbeMatch[1], res);
+        return;
+      }
+      const modelsPutMatch = pathname.match(/^\/api\/models\/([^/]+)$/);
+      if (modelsPutMatch && method === "PUT") {
+        await this.handleModelsUpdate(modelsPutMatch[1], req, res);
+        return;
+      }
+      if (modelsPutMatch && method === "DELETE") {
+        await this.handleModelsDelete(modelsPutMatch[1], res);
+        return;
+      }
+      if (pathname === "/api/models/recommend" && method === "GET") {
+        await this.handleModelsRecommend(url, res);
+        return;
+      }
+      const modelsCompareMatch = pathname.match(/^\/api\/models\/([^/]+)\/compare\/([^/]+)$/);
+      if (modelsCompareMatch && method === "GET") {
+        await this.handleModelsCompare(modelsCompareMatch[1], modelsCompareMatch[2], res);
+        return;
+      }
+
+      // ---- 聊天室 API ----
+      if (pathname === "/api/chatrooms" && method === "GET") {
+        await this.handleChatroomsList(res);
+        return;
+      }
+      if (pathname === "/api/chatrooms" && method === "POST") {
+        await this.handleChatroomsCreate(req, res);
+        return;
+      }
+      const chatroomMatch = pathname.match(/^\/api\/chatrooms\/([^/]+)$/);
+      const chatroomMembersMatch = pathname.match(/^\/api\/chatrooms\/([^/]+)\/members$/);
+      const chatroomJoinMatch = pathname.match(/^\/api\/chatrooms\/([^/]+)\/join$/);
+      const chatroomLeaveMatch = pathname.match(/^\/api\/chatrooms\/([^/]+)\/leave$/);
+      const chatroomMessagesMatch = pathname.match(/^\/api\/chatrooms\/([^/]+)\/messages$/);
+      const chatroomBindTeamMatch = pathname.match(/^\/api\/chatrooms\/([^/]+)\/bind-team$/);
+      const chatroomAskMatch = pathname.match(/^\/api\/chatrooms\/([^/]+)\/ask$/);
+      const chatroomStreamMatch = pathname.match(/^\/api\/chatrooms\/([^/]+)\/stream$/);
+      const chatroomStatsMatch = pathname.match(/^\/api\/chatrooms\/([^/]+)\/stats$/);
+
+      if (chatroomStreamMatch && method === "GET") {
+        await this.handleChatroomStream(chatroomStreamMatch[1], req, res);
+        return;
+      }
+      if (chatroomStatsMatch && method === "GET") {
+        await this.handleChatroomStats(chatroomStatsMatch[1], res);
+        return;
+      }
+      if (chatroomMembersMatch && method === "GET") {
+        await this.handleChatroomMembers(chatroomMembersMatch[1], res);
+        return;
+      }
+      if (chatroomJoinMatch && method === "POST") {
+        await this.handleChatroomJoin(chatroomJoinMatch[1], req, res);
+        return;
+      }
+      if (chatroomLeaveMatch && method === "POST") {
+        await this.handleChatroomLeave(chatroomLeaveMatch[1], req, res);
+        return;
+      }
+      if (chatroomMessagesMatch && method === "GET") {
+        await this.handleChatroomMessages(chatroomMessagesMatch[1], url, res);
+        return;
+      }
+      if (chatroomMessagesMatch && method === "POST") {
+        await this.handleChatroomSendMessage(chatroomMessagesMatch[1], req, res);
+        return;
+      }
+      if (chatroomBindTeamMatch && method === "POST") {
+        await this.handleChatroomBindTeam(chatroomBindTeamMatch[1], req, res);
+        return;
+      }
+      if (chatroomAskMatch && method === "POST") {
+        await this.handleChatroomAsk(chatroomAskMatch[1], req, res);
+        return;
+      }
+      if (chatroomMatch && method === "GET") {
+        await this.handleChatroomGet(chatroomMatch[1], res);
+        return;
+      }
+      if (chatroomMatch && method === "DELETE") {
+        await this.handleChatroomDelete(chatroomMatch[1], res);
+        return;
+      }
+
+      // ---- Dreaming API ----
+      if (pathname === "/api/dreaming/config" && method === "GET") {
+        await this.handleDreamingGetConfig(res);
+        return;
+      }
+      if (pathname === "/api/dreaming/config" && method === "POST") {
+        await this.handleDreamingSetConfig(req, res);
+        return;
+      }
+      if (pathname === "/api/dreaming/learn" && method === "POST") {
+        await this.handleDreamingLearn(req, res);
+        return;
+      }
+      if (pathname === "/api/dreaming/analyze" && method === "POST") {
+        await this.handleDreamingAnalyze(req, res);
+        return;
+      }
+      if (pathname === "/api/dreaming/history" && method === "GET") {
+        await this.handleDreamingHistory(res);
+        return;
+      }
+      if (pathname === "/api/dreaming/stats" && method === "GET") {
+        await this.handleDreamingStats(res);
+        return;
+      }
+      const dreamingEvolveMatch = pathname.match(/^\/api\/dreaming\/evolve\/([^/]+)$/);
+      if (dreamingEvolveMatch && method === "POST") {
+        await this.handleDreamingEvolve(dreamingEvolveMatch[1], res);
+        return;
+      }
+      if (pathname === "/api/dreaming/watch/start" && method === "POST") {
+        await this.handleDreamingWatchStart(res);
+        return;
+      }
+      if (pathname === "/api/dreaming/watch/stop" && method === "POST") {
+        await this.handleDreamingWatchStop(res);
         return;
       }
 
@@ -1501,6 +1714,600 @@ export class DashboardServer {
       const msg = err instanceof Error ? err.message : String(err);
       this.writeJSON(res, 500, { error: msg });
     }
+  }
+
+  // ===========================================================================
+  // 日志 API
+  // ===========================================================================
+
+  /** GET /api/logs → 查询日志 */
+  private async handleLogsQuery(url: URL, res: ServerResponse): Promise<void> {
+    const levelParam = url.searchParams.get("level");
+    const sourceParam = url.searchParams.get("source");
+    const search = url.searchParams.get("search") ?? undefined;
+    const limit = parseInt(url.searchParams.get("limit") ?? "100", 10);
+    const offset = parseInt(url.searchParams.get("offset") ?? "0", 10);
+    const level = levelParam ? (levelParam.split(",") as Array<"debug" | "info" | "warn" | "error">) : undefined;
+    const source = sourceParam ? sourceParam.split(",") : undefined;
+    const result = logger.query({ level, source, search, limit, offset });
+    this.writeJSON(res, 200, result);
+  }
+
+  /** GET /api/logs/stats → 日志统计 */
+  private async handleLogsStats(res: ServerResponse): Promise<void> {
+    this.writeJSON(res, 200, logger.stats());
+  }
+
+  /** POST /api/logs/clear → 清空日志 */
+  private async handleLogsClear(res: ServerResponse): Promise<void> {
+    logger.clear();
+    this.writeJSON(res, 200, { ok: true });
+  }
+
+  /** GET /api/logs/stream → SSE 实时日志流 */
+  private async handleLogsStream(res: ServerResponse): Promise<void> {
+    const headers: Record<string, string> = {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      "Connection": "keep-alive",
+      "X-Accel-Buffering": "no",
+    };
+    this.applyCORS(headers);
+    res.writeHead(200, headers);
+    res.write(": connected\n\n");
+
+    // 订阅日志回调
+    const unsubscribe = logger.subscribe((entry) => {
+      try {
+        res.write(`event: log\ndata: ${JSON.stringify(entry)}\n\n`);
+      } catch {
+        /* 客户端已断开 */
+      }
+    });
+
+    // 客户端断开时取消订阅
+    res.on("close", () => {
+      unsubscribe();
+    });
+  }
+
+  // ===========================================================================
+  // Langfuse 配置 API
+  // ===========================================================================
+
+  /** GET /api/langfuse/config → 读取 Langfuse 配置 */
+  private async handleLangfuseGetConfig(res: ServerResponse): Promise<void> {
+    const cfg = loadConfig();
+    const lf = (cfg as unknown as Record<string, unknown>).langfuse ?? {};
+    this.writeJSON(res, 200, lf);
+  }
+
+  /** POST /api/langfuse/config → 写入 Langfuse 配置 */
+  private async handleLangfuseSetConfig(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readJSON(req);
+    if (!body || typeof body.publicKey !== "string" || typeof body.secretKey !== "string") {
+      this.writeJSON(res, 400, { error: "Missing 'publicKey' or 'secretKey' in body" });
+      return;
+    }
+    const langfuseConfig: Record<string, unknown> = {
+      publicKey: body.publicKey,
+      secretKey: body.secretKey,
+      baseUrl: body.baseUrl ?? "https://cloud.langfuse.com",
+      enabled: body.enabled ?? false,
+    };
+    // 写入配置文件
+    const existing = (findConfigFile() ?? {}) as Record<string, unknown>;
+    existing.langfuse = langfuseConfig;
+    writeConfigFile(existing as Partial<QuarkConfig>);
+    // 重建 Langfuse 客户端
+    if (this.langfuseClient) {
+      await this.langfuseClient.shutdown().catch(() => {});
+    }
+    this.langfuseClient = new LangfuseClient({
+      publicKey: body.publicKey as string,
+      secretKey: body.secretKey as string,
+      baseUrl: (body.baseUrl as string) ?? "https://cloud.langfuse.com",
+      enabled: (body.enabled as boolean) ?? false,
+    });
+    this.writeJSON(res, 200, { ok: true, config: langfuseConfig });
+  }
+
+  /** POST /api/langfuse/test → 测试 Langfuse 连接 */
+  private async handleLangfuseTest(res: ServerResponse): Promise<void> {
+    if (!this.langfuseClient) {
+      this.writeJSON(res, 400, { error: "Langfuse not configured" });
+      return;
+    }
+    try {
+      // 发一个空 trace 测试连通性
+      this.langfuseClient.createTrace({ id: "test-" + Date.now(), name: "connection-test" });
+      await this.langfuseClient.flush();
+      this.writeJSON(res, 200, { ok: true, message: "连接测试成功" });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.writeJSON(res, 200, { ok: false, error: msg });
+    }
+  }
+
+  /** POST /api/langfuse/flush → 手动 flush */
+  private async handleLangfuseFlush(res: ServerResponse): Promise<void> {
+    if (!this.langfuseClient) {
+      this.writeJSON(res, 400, { error: "Langfuse not configured" });
+      return;
+    }
+    await this.langfuseClient.flush();
+    this.writeJSON(res, 200, { ok: true });
+  }
+
+  /** POST /api/langfuse/send-traces → 发送当前 tracer 的 span 到 Langfuse */
+  private async handleLangfuseSendTraces(res: ServerResponse): Promise<void> {
+    if (!this.langfuseClient) {
+      this.writeJSON(res, 400, { error: "Langfuse not configured" });
+      return;
+    }
+    let spans: Span[] = [];
+    try {
+      const instance = await this.getAgent();
+      spans = instance.tracer.export();
+    } catch {
+      // agent 未创建
+    }
+    this.langfuseClient.sendTracerSpans(spans);
+    await this.langfuseClient.flush();
+    this.writeJSON(res, 200, { ok: true, sentSpans: spans.length });
+  }
+
+  // ===========================================================================
+  // 模型管理 API
+  // ===========================================================================
+
+  /** 获取 ModelManager 单例 */
+  private getModelManager(): ModelManager {
+    if (!this.modelManager) {
+      this.modelManager = new ModelManager();
+    }
+    return this.modelManager;
+  }
+
+  /** GET /api/models → 列出所有模型配置 */
+  private async handleModelsList(res: ServerResponse): Promise<void> {
+    try {
+      const mm = this.getModelManager();
+      this.writeJSON(res, 200, mm.list());
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.writeJSON(res, 500, { error: msg });
+    }
+  }
+
+  /** GET /api/models/active → 当前激活配置 */
+  private async handleModelsActive(res: ServerResponse): Promise<void> {
+    try {
+      const mm = this.getModelManager();
+      this.writeJSON(res, 200, mm.getActive());
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.writeJSON(res, 404, { error: msg });
+    }
+  }
+
+  /** POST /api/models/switch → 切换激活配置 */
+  private async handleModelsSwitch(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readJSON(req);
+    if (!body || typeof body.id !== "string") {
+      this.writeJSON(res, 400, { error: "Missing 'id' in body" });
+      return;
+    }
+    try {
+      const mm = this.getModelManager();
+      const config = mm.setActive(body.id as string);
+      await this.resetAgent();
+      this.writeJSON(res, 200, { ok: true, config });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.writeJSON(res, 500, { error: msg });
+    }
+  }
+
+  /** POST /api/models → 添加配置 */
+  private async handleModelsAdd(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readJSON(req);
+    if (!body || typeof body.name !== "string") {
+      this.writeJSON(res, 400, { error: "Missing required fields in body" });
+      return;
+    }
+    try {
+      const mm = this.getModelManager();
+      const config = mm.add({
+        name: body.name as string,
+        providerId: (body.providerId as string) ?? "",
+        modelId: (body.modelId as string) ?? "",
+        apiKey: body.apiKey as string | undefined,
+        baseURL: body.baseURL as string | undefined,
+        parameters: (body.parameters as Record<string, unknown>) ?? {},
+      });
+      this.writeJSON(res, 200, { ok: true, config });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.writeJSON(res, 500, { error: msg });
+    }
+  }
+
+  /** PUT /api/models/:id → 更新配置 */
+  private async handleModelsUpdate(id: string, req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readJSON(req);
+    if (!body) {
+      this.writeJSON(res, 400, { error: "Invalid JSON body" });
+      return;
+    }
+    try {
+      const mm = this.getModelManager();
+      const config = mm.update(id, body as Record<string, unknown>);
+      this.writeJSON(res, 200, { ok: true, config });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.writeJSON(res, 500, { error: msg });
+    }
+  }
+
+  /** DELETE /api/models/:id → 删除配置 */
+  private async handleModelsDelete(id: string, res: ServerResponse): Promise<void> {
+    try {
+      const mm = this.getModelManager();
+      const removed = mm.remove(id);
+      this.writeJSON(res, 200, { ok: true, removed });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.writeJSON(res, 500, { error: msg });
+    }
+  }
+
+  /** POST /api/models/:id/probe → 探测配置可用性 */
+  private async handleModelsProbe(id: string, res: ServerResponse): Promise<void> {
+    try {
+      const mm = this.getModelManager();
+      const result = await mm.probe(id);
+      this.writeJSON(res, 200, result);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.writeJSON(res, 500, { error: msg });
+    }
+  }
+
+  /** GET /api/models/recommend?mode=price|efficient → 推荐配置 */
+  private async handleModelsRecommend(url: URL, res: ServerResponse): Promise<void> {
+    const mode = url.searchParams.get("mode");
+    if (mode !== "price" && mode !== "efficient") {
+      this.writeJSON(res, 400, { error: "Invalid mode, use 'price' or 'efficient'" });
+      return;
+    }
+    try {
+      const mm = this.getModelManager();
+      this.writeJSON(res, 200, mm.recommendFromCatalog(mode));
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.writeJSON(res, 500, { error: msg });
+    }
+  }
+
+  /** GET /api/models/:ida/compare/:idb → 对比两个配置 */
+  private async handleModelsCompare(idA: string, idB: string, res: ServerResponse): Promise<void> {
+    try {
+      const mm = this.getModelManager();
+      this.writeJSON(res, 200, mm.compare(idA, idB));
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.writeJSON(res, 500, { error: msg });
+    }
+  }
+
+  // ===========================================================================
+  // 聊天室 API
+  // ===========================================================================
+
+  /** 获取 ChatRoomManager 单例 */
+  private getChatroomManager(): ChatRoomManager {
+    if (!this.chatroomManager) {
+      this.chatroomManager = new ChatRoomManager();
+    }
+    return this.chatroomManager;
+  }
+
+  /** GET /api/chatrooms → 列出所有房间 */
+  private async handleChatroomsList(res: ServerResponse): Promise<void> {
+    const crm = this.getChatroomManager();
+    this.writeJSON(res, 200, crm.listRooms());
+  }
+
+  /** POST /api/chatrooms → 创建房间 */
+  private async handleChatroomsCreate(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readJSON(req);
+    if (!body || typeof body.name !== "string") {
+      this.writeJSON(res, 400, { error: "Missing 'name' in body" });
+      return;
+    }
+    const crm = this.getChatroomManager();
+    const room = crm.createRoom(body.name as string, body.description as string | undefined);
+    this.writeJSON(res, 200, room);
+  }
+
+  /** GET /api/chatrooms/:id → 获取房间信息 */
+  private async handleChatroomGet(id: string, res: ServerResponse): Promise<void> {
+    const crm = this.getChatroomManager();
+    const room = crm.getRoom(id);
+    if (!room) {
+      this.writeJSON(res, 404, { error: "Room not found" });
+      return;
+    }
+    this.writeJSON(res, 200, room);
+  }
+
+  /** DELETE /api/chatrooms/:id → 删除房间 */
+  private async handleChatroomDelete(id: string, res: ServerResponse): Promise<void> {
+    const crm = this.getChatroomManager();
+    const removed = crm.deleteRoom(id);
+    this.writeJSON(res, 200, { ok: true, removed });
+  }
+
+  /** GET /api/chatrooms/:id/members → 列出成员 */
+  private async handleChatroomMembers(id: string, res: ServerResponse): Promise<void> {
+    const crm = this.getChatroomManager();
+    this.writeJSON(res, 200, crm.listMembers(id));
+  }
+
+  /** POST /api/chatrooms/:id/join → 加入房间 */
+  private async handleChatroomJoin(id: string, req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readJSON(req);
+    if (!body || typeof body.userId !== "string" || typeof body.name !== "string") {
+      this.writeJSON(res, 400, { error: "Missing 'userId' or 'name' in body" });
+      return;
+    }
+    const crm = this.getChatroomManager();
+    const ok = crm.joinRoom(id, {
+      id: body.userId as string,
+      name: body.name as string,
+      role: (body.role as "admin" | "member" | "observer") ?? "member",
+    });
+    this.writeJSON(res, 200, { ok });
+  }
+
+  /** POST /api/chatrooms/:id/leave → 离开房间 */
+  private async handleChatroomLeave(id: string, req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readJSON(req);
+    if (!body || typeof body.userId !== "string") {
+      this.writeJSON(res, 400, { error: "Missing 'userId' in body" });
+      return;
+    }
+    const crm = this.getChatroomManager();
+    const ok = crm.leaveRoom(id, body.userId as string);
+    this.writeJSON(res, 200, { ok });
+  }
+
+  /** GET /api/chatrooms/:id/messages → 获取消息 */
+  private async handleChatroomMessages(id: string, url: URL, res: ServerResponse): Promise<void> {
+    const crm = this.getChatroomManager();
+    const limit = parseInt(url.searchParams.get("limit") ?? "50", 10);
+    const before = url.searchParams.get("before") ? parseInt(url.searchParams.get("before")!, 10) : undefined;
+    const messages = crm.getMessages(id, { limit, before });
+    this.writeJSON(res, 200, messages);
+  }
+
+  /** POST /api/chatrooms/:id/messages → 发消息 */
+  private async handleChatroomSendMessage(id: string, req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readJSON(req);
+    if (!body || typeof body.userId !== "string" || typeof body.content !== "string") {
+      this.writeJSON(res, 400, { error: "Missing 'userId' or 'content' in body" });
+      return;
+    }
+    try {
+      const crm = this.getChatroomManager();
+      const msg = crm.sendMessage(id, body.userId as string, body.content as string);
+      this.writeJSON(res, 200, msg);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.writeJSON(res, 500, { error: msg });
+    }
+  }
+
+  /** POST /api/chatrooms/:id/bind-team → 绑定 team */
+  private async handleChatroomBindTeam(id: string, req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readJSON(req);
+    if (!body) {
+      this.writeJSON(res, 400, { error: "Invalid JSON body" });
+      return;
+    }
+    try {
+      const crm = this.getChatroomManager();
+      crm.bindTeam(id, body as unknown as TeamConfig);
+      this.writeJSON(res, 200, { ok: true });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.writeJSON(res, 500, { error: msg });
+    }
+  }
+
+  /** POST /api/chatrooms/:id/ask → 让 team 处理消息 */
+  private async handleChatroomAsk(id: string, req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readJSON(req);
+    if (!body || typeof body.messageId !== "string") {
+      this.writeJSON(res, 400, { error: "Missing 'messageId' in body" });
+      return;
+    }
+    try {
+      const crm = this.getChatroomManager();
+      const factory = await this.getTeamFactory();
+      const result = await crm.processWithTeam(id, body.messageId as string, factory);
+      this.writeJSON(res, 200, { ok: true, messages: result });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.writeJSON(res, 500, { error: msg });
+    }
+  }
+
+  /** GET /api/chatrooms/:id/stream → SSE 实时消息流 */
+  private async handleChatroomStream(id: string, req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const headers: Record<string, string> = {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      "Connection": "keep-alive",
+      "X-Accel-Buffering": "no",
+    };
+    this.applyCORS(headers);
+    res.writeHead(200, headers);
+    res.write(": connected\n\n");
+
+    try {
+      const crm = this.getChatroomManager();
+      const unsubscribe = crm.subscribe(id, (msg) => {
+        try {
+          res.write(`event: message\ndata: ${JSON.stringify(msg)}\n\n`);
+        } catch {
+          /* 客户端已断开 */
+        }
+      });
+      req.on("close", () => {
+        unsubscribe();
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      res.write(`event: error\ndata: ${JSON.stringify({ error: msg })}\n\n`);
+      try { res.end(); } catch { /* already ended */ }
+    }
+  }
+
+  /** GET /api/chatrooms/:id/stats → 房间统计 */
+  private async handleChatroomStats(id: string, res: ServerResponse): Promise<void> {
+    const crm = this.getChatroomManager();
+    this.writeJSON(res, 200, crm.getStats(id));
+  }
+
+  // ===========================================================================
+  // Dreaming API
+  // ===========================================================================
+
+  /** 获取 DreamingEngine 单例 */
+  private getDreamingEngine(): DreamingEngine {
+    if (!this.dreamingEngine) {
+      this.dreamingEngine = new DreamingEngine({ enabled: true });
+    }
+    return this.dreamingEngine;
+  }
+
+  /** GET /api/dreaming/config → 读取自进化配置 */
+  private async handleDreamingGetConfig(res: ServerResponse): Promise<void> {
+    const cfg = loadConfig();
+    const dreaming = (cfg as unknown as Record<string, unknown>).dreaming ?? { enabled: true, strategy: "both", maxDepth: 3 };
+    this.writeJSON(res, 200, dreaming);
+  }
+
+  /** POST /api/dreaming/config → 更新自进化配置 */
+  private async handleDreamingSetConfig(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readJSON(req);
+    if (!body) {
+      this.writeJSON(res, 400, { error: "Invalid JSON body" });
+      return;
+    }
+    // 写入配置文件
+    const existing = (findConfigFile() ?? {}) as Record<string, unknown>;
+    existing.dreaming = body;
+    writeConfigFile(existing as Partial<QuarkConfig>);
+    // 重建引擎
+    this.dreamingEngine = new DreamingEngine(body as Partial<DreamingConfig> & { enabled: boolean });
+    this.writeJSON(res, 200, { ok: true, config: body });
+  }
+
+  /** POST /api/dreaming/learn → 手动 /learn */
+  private async handleDreamingLearn(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readJSON(req);
+    if (!body || typeof body.sessionId !== "string") {
+      this.writeJSON(res, 400, { error: "Missing 'sessionId' in body" });
+      return;
+    }
+    try {
+      const engine = this.getDreamingEngine();
+      // 获取当前 tracer 的 span 作为 trace 数据
+      let traces: Array<{ name: string; kind: string; status: string; error?: string; attributes?: Record<string, unknown> }> = [];
+      try {
+        const instance = await this.getAgent();
+        traces = instance.tracer.export();
+      } catch {
+        // agent 未创建，使用空 trace
+      }
+      const record = await engine.learn(body.sessionId as string, traces);
+      this.writeJSON(res, 200, record);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.writeJSON(res, 500, { error: msg });
+    }
+  }
+
+  /** POST /api/dreaming/analyze → 分析失败 */
+  private async handleDreamingAnalyze(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readJSON(req);
+    if (!body || typeof body.fingerprint !== "string") {
+      this.writeJSON(res, 400, { error: "Missing 'fingerprint' in body" });
+      return;
+    }
+    try {
+      const engine = this.getDreamingEngine();
+      let traces: Array<{ name: string; kind: string; status: string; error?: string; attributes?: Record<string, unknown> }> = [];
+      try {
+        const instance = await this.getAgent();
+        traces = instance.tracer.export();
+      } catch {
+        // agent 未创建
+      }
+      const record = await engine.analyzeFailure(body.fingerprint as string, traces);
+      this.writeJSON(res, 200, record ?? { ok: false, message: "未触发进化条件" });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.writeJSON(res, 500, { error: msg });
+    }
+  }
+
+  /** GET /api/dreaming/history → 进化历史 */
+  private async handleDreamingHistory(res: ServerResponse): Promise<void> {
+    const engine = this.getDreamingEngine();
+    this.writeJSON(res, 200, engine.getHistory());
+  }
+
+  /** GET /api/dreaming/stats → 进化统计 */
+  private async handleDreamingStats(res: ServerResponse): Promise<void> {
+    const engine = this.getDreamingEngine();
+    this.writeJSON(res, 200, engine.getStats());
+  }
+
+  /** POST /api/dreaming/evolve/:id → 手动执行某个进化 */
+  private async handleDreamingEvolve(id: string, res: ServerResponse): Promise<void> {
+    const engine = this.getDreamingEngine();
+    const history = engine.getHistory();
+    const record = history.find((r) => r.id === id);
+    if (!record) {
+      this.writeJSON(res, 404, { error: `进化记录不存在: ${id}` });
+      return;
+    }
+    const result = await engine.evolve(record);
+    this.writeJSON(res, 200, result);
+  }
+
+  /** POST /api/dreaming/watch/start → 启动自动监视 */
+  private async handleDreamingWatchStart(res: ServerResponse): Promise<void> {
+    const engine = this.getDreamingEngine();
+    try {
+      const instance = await this.getAgent();
+      engine.startAutoWatch(instance.tracer as unknown as import("../dreaming/index.js").WatchableTracer);
+      this.writeJSON(res, 200, { ok: true });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.writeJSON(res, 500, { error: msg });
+    }
+  }
+
+  /** POST /api/dreaming/watch/stop → 停止自动监视 */
+  private async handleDreamingWatchStop(res: ServerResponse): Promise<void> {
+    const engine = this.getDreamingEngine();
+    engine.stopAutoWatch();
+    this.writeJSON(res, 200, { ok: true });
   }
 
   // ===========================================================================
