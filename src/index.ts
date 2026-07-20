@@ -198,6 +198,8 @@ export * as Extensions from "../packages/extensions/src/index.js";
 
 // 便捷工厂
 import Database from "better-sqlite3";
+import { mkdirSync } from "node:fs";
+import { dirname } from "node:path";
 import { OpenAIProvider } from "./provider/openai.js";
 import { SqliteMemory } from "./memory/sqlite.js";
 import { VmSandbox } from "./sandbox/vm.js";
@@ -255,6 +257,10 @@ export async function createAgent(opts: CreateAgentOptions): Promise<{
     });
 
   const dbPath = opts.dbPath ?? "./.data/micro-agent.sqlite";
+  // 确保父目录存在（better-sqlite3 不会自动创建）
+  try {
+    mkdirSync(dirname(dbPath), { recursive: true });
+  } catch {}
   const db = new Database(dbPath);
 
   const memory = new SqliteMemory(
