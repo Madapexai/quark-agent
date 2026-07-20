@@ -35,6 +35,7 @@ Usage:
   quark-agent ask "<question>"             One-shot Q&A
   quark-agent serve [--port 8787]          Start HTTP channel
   quark-agent setup [--non-interactive]    First-run setup wizard
+  quark-agent dashboard [--port 8788]      Start webui config center
   quark-agent add <package>               Install a plugin/skill
   quark-agent list                        List installed plugins
   quark-agent evolve --prompt-file <p> --eval-file <e>
@@ -50,6 +51,7 @@ Examples:
   npx quark-agent ask "Read package.json"  # one-shot
   npx quark-agent add @someone/slack-skill # install a plugin
   npx quark-agent setup                    # interactive setup wizard
+  npx quark-agent dashboard                # webui config center
 `);
 }
 
@@ -74,6 +76,11 @@ async function main(): Promise<void> {
 
   if (cmd === "setup") {
     await runSetup(args.slice(1));
+    return;
+  }
+
+  if (cmd === "dashboard") {
+    await runDashboard(args.slice(1));
     return;
   }
 
@@ -220,6 +227,23 @@ async function runEvolve(args: string[]): Promise<void> {
 }
 
 // ============================================================================
+// Dashboard: webui 配置中心
+// ============================================================================
+
+async function runDashboard(dashArgs: string[]): Promise<void> {
+  // 解析 --port / --host / --no-open
+  const portIdx = dashArgs.indexOf("--port");
+  const port = portIdx >= 0 ? parseInt(dashArgs[portIdx + 1], 10) : 8788;
+  const hostIdx = dashArgs.indexOf("--host");
+  const host = hostIdx >= 0 ? dashArgs[hostIdx + 1] : "127.0.0.1";
+  const open = !dashArgs.includes("--no-open");
+
+  const { DashboardServer } = await import("../src/dashboard/server.js");
+  const server = new DashboardServer({ port, host, open });
+  await server.start();
+}
+
+// ============================================================================
 // Plugin management: add / list
 // ============================================================================
 
@@ -353,14 +377,18 @@ Supported providers:
 }
 
 const PROVIDER_CHOICES = [
-  { name: "OpenAI", envKey: "MICRO_API_KEY", defaultBase: "https://api.openai.com/v1", defaultModel: "gpt-4o-mini" },
+  { name: "GLM / ZhipuAI (free)", envKey: "GLM_API_KEY", defaultBase: "https://open.bigmodel.cn/api/paas/v4", defaultModel: "glm-4-flash" },
+  { name: "Agnes AI (free)", envKey: "AGNES_API_KEY", defaultBase: "https://apihub.agnes-ai.com/v1", defaultModel: "agnes-2.0-flash" },
+  { name: "Volcengine Ark (paid, cheap)", envKey: "ARK_API_KEY", defaultBase: "https://ark.cn-beijing.volces.com/api/coding/v3", defaultModel: "doubao-seed-code" },
+  { name: "DeepSeek (paid, cheap)", envKey: "DEEPSEEK_API_KEY", defaultBase: "https://api.deepseek.com/v1", defaultModel: "deepseek-chat" },
+  { name: "OpenAI", envKey: "OPENAI_API_KEY", defaultBase: "https://api.openai.com/v1", defaultModel: "gpt-4o-mini" },
   { name: "Anthropic", envKey: "ANTHROPIC_API_KEY", defaultBase: "https://api.anthropic.com/v1", defaultModel: "claude-sonnet-4-5-20250929" },
   { name: "Gemini", envKey: "GEMINI_API_KEY", defaultBase: "https://generativelanguage.googleapis.com/v1beta", defaultModel: "gemini-1.5-flash" },
-  { name: "Ollama", envKey: "", defaultBase: "http://127.0.0.1:11434", defaultModel: "llama3.1" },
   { name: "OpenRouter", envKey: "OPENROUTER_API_KEY", defaultBase: "https://openrouter.ai/api/v1", defaultModel: "openai/gpt-4o-mini" },
+  { name: "Ollama (local, no key)", envKey: "", defaultBase: "http://127.0.0.1:11434", defaultModel: "llama3.1" },
 ];
 
-const CHANNEL_CHOICES = ["CLI", "HTTP", "Discord", "Slack"];
+const CHANNEL_CHOICES = ["CLI", "HTTP", "Discord", "Slack", "Telegram", "Feishu", "WeChat"];
 
 const SANDBOX_CHOICES = [
   { name: "strict", desc: "No network, no filesystem, no shell, approve none" },
@@ -388,7 +416,7 @@ async function runSetup(setupArgs: string[]): Promise<void> {
     for (let i = 0; i < PROVIDER_CHOICES.length; i++) {
       console.log(`  ${i + 1}. ${PROVIDER_CHOICES[i].name}`);
     }
-    const providerIdx = await rl.question("\nEnter choice (1-5): ");
+    const providerIdx = await rl.question(`\nEnter choice (1-${PROVIDER_CHOICES.length}): `);
     const pIdx = Math.max(0, Math.min(PROVIDER_CHOICES.length - 1, parseInt(providerIdx, 10) - 1));
     const provider = PROVIDER_CHOICES[pIdx];
     console.log(`  → Selected: ${provider.name}\n`);

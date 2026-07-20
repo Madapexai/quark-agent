@@ -1,0 +1,1919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>quark-agent dashboard</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9f9f9;
+  --bg-tertiary: #f0f0f0;
+  --bg-hover: #f4f4f4;
+  --bg-active: #e8e8e8;
+  --border: #e5e5e5;
+  --border-light: #f0f0f0;
+  --text-primary: #1a1a1a;
+  --text-secondary: #6b6b6b;
+  --text-tertiary: #999999;
+  --accent: #1a1a1a;
+  --accent-hover: #333333;
+  --blue: #2563eb;
+  --blue-hover: #1d4ed8;
+  --blue-bg: #eff6ff;
+  --green: #16a34a;
+  --green-bg: #f0fdf4;
+  --orange: #ea580c;
+  --orange-bg: #fff7ed;
+  --red: #dc2626;
+  --red-bg: #fef2f2;
+  --yellow: #ca8a04;
+  --yellow-bg: #fefce8;
+  --purple: #7c3aed;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.1);
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
+  --transition: 150ms ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #212121;
+    --bg-tertiary: #2a2a2a;
+    --bg-hover: #2d2d2d;
+    --bg-active: #383838;
+    --border: #333333;
+    --border-light: #2a2a2a;
+    --text-primary: #e5e5e5;
+    --text-secondary: #a0a0a0;
+    --text-tertiary: #666666;
+    --accent: #ffffff;
+    --accent-hover: #e5e5e5;
+    --blue: #60a5fa;
+    --blue-hover: #93c5fd;
+    --blue-bg: #1e293b;
+    --green: #4ade80;
+    --green-bg: #052e16;
+    --orange: #fb923c;
+    --orange-bg: #431407;
+    --red: #f87171;
+    --red-bg: #450a0a;
+    --yellow: #facc15;
+    --yellow-bg: #422006;
+    --purple: #a78bfa;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+    --shadow-md: 0 2px 8px rgba(0,0,0,0.4);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.5);
+  }
+}
+
+html, body { height: 100%; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Top bar */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-primary);
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.topbar h1 {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.topbar .spacer { flex: 1; }
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+.status-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--text-tertiary);
+  box-shadow: 0 0 0 3px rgba(255,255,255,0);
+}
+.status-dot.green { background: var(--green); box-shadow: 0 0 0 3px var(--green-bg); }
+.status-dot.yellow { background: var(--yellow); box-shadow: 0 0 0 3px var(--yellow-bg); }
+.status-dot.red { background: var(--red); box-shadow: 0 0 0 3px var(--red-bg); }
+
+.btn {
+  font-family: inherit;
+  font-size: 13px;
+  padding: 7px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:hover { background: var(--bg-hover); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn.primary {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+.btn.primary:hover { background: var(--blue-hover); border-color: var(--blue-hover); }
+.btn.danger {
+  background: transparent;
+  border-color: var(--red);
+  color: var(--red);
+}
+.btn.danger:hover { background: var(--red-bg); }
+.btn.small { padding: 4px 10px; font-size: 12px; }
+.btn.icon { padding: 6px; }
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 2px;
+  padding: 0 24px;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+.tab {
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+.tab:hover { color: var(--text-primary); background: var(--bg-hover); }
+.tab.active {
+  color: var(--blue);
+  border-bottom-color: var(--blue);
+  font-weight: 500;
+}
+
+/* Main */
+.main {
+  flex: 1;
+  padding: 24px;
+  overflow: auto;
+}
+.panel {
+  display: none;
+  max-width: 1100px;
+  margin: 0 auto;
+  animation: fadeIn 150ms ease;
+}
+.panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+.panel-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.panel-subtitle {
+  color: var(--text-secondary);
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+/* Section */
+.section {
+  margin-bottom: 24px;
+}
+.section-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  margin-bottom: 10px;
+}
+
+/* Card grid */
+.card-grid {
+  display: grid;
+  gap: 10px;
+}
+.card-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.card-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  background: var(--bg-secondary);
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+}
+.card:hover { border-color: var(--text-tertiary); background: var(--bg-hover); }
+.card.selected {
+  border-color: var(--blue);
+  background: var(--blue-bg);
+}
+.card.selected::after {
+  content: '';
+  position: absolute;
+  top: 10px; right: 10px;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--blue);
+  box-shadow: inset 0 0 0 3px var(--bg-primary);
+}
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.card-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.card-meta {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+/* Form */
+.form-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.field.full { grid-column: 1 / -1; }
+.field label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+.field .hint {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+.input, .select, .textarea {
+  font-family: inherit;
+  font-size: 13px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: var(--transition);
+  outline: none;
+  width: 100%;
+}
+.input:focus, .select:focus, .textarea:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px var(--blue-bg);
+}
+.textarea {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  min-height: 80px;
+  resize: vertical;
+  line-height: 1.5;
+}
+.input.mono { font-family: var(--font-mono); }
+
+/* Slider */
+.slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.slider-wrap input[type=range] {
+  flex: 1;
+  accent-color: var(--blue);
+}
+.slider-wrap .value {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  min-width: 36px;
+  text-align: right;
+  color: var(--text-secondary);
+}
+
+/* Toggle */
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 38px;
+  height: 22px;
+  flex-shrink: 0;
+}
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle .slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  transition: var(--transition);
+}
+.toggle .slider::before {
+  content: '';
+  position: absolute;
+  height: 16px; width: 16px;
+  left: 2px; top: 2px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  transition: var(--transition);
+}
+.toggle input:checked + .slider {
+  background: var(--blue);
+  border-color: var(--blue);
+}
+.toggle input:checked + .slider::before {
+  transform: translateX(16px);
+  background: #fff;
+  border-color: var(--blue);
+}
+.field-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+}
+.field-row label {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.field-row .hint {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+/* Two-pane */
+.two-pane {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.pane {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  background: var(--bg-secondary);
+  min-height: 200px;
+}
+.pane-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+}
+
+/* Tool / list items */
+.list-item {
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+  background: var(--bg-primary);
+  margin-bottom: 6px;
+  font-size: 12.5px;
+}
+.list-item .name {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+.list-item .desc {
+  color: var(--text-secondary);
+  font-size: 12px;
+  margin-top: 2px;
+}
+.list-item .row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.list-item .row .meta {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-tertiary);
+  font-size: 11px;
+}
+.empty {
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  padding: 24px;
+}
+
+/* Probe result */
+.probe-result {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-family: var(--font-mono);
+  display: none;
+}
+.probe-result.show { display: block; }
+.probe-result.ok {
+  background: var(--green-bg);
+  color: var(--green);
+  border: 1px solid var(--green);
+}
+.probe-result.err {
+  background: var(--red-bg);
+  color: var(--red);
+  border: 1px solid var(--red);
+}
+.probe-result.loading {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+/* Collapsible (channels) */
+.collapsible {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.collapsible > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+  font-size: 13px;
+  user-select: none;
+}
+.collapsible > summary::-webkit-details-marker { display: none; }
+.collapsible > summary::before {
+  content: '▶';
+  font-size: 10px;
+  color: var(--text-tertiary);
+  transition: transform 200ms;
+}
+.collapsible[open] > summary::before { transform: rotate(90deg); }
+.collapsible > summary .badge {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+}
+.collapsible .body {
+  padding: 0 16px 16px;
+  border-top: 1px solid var(--border-light);
+}
+
+/* Chat */
+.chat-wrap {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 200px);
+  min-height: 400px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-secondary);
+}
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+.chat-msg {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  max-width: 80%;
+}
+.chat-msg.user { margin-left: auto; align-items: flex-end; }
+.chat-msg.assistant { margin-right: auto; align-items: flex-start; }
+.chat-msg .bubble {
+  padding: 10px 14px;
+  border-radius: var(--radius-lg);
+  font-size: 13px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.chat-msg.user .bubble {
+  background: var(--blue);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+.chat-msg.assistant .bubble {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+}
+.chat-msg .role {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-bottom: 3px;
+  font-family: var(--font-mono);
+}
+.chat-msg .toolcalls {
+  margin-top: 6px;
+  padding: 6px 10px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.chat-msg .toolcalls-list {
+  display: none;
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+}
+.chat-msg .toolcalls.open + .toolcalls-list { display: block; }
+.chat-thinking {
+  color: var(--text-tertiary);
+  font-style: italic;
+  font-size: 12px;
+  padding: 4px 0;
+}
+.chat-thinking .dots span {
+  display: inline-block;
+  animation: blink 1.4s infinite;
+}
+.chat-thinking .dots span:nth-child(2) { animation-delay: 0.2s; }
+.chat-thinking .dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes blink { 0%,50%,100%{opacity:0.3}25%,75%{opacity:1} }
+
+.chat-input {
+  border-top: 1px solid var(--border);
+  padding: 10px;
+  background: var(--bg-primary);
+  display: flex;
+  gap: 8px;
+}
+.chat-input textarea {
+  flex: 1;
+  resize: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 13px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  outline: none;
+  min-height: 38px;
+  max-height: 120px;
+}
+.chat-input textarea:focus { border-color: var(--blue); }
+.chat-stats {
+  display: flex;
+  gap: 12px;
+  padding: 6px 10px;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-light);
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+}
+.chat-stats .stat strong { color: var(--text-primary); font-weight: 600; }
+
+/* Trace */
+.trace-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.trace-stat {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  background: var(--bg-secondary);
+}
+.trace-stat .kind {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+.trace-stat .nums {
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+.trace-stat .nums strong { color: var(--text-primary); }
+.trace-timeline {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  overflow: hidden;
+}
+.trace-row {
+  display: grid;
+  grid-template-columns: 200px 100px 80px 1fr 40px;
+  gap: 10px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 12px;
+  align-items: center;
+}
+.trace-row:last-child { border-bottom: none; }
+.trace-row.header {
+  background: var(--bg-tertiary);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+}
+.trace-row .name { font-family: var(--font-mono); }
+.trace-row .kind { color: var(--text-secondary); font-family: var(--font-mono); }
+.trace-row .dur { color: var(--text-secondary); font-family: var(--font-mono); text-align: right; }
+.trace-row .status { text-align: center; font-weight: 600; }
+.trace-row .status.ok { color: var(--green); }
+.trace-row .status.err { color: var(--red); }
+.trace-row .err { color: var(--red); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.trace-toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  align-items: center;
+}
+.trace-toolbar .spacer { flex: 1; }
+.trace-toolbar .auto {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 200ms, transform 200ms;
+  pointer-events: none;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.toast.ok { border-color: var(--green); color: var(--green); }
+.toast.err { border-color: var(--red); color: var(--red); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .topbar { padding: 10px 14px; flex-wrap: wrap; gap: 8px; }
+  .tabs { padding: 0 14px; }
+  .main { padding: 14px; }
+  .card-grid.cols-2, .card-grid.cols-3 { grid-template-columns: 1fr; }
+  .two-pane { grid-template-columns: 1fr; }
+  .form-grid { grid-template-columns: 1fr; }
+  .trace-row { grid-template-columns: 1fr 60px 30px; }
+  .trace-row .kind, .trace-row .err { display: none; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <h1>quark-agent dashboard</h1>
+    <div class="status-pill">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">Loading…</span>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn" id="btnReset" title="Reset config to template">Reset</button>
+    <button class="btn primary" id="btnSaveAll">Save All</button>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-tab="provider">Provider</button>
+    <button class="tab" data-tab="model">Model</button>
+    <button class="tab" data-tab="profile">Profile &amp; Skills</button>
+    <button class="tab" data-tab="sandbox">Sandbox</button>
+    <button class="tab" data-tab="channels">Channels</button>
+    <button class="tab" data-tab="checkpoint">Checkpoint</button>
+    <button class="tab" data-tab="chat">Chat</button>
+    <button class="tab" data-tab="trace">Trace</button>
+  </nav>
+
+  <main class="main">
+
+    <!-- ============ Provider ============ -->
+    <section class="panel active" data-panel="provider">
+      <div class="panel-title">Provider</div>
+      <div class="panel-subtitle">Pick a provider preset, fill credentials, probe, then auto-save.</div>
+
+      <div class="section">
+        <div class="section-title">Provider preset</div>
+        <div class="card-grid cols-3" id="providerCards"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Credentials</div>
+        <div class="form-grid">
+          <div class="field full">
+            <label for="provApiKey">API Key</label>
+            <input class="input mono" id="provApiKey" type="password" placeholder="sk-..." autocomplete="off">
+          </div>
+          <div class="field full">
+            <label for="provBaseURL">Base URL</label>
+            <input class="input mono" id="provBaseURL" type="text" placeholder="https://api.openai.com/v1">
+          </div>
+          <div class="field full">
+            <label for="provModel">Model</label>
+            <input class="input mono" id="provModel" type="text" placeholder="gpt-4o-mini">
+          </div>
+        </div>
+        <div style="margin-top:12px; display:flex; gap:8px; align-items:center;">
+          <button class="btn primary" id="btnProbe">Probe</button>
+          <div class="probe-result" id="probeResult"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Model ============ -->
+    <section class="panel" data-panel="model">
+      <div class="panel-title">Model</div>
+      <div class="panel-subtitle">Generation parameters and runtime budgets.</div>
+
+      <div class="section">
+        <div class="section-title">Generation</div>
+        <div class="form-grid">
+          <div class="field full">
+            <label for="mModel">Model name</label>
+            <input class="input mono" id="mModel" type="text">
+          </div>
+          <div class="field full">
+            <label for="mTemp">Temperature</label>
+            <div class="slider-wrap">
+              <input type="range" id="mTemp" min="0" max="2" step="0.1">
+              <span class="value" id="mTempVal">0.7</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="mMaxTokens">maxTokens</label>
+            <input class="input mono" id="mMaxTokens" type="number" min="1">
+          </div>
+          <div class="field">
+            <label for="mCtxBudget">contextTokenBudget</label>
+            <input class="input mono" id="mCtxBudget" type="number" min="1">
+          </div>
+          <div class="field">
+            <label for="mMemRounds">workingMemoryRounds</label>
+            <input class="input mono" id="mMemRounds" type="number" min="0">
+          </div>
+          <div class="field">
+            <label for="mMaxToolRounds">maxToolRounds</label>
+            <input class="input mono" id="mMaxToolRounds" type="number" min="0">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Profile & Skills ============ -->
+    <section class="panel" data-panel="profile">
+      <div class="panel-title">Profile &amp; Skills</div>
+      <div class="panel-subtitle">Choose a profile to scope tool categories, then manage installed skills.</div>
+
+      <div class="section">
+        <div class="section-title">Profiles</div>
+        <div class="two-pane">
+          <div class="pane">
+            <div class="pane-title">Pick a profile</div>
+            <div class="card-grid" id="profileCards"></div>
+          </div>
+          <div class="pane">
+            <div class="pane-title">Tools in profile</div>
+            <div id="profileTools"><div class="empty">Select a profile to view its tools</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Installed skills</div>
+        <div id="skillList"><div class="empty">Loading skills…</div></div>
+        <div style="margin-top:12px; display:flex; gap:8px; align-items:center;">
+          <input class="input mono" id="skillPkg" type="text" placeholder="package name, e.g. lodash or @scope/pkg" style="flex:1;">
+          <button class="btn primary" id="btnSkillAdd">Install</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Sandbox ============ -->
+    <section class="panel" data-panel="sandbox">
+      <div class="panel-title">Sandbox</div>
+      <div class="panel-subtitle">Pick a preset, then fine-tune the policy.</div>
+
+      <div class="section">
+        <div class="section-title">Preset</div>
+        <div class="card-grid cols-3" id="sandboxPresets"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Advanced policy</div>
+        <div class="form-grid">
+          <div class="field-row full">
+            <div>
+              <label>allowNetwork</label>
+              <div class="hint">Permit outbound network in sandbox</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="sbAllowNet">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="field-row full">
+            <div>
+              <label>allowFilesystem</label>
+              <div class="hint">Permit filesystem access in sandbox</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="sbAllowFs">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="field">
+            <label for="sbTimeout">maxTimeoutMs</label>
+            <input class="input mono" id="sbTimeout" type="number" min="100">
+          </div>
+          <div class="field">
+            <label for="sbApprove">toolAutoApprove</label>
+            <select class="select" id="sbApprove">
+              <option value="all">all</option>
+              <option value="safe">safe</option>
+              <option value="none">none</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label for="sbDeny">shellDenylist <span class="hint">(one per line, substring match)</span></label>
+            <textarea class="textarea" id="sbDeny" rows="5"></textarea>
+          </div>
+          <div class="field full">
+            <label for="sbSafe">safeTools <span class="hint">(one per line)</span></label>
+            <textarea class="textarea" id="sbSafe" rows="5"></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Channels ============ -->
+    <section class="panel" data-panel="channels">
+      <div class="panel-title">Channels</div>
+      <div class="panel-subtitle">Configure external channel adapters. Expand a card to edit its fields.</div>
+
+      <div id="channelList"></div>
+    </section>
+
+    <!-- ============ Checkpoint ============ -->
+    <section class="panel" data-panel="checkpoint">
+      <div class="panel-title">Checkpoint &amp; Long-running</div>
+      <div class="panel-subtitle">Session checkpoints and background task runner.</div>
+
+      <div class="section">
+        <div class="section-title">Checkpoint</div>
+        <div class="form-grid">
+          <div class="field-row full">
+            <div>
+              <label>enabled</label>
+              <div class="hint">Persist session state snapshots</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="cpEnabled">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="field">
+            <label for="cpInterval">autoSaveInterval <span class="hint">(seconds, 0 = on-demand)</span></label>
+            <input class="input mono" id="cpInterval" type="number" min="0">
+          </div>
+          <div class="field">
+            <label for="cpMax">maxPerSession</label>
+            <input class="input mono" id="cpMax" type="number" min="1">
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Long-running tasks</div>
+        <div class="form-grid">
+          <div class="field-row full">
+            <div>
+              <label>enabled</label>
+              <div class="hint">Enable background task runner</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="lrEnabled">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="field">
+            <label for="lrConcurrent">maxConcurrent</label>
+            <input class="input mono" id="lrConcurrent" type="number" min="1">
+          </div>
+          <div class="field">
+            <label for="lrTimeout">timeoutMinutes</label>
+            <input class="input mono" id="lrTimeout" type="number" min="1">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Chat ============ -->
+    <section class="panel" data-panel="chat">
+      <div class="panel-title">Chat</div>
+      <div class="panel-subtitle">Talk to the agent. Replies include tool-call summaries and token stats.</div>
+
+      <div class="chat-wrap">
+        <div class="chat-messages" id="chatMessages">
+          <div class="empty" id="chatEmpty">Send a message to start a session.</div>
+        </div>
+        <div class="chat-stats" id="chatStats">
+          <span class="stat">rounds: <strong id="statRounds">0</strong></span>
+          <span class="stat">toolCalls: <strong id="statToolCalls">0</strong></span>
+          <span class="stat">contextTokens: <strong id="statCtx">0</strong></span>
+          <span class="stat" id="statRecovered" style="display:none; color: var(--orange);">recovered</span>
+        </div>
+        <div class="chat-input">
+          <textarea id="chatInput" placeholder="Send a message… (Enter to send, Shift+Enter for newline)" rows="1"></textarea>
+          <button class="btn primary" id="btnChatSend">Send</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Trace ============ -->
+    <section class="panel" data-panel="trace">
+      <div class="panel-title">Trace</div>
+      <div class="panel-subtitle">OpenTelemetry-style spans produced by the agent runtime.</div>
+
+      <div class="trace-toolbar">
+        <button class="btn" id="btnTraceRefresh">Refresh</button>
+        <button class="btn danger" id="btnTraceClear">Clear</button>
+        <div class="spacer"></div>
+        <span class="auto" id="traceAuto">auto-refresh: on (2s)</span>
+      </div>
+
+      <div class="trace-stats" id="traceStats">
+        <div class="empty">No stats yet.</div>
+      </div>
+
+      <div class="trace-timeline" id="traceTimeline">
+        <div class="trace-row header">
+          <div>name</div>
+          <div>kind</div>
+          <div>dur</div>
+          <div>error</div>
+          <div>st</div>
+        </div>
+        <div class="empty">No spans recorded.</div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---------------------------------------------------------------------------
+  // State
+  // ---------------------------------------------------------------------------
+  const state = {
+    config: {},
+    activeTab: 'provider',
+    providers: [],
+    profiles: [],
+    currentProfileTools: [],
+    skills: [],
+    sandboxPresets: {},
+    channelTemplates: {},
+    traceStats: {},
+    traces: [],
+    chatSessionId: null,
+    chatBusy: false,
+    traceTimer: null,
+    selectedSandboxPreset: null,
+  };
+
+  // ---------------------------------------------------------------------------
+  // Utils
+  // ---------------------------------------------------------------------------
+  const $ = (s, root) => (root || document).querySelector(s);
+  const $$ = (s, root) => Array.from((root || document).querySelectorAll(s));
+
+  function escapeHtml(s) {
+    if (s == null) return '';
+    const d = document.createElement('div');
+    d.textContent = String(s);
+    return d.innerHTML;
+  }
+
+  let toastTimer = null;
+  function showToast(msg, kind) {
+    const el = $('#toast');
+    el.textContent = msg;
+    el.className = 'toast show' + (kind ? ' ' + kind : '');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.className = 'toast'; }, 2200);
+  }
+
+  function debounce(fn, ms) {
+    let t = null;
+    return function (...args) {
+      if (t) clearTimeout(t);
+      t = setTimeout(() => { t = null; fn.apply(this, args); }, ms);
+    };
+  }
+
+  async function apiGet(path) {
+    const r = await fetch(path);
+    if (!r.ok) throw new Error('GET ' + path + ' → HTTP ' + r.status);
+    return r.json();
+  }
+  async function apiPost(path, body) {
+    const r = await fetch(path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: body == null ? '{}' : JSON.stringify(body),
+    });
+    if (!r.ok) throw new Error('POST ' + path + ' → HTTP ' + r.status);
+    return r.json();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Tab switching
+  // ---------------------------------------------------------------------------
+  $$('.tab').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+
+  function switchTab(name) {
+    state.activeTab = name;
+    $$('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+    $$('.panel').forEach(p => p.classList.toggle('active', p.dataset.panel === name));
+    if (name === 'trace') startTraceAutoRefresh();
+    else stopTraceAutoRefresh();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Config: load + save (debounced)
+  // ---------------------------------------------------------------------------
+  async function loadConfig() {
+    try {
+      state.config = await apiGet('/api/config');
+      hydrateAll();
+      updateStatus();
+    } catch (e) {
+      showToast('Failed to load config: ' + e.message, 'err');
+      $('#statusText').textContent = 'Config unavailable';
+    }
+  }
+
+  const saveConfigDebounced = debounce(async () => {
+    try {
+      const patch = collectConfigPatch();
+      state.config = await apiPost('/api/config', patch);
+      hydrateAll();
+      updateStatus();
+      showToast('Saved', 'ok');
+    } catch (e) {
+      showToast('Save failed: ' + e.message, 'err');
+    }
+  }, 500);
+
+  function saveConfigNow() {
+    saveConfigDebounced();
+  }
+
+  function collectConfigPatch() {
+    const c = state.config || {};
+    const patch = {
+      apiKey: $('#provApiKey').value,
+      baseURL: $('#provBaseURL').value,
+      model: $('#mModel').value || $('#provModel').value,
+      temperature: parseFloat($('#mTemp').value),
+      maxTokens: parseInt($('#mMaxTokens').value, 10),
+      contextTokenBudget: parseInt($('#mCtxBudget').value, 10),
+      workingMemoryRounds: parseInt($('#mMemRounds').value, 10),
+      maxToolRounds: parseInt($('#mMaxToolRounds').value, 10),
+      profile: c.profile,
+      sandbox: collectSandboxPatch(),
+      checkpoint: {
+        enabled: $('#cpEnabled').checked,
+        autoSaveInterval: parseInt($('#cpInterval').value, 10),
+        maxPerSession: parseInt($('#cpMax').value, 10),
+      },
+      longRunning: {
+        enabled: $('#lrEnabled').checked,
+        maxConcurrent: parseInt($('#lrConcurrent').value, 10),
+        timeoutMinutes: parseInt($('#lrTimeout').value, 10),
+      },
+      channels: collectChannelsPatch(),
+    };
+    return patch;
+  }
+
+  function collectSandboxPatch() {
+    const deny = $('#sbDeny').value.split('\n').map(s => s.trim()).filter(Boolean);
+    const safe = $('#sbSafe').value.split('\n').map(s => s.trim()).filter(Boolean);
+    return {
+      allowNetwork: $('#sbAllowNet').checked,
+      allowFilesystem: $('#sbAllowFs').checked,
+      maxTimeoutMs: parseInt($('#sbTimeout').value, 10),
+      toolAutoApprove: $('#sbApprove').value,
+      shellDenylist: deny,
+      safeTools: safe,
+    };
+  }
+
+  function collectChannelsPatch() {
+    const out = {};
+    Object.keys(state.channelTemplates || {}).forEach(name => {
+      const body = {};
+      $$('#channel-' + name + ' [data-field]').forEach(el => {
+        body[el.dataset.field] = el.value;
+      });
+      out[name] = body;
+    });
+    return out;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Hydrate UI from state.config
+  // ---------------------------------------------------------------------------
+  function hydrateAll() {
+    hydrateProvider();
+    hydrateModel();
+    hydrateProfile();
+    hydrateSandbox();
+    hydrateChannels();
+    hydrateCheckpoint();
+  }
+
+  function hydrateProvider() {
+    $('#provApiKey').value = state.config.apiKey || '';
+    $('#provBaseURL').value = state.config.baseURL || '';
+    $('#provModel').value = state.config.model || '';
+    $('#mModel').value = state.config.model || '';
+    // mark selected provider card by matching baseURL/model
+    $$('#providerCards .card').forEach(card => {
+      const p = JSON.parse(card.dataset.provider || '{}');
+      const match = p.defaultBase === state.config.baseURL ||
+        (p.name && state.config.baseURL && state.config.baseURL.toLowerCase().indexOf(p.name.toLowerCase()) !== -1);
+      card.classList.toggle('selected', !!match);
+    });
+  }
+
+  function hydrateModel() {
+    $('#mModel').value = state.config.model || '';
+    const t = state.config.temperature ?? 0.7;
+    $('#mTemp').value = t;
+    $('#mTempVal').textContent = String(Number(t).toFixed(1));
+    $('#mMaxTokens').value = state.config.maxTokens ?? '';
+    $('#mCtxBudget').value = state.config.contextTokenBudget ?? '';
+    $('#mMemRounds').value = state.config.workingMemoryRounds ?? '';
+    $('#mMaxToolRounds').value = state.config.maxToolRounds ?? '';
+  }
+
+  function hydrateProfile() {
+    $$('#profileCards .card').forEach(c => {
+      c.classList.toggle('selected', c.dataset.name === state.config.profile);
+    });
+    if (state.config.profile) loadProfileTools(state.config.profile);
+  }
+
+  function hydrateSandbox() {
+    const sb = state.config.sandbox || {};
+    $('#sbAllowNet').checked = !!sb.allowNetwork;
+    $('#sbAllowFs').checked = !!sb.allowFilesystem;
+    $('#sbTimeout').value = sb.maxTimeoutMs ?? '';
+    $('#sbApprove').value = sb.toolAutoApprove || 'safe';
+    $('#sbDeny').value = (sb.shellDenylist || []).join('\n');
+    $('#sbSafe').value = (sb.safeTools || []).join('\n');
+    // detect matching preset
+    const presets = state.sandboxPresets || {};
+    let matchedPreset = null;
+    for (const k of Object.keys(presets)) {
+      const p = presets[k];
+      if (p && p.allowNetwork === sb.allowNetwork &&
+          p.allowFilesystem === sb.allowFilesystem &&
+          p.toolAutoApprove === sb.toolAutoApprove &&
+          p.maxTimeoutMs === sb.maxTimeoutMs) {
+        matchedPreset = k;
+        break;
+      }
+    }
+    state.selectedSandboxPreset = matchedPreset;
+    $$('#sandboxPresets .card').forEach(c => {
+      c.classList.toggle('selected', c.dataset.name === matchedPreset);
+    });
+  }
+
+  function hydrateChannels() {
+    const chans = state.config.channels || {};
+    Object.keys(state.channelTemplates || {}).forEach(name => {
+      const data = chans[name] || {};
+      $$('#channel-' + name + ' [data-field]').forEach(el => {
+        if (data[el.dataset.field] != null) el.value = data[el.dataset.field];
+      });
+      // update badge
+      const filled = Object.values(data).filter(v => v && String(v).trim()).length;
+      const badge = $('#channel-' + name + '-badge');
+      if (badge) badge.textContent = filled ? filled + ' field(s) set' : 'not configured';
+    });
+  }
+
+  function hydrateCheckpoint() {
+    const cp = state.config.checkpoint || {};
+    $('#cpEnabled').checked = !!cp.enabled;
+    $('#cpInterval').value = cp.autoSaveInterval ?? '';
+    $('#cpMax').value = cp.maxPerSession ?? '';
+    const lr = state.config.longRunning || {};
+    $('#lrEnabled').checked = !!lr.enabled;
+    $('#lrConcurrent').value = lr.maxConcurrent ?? '';
+    $('#lrTimeout').value = lr.timeoutMinutes ?? '';
+  }
+
+  // ---------------------------------------------------------------------------
+  // Status indicator
+  // ---------------------------------------------------------------------------
+  function updateStatus() {
+    const c = state.config || {};
+    const hasKey = !!c.apiKey && String(c.apiKey).trim().length > 0;
+    const hasModel = !!c.model && String(c.model).trim().length > 0;
+    const hasBase = !!c.baseURL && String(c.baseURL).trim().length > 0;
+    const dot = $('#statusDot');
+    const txt = $('#statusText');
+    dot.className = 'status-dot';
+    if (hasKey && hasModel && hasBase) {
+      dot.classList.add('green');
+      txt.textContent = 'Configured · ' + (c.model || '');
+    } else if (hasKey || hasModel || hasBase) {
+      dot.classList.add('yellow');
+      txt.textContent = 'Partially configured';
+    } else {
+      dot.classList.add('red');
+      txt.textContent = 'Not configured';
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Provider tab
+  // ---------------------------------------------------------------------------
+  async function loadProviders() {
+    try {
+      state.providers = await apiGet('/api/providers');
+    } catch (e) {
+      state.providers = [];
+    }
+    renderProviderCards();
+    hydrateProvider();
+  }
+
+  function renderProviderCards() {
+    const wrap = $('#providerCards');
+    if (!state.providers || state.providers.length === 0) {
+      wrap.innerHTML = '<div class="empty">No provider presets available.</div>';
+      return;
+    }
+    wrap.innerHTML = state.providers.map(p => `
+      <div class="card" data-provider="${escapeHtml(JSON.stringify(p))}" data-name="${escapeHtml(p.name)}">
+        <div class="card-title">${escapeHtml(p.name)}</div>
+        <div class="card-desc">${escapeHtml(p.defaultBase || '')}${p.defaultModel ? ' · ' + escapeHtml(p.defaultModel) : ''}</div>
+        <div class="card-meta"><span class="tag">${escapeHtml(p.envKey || '')}</span></div>
+      </div>
+    `).join('');
+    $$('#providerCards .card').forEach(card => {
+      card.addEventListener('click', () => {
+        $$('#providerCards .card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        const p = JSON.parse(card.dataset.provider);
+        if (p.defaultBase) $('#provBaseURL').value = p.defaultBase;
+        if (p.defaultModel) {
+          $('#provModel').value = p.defaultModel;
+          $('#mModel').value = p.defaultModel;
+        }
+        saveConfigDebounced();
+      });
+    });
+  }
+
+  // Probe
+  $('#btnProbe').addEventListener('click', async () => {
+    const result = $('#probeResult');
+    const apiKey = $('#provApiKey').value.trim();
+    const baseURL = $('#provBaseURL').value.trim();
+    const model = $('#provModel').value.trim();
+    if (!apiKey || !baseURL || !model) {
+      result.className = 'probe-result show err';
+      result.textContent = '✗ apiKey, baseURL and model are all required';
+      return;
+    }
+    const btn = $('#btnProbe');
+    btn.disabled = true;
+    result.className = 'probe-result show loading';
+    result.textContent = 'Probing…';
+    try {
+      const r = await apiPost('/api/probe', { apiKey, baseURL, model });
+      if (r.ok) {
+        result.className = 'probe-result show ok';
+        result.textContent = '✓ ok · ' + (r.latencyMs ?? '?') + 'ms';
+      } else {
+        result.className = 'probe-result show err';
+        result.textContent = '✗ ' + (r.error || 'unknown error');
+      }
+    } catch (e) {
+      result.className = 'probe-result show err';
+      result.textContent = '✗ ' + e.message;
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  // Provider field autosave
+  ['provApiKey', 'provBaseURL', 'provModel'].forEach(id => {
+    $('#' + id).addEventListener('input', () => {
+      if (id === 'provModel') $('#mModel').value = $('#provModel').value;
+      saveConfigDebounced();
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Model tab
+  // ---------------------------------------------------------------------------
+  $('#mTemp').addEventListener('input', () => {
+    $('#mTempVal').textContent = String(Number($('#mTemp').value).toFixed(1));
+    saveConfigDebounced();
+  });
+  ['mModel', 'mMaxTokens', 'mCtxBudget', 'mMemRounds', 'mMaxToolRounds'].forEach(id => {
+    $('#' + id).addEventListener('input', saveConfigDebounced);
+  });
+
+  // ---------------------------------------------------------------------------
+  // Profile & Skills tab
+  // ---------------------------------------------------------------------------
+  async function loadProfiles() {
+    try { state.profiles = await apiGet('/api/profiles'); }
+    catch (e) { state.profiles = []; }
+    renderProfileCards();
+    hydrateProfile();
+  }
+
+  function renderProfileCards() {
+    const wrap = $('#profileCards');
+    if (!state.profiles || state.profiles.length === 0) {
+      wrap.innerHTML = '<div class="empty">No profiles exposed by backend.</div>';
+      return;
+    }
+    wrap.innerHTML = state.profiles.map(p => `
+      <div class="card" data-name="${escapeHtml(p.name)}">
+        <div class="card-title">${escapeHtml(p.name)}</div>
+        <div class="card-desc">${escapeHtml(p.description || '')}</div>
+        <div class="card-meta">${(p.categories || []).map(c => `<span class="tag">${escapeHtml(c)}</span>`).join('')}</div>
+      </div>
+    `).join('');
+    $$('#profileCards .card').forEach(card => {
+      card.addEventListener('click', () => {
+        $$('#profileCards .card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        state.config.profile = card.dataset.name;
+        loadProfileTools(card.dataset.name);
+        saveConfigDebounced();
+      });
+    });
+  }
+
+  async function loadProfileTools(name) {
+    const wrap = $('#profileTools');
+    wrap.innerHTML = '<div class="empty">Loading tools…</div>';
+    try {
+      const tools = await apiGet('/api/profiles/' + encodeURIComponent(name) + '/tools');
+      state.currentProfileTools = tools;
+      if (!tools || tools.length === 0) {
+        wrap.innerHTML = '<div class="empty">No tools in this profile.</div>';
+        return;
+      }
+      wrap.innerHTML = tools.map(t => `
+        <div class="list-item">
+          <div class="name">${escapeHtml(t.name)}</div>
+          ${t.description ? `<div class="desc">${escapeHtml(t.description)}</div>` : ''}
+        </div>
+      `).join('');
+    } catch (e) {
+      wrap.innerHTML = '<div class="empty">Failed to load tools: ' + escapeHtml(e.message) + '</div>';
+    }
+  }
+
+  async function loadSkills() {
+    try { state.skills = await apiGet('/api/skills'); }
+    catch (e) { state.skills = []; }
+    renderSkills();
+  }
+
+  function renderSkills() {
+    const wrap = $('#skillList');
+    if (!state.skills || state.skills.length === 0) {
+      wrap.innerHTML = '<div class="empty">No skills installed.</div>';
+      return;
+    }
+    wrap.innerHTML = state.skills.map(s => `
+      <div class="list-item">
+        <div class="row">
+          <div style="flex:1; min-width:0;">
+            <div class="name">${escapeHtml(s.name)}</div>
+            <div class="meta">${escapeHtml(s.package || '')} · ${escapeHtml(s.source || '')}${s.installedAt ? ' · ' + escapeHtml(s.installedAt) : ''}</div>
+          </div>
+          <button class="btn danger small" data-remove="${escapeHtml(s.name)}">Remove</button>
+        </div>
+      </div>
+    `).join('');
+    $$('#skillList [data-remove]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const name = btn.dataset.remove;
+        btn.disabled = true;
+        try {
+          await apiPost('/api/skills/remove', { name });
+          showToast('Removed ' + name, 'ok');
+          await loadSkills();
+        } catch (e) {
+          showToast('Remove failed: ' + e.message, 'err');
+          btn.disabled = false;
+        }
+      });
+    });
+  }
+
+  $('#btnSkillAdd').addEventListener('click', async () => {
+    const pkg = $('#skillPkg').value.trim();
+    if (!pkg) return;
+    const btn = $('#btnSkillAdd');
+    btn.disabled = true;
+    btn.textContent = 'Installing…';
+    try {
+      const r = await apiPost('/api/skills/add', { package: pkg });
+      showToast('Installed ' + pkg + (r.source ? ' (' + r.source + ')' : ''), 'ok');
+      $('#skillPkg').value = '';
+      await loadSkills();
+    } catch (e) {
+      showToast('Install failed: ' + e.message, 'err');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Install';
+    }
+  });
+
+  // ---------------------------------------------------------------------------
+  // Sandbox tab
+  // ---------------------------------------------------------------------------
+  async function loadSandboxPresets() {
+    try { state.sandboxPresets = await apiGet('/api/sandbox/presets'); }
+    catch (e) { state.sandboxPresets = {}; }
+    renderSandboxPresets();
+    hydrateSandbox();
+  }
+
+  function renderSandboxPresets() {
+    const wrap = $('#sandboxPresets');
+    const presets = state.sandboxPresets || {};
+    const names = Object.keys(presets);
+    if (names.length === 0) {
+      wrap.innerHTML = '<div class="empty">No sandbox presets available.</div>';
+      return;
+    }
+    const desc = {
+      strict: 'No network, no filesystem, no shell, approve none',
+      balanced: 'Network + filesystem ok, denylist only, approve safe',
+      permissive: 'Everything allowed, approve all',
+    };
+    wrap.innerHTML = names.map(name => {
+      const p = presets[name] || {};
+      const meta = [
+        p.allowNetwork ? 'net' : 'no-net',
+        p.allowFilesystem ? 'fs' : 'no-fs',
+        p.toolAutoApprove || '?',
+      ].join(' · ');
+      return `
+        <div class="card" data-name="${escapeHtml(name)}">
+          <div class="card-title">${escapeHtml(name)}</div>
+          <div class="card-desc">${escapeHtml(desc[name] || '')}</div>
+          <div class="card-meta"><span class="tag">${escapeHtml(meta)}</span></div>
+        </div>
+      `;
+    }).join('');
+    $$('#sandboxPresets .card').forEach(card => {
+      card.addEventListener('click', () => {
+        $$('#sandboxPresets .card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        const name = card.dataset.name;
+        const p = state.sandboxPresets[name];
+        state.selectedSandboxPreset = name;
+        if (!p) return;
+        $('#sbAllowNet').checked = !!p.allowNetwork;
+        $('#sbAllowFs').checked = !!p.allowFilesystem;
+        $('#sbTimeout').value = p.maxTimeoutMs ?? '';
+        $('#sbApprove').value = p.toolAutoApprove || 'safe';
+        $('#sbDeny').value = (p.shellDenylist || []).join('\n');
+        $('#sbSafe').value = (p.safeTools || []).join('\n');
+        saveConfigDebounced();
+      });
+    });
+  }
+
+  ['sbAllowNet', 'sbAllowFs', 'sbApprove', 'sbTimeout', 'sbDeny', 'sbSafe'].forEach(id => {
+    const el = $('#' + id);
+    el.addEventListener('input', () => {
+      state.selectedSandboxPreset = null;
+      $$('#sandboxPresets .card').forEach(c => c.classList.remove('selected'));
+      saveConfigDebounced();
+    });
+    el.addEventListener('change', () => {
+      state.selectedSandboxPreset = null;
+      $$('#sandboxPresets .card').forEach(c => c.classList.remove('selected'));
+      saveConfigDebounced();
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Channels tab
+  // ---------------------------------------------------------------------------
+  async function loadChannelTemplates() {
+    try { state.channelTemplates = await apiGet('/api/channels/templates'); }
+    catch (e) { state.channelTemplates = {}; }
+    renderChannels();
+    hydrateChannels();
+  }
+
+  function renderChannels() {
+    const wrap = $('#channelList');
+    const names = Object.keys(state.channelTemplates || {});
+    if (names.length === 0) {
+      wrap.innerHTML = '<div class="empty">No channel templates available.</div>';
+      return;
+    }
+    wrap.innerHTML = names.map(name => {
+      const tpl = state.channelTemplates[name] || {};
+      const fields = Object.keys(tpl);
+      const fieldHtml = fields.map(f => `
+        <div class="field">
+          <label for="ch-${escapeHtml(name)}-${escapeHtml(f)}">${escapeHtml(f)}</label>
+          <input class="input mono" id="ch-${escapeHtml(name)}-${escapeHtml(f)}" data-field="${escapeHtml(f)}" type="${f.toLowerCase().indexOf('secret') !== -1 || f.toLowerCase().indexOf('token') !== -1 || f.toLowerCase().indexOf('key') !== -1 ? 'password' : 'text'}" value="${escapeHtml(tpl[f] || '')}" autocomplete="off">
+        </div>
+      `).join('');
+      return `
+        <details class="collapsible" id="channel-${escapeHtml(name)}">
+          <summary>
+            <span>${escapeHtml(name)}</span>
+            <span class="badge" id="channel-${escapeHtml(name)}-badge">not configured</span>
+          </summary>
+          <div class="body">
+            <div class="form-grid">${fieldHtml}</div>
+          </div>
+        </details>
+      `;
+    }).join('');
+    // wire autosave
+    names.forEach(name => {
+      $$('#channel-' + name + ' [data-field]').forEach(el => {
+        el.addEventListener('input', () => {
+          hydrateChannels();
+          saveConfigDebounced();
+        });
+      });
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // Checkpoint tab
+  // ---------------------------------------------------------------------------
+  ['cpEnabled', 'cpInterval', 'cpMax', 'lrEnabled', 'lrConcurrent', 'lrTimeout'].forEach(id => {
+    $('#' + id).addEventListener('input', saveConfigDebounced);
+    $('#' + id).addEventListener('change', saveConfigDebounced);
+  });
+
+  // ---------------------------------------------------------------------------
+  // Chat tab
+  // ---------------------------------------------------------------------------
+  const chatInput = $('#chatInput');
+  const chatSendBtn = $('#btnChatSend');
+  const chatMessagesEl = $('#chatMessages');
+
+  function autoResizeChat() {
+    chatInput.style.height = 'auto';
+    chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+  }
+  chatInput.addEventListener('input', autoResizeChat);
+  chatInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendChat();
+    }
+  });
+  chatSendBtn.addEventListener('click', sendChat);
+
+  function appendChatMsg(role, text, opts) {
+    $('#chatEmpty')?.remove();
+    const div = document.createElement('div');
+    div.className = 'chat-msg ' + role;
+    const roleLabel = role === 'user' ? 'you' : 'assistant';
+    const toolCallsHtml = (opts && opts.toolCalls && opts.toolCalls.length)
+      ? `<div class="toolcalls" data-toggle>toolCalls: ${opts.toolCalls.length} ▾</div>
+         <div class="toolcalls-list">${escapeHtml(opts.toolCalls.map(t => (typeof t === 'string' ? t : JSON.stringify(t))).join('\n'))}</div>`
+      : '';
+    div.innerHTML = `
+      <div class="role">${roleLabel}</div>
+      <div class="bubble">${escapeHtml(text)}</div>
+      ${toolCallsHtml}
+    `;
+    chatMessagesEl.appendChild(div);
+    const toggle = div.querySelector('[data-toggle]');
+    if (toggle) {
+      toggle.addEventListener('click', () => {
+        toggle.classList.toggle('open');
+      });
+    }
+    chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+    return div;
+  }
+
+  async function sendChat() {
+    const text = chatInput.value.trim();
+    if (!text || state.chatBusy) return;
+    state.chatBusy = true;
+    chatSendBtn.disabled = true;
+    chatInput.value = '';
+    autoResizeChat();
+
+    appendChatMsg('user', text);
+    const thinking = document.createElement('div');
+    thinking.className = 'chat-msg assistant';
+    thinking.innerHTML = `<div class="role">assistant</div><div class="bubble"><span class="chat-thinking">thinking<span class="dots"><span>.</span><span>.</span><span>.</span></span></span></div>`;
+    chatMessagesEl.appendChild(thinking);
+    chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+
+    try {
+      const r = await apiPost('/api/chat', {
+        text,
+        sessionId: state.chatSessionId,
+        userId: 'dashboard',
+      });
+      if (r.sessionId) state.chatSessionId = r.sessionId;
+      thinking.remove();
+      appendChatMsg('assistant', r.reply || '(empty reply)', {
+        toolCalls: r.toolCalls || [],
+      });
+      $('#statRounds').textContent = String(r.rounds ?? 0);
+      $('#statToolCalls').textContent = String((r.toolCalls || []).length);
+      $('#statCtx').textContent = String(r.contextTokens ?? 0);
+      $('#statRecovered').style.display = r.recovered ? 'inline' : 'none';
+    } catch (e) {
+      thinking.remove();
+      appendChatMsg('assistant', '⚠️ ' + e.message);
+    } finally {
+      state.chatBusy = false;
+      chatSendBtn.disabled = false;
+      chatInput.focus();
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Trace tab
+  // ---------------------------------------------------------------------------
+  async function loadTrace() {
+    try {
+      const [stats, spans] = await Promise.all([apiGet('/api/trace/stats'), apiGet('/api/trace')]);
+      state.traceStats = stats || {};
+      state.traces = spans || [];
+      renderTraceStats();
+      renderTraceTimeline();
+    } catch (e) {
+      $('#traceStats').innerHTML = '<div class="empty">Failed to load trace: ' + escapeHtml(e.message) + '</div>';
+    }
+  }
+
+  function renderTraceStats() {
+    const wrap = $('#traceStats');
+    const stats = state.traceStats || {};
+    const keys = Object.keys(stats);
+    if (keys.length === 0) {
+      wrap.innerHTML = '<div class="empty">No stats yet.</div>';
+      return;
+    }
+    wrap.innerHTML = keys.map(k => {
+      const s = stats[k] || {};
+      return `
+        <div class="trace-stat">
+          <div class="kind">${escapeHtml(k)}</div>
+          <div class="nums">
+            <span>count: <strong>${escapeHtml(String(s.count ?? 0))}</strong></span>
+            <span>avg: <strong>${escapeHtml(String(s.avgMs ?? 0))}ms</strong></span>
+            <span style="color:var(--red);">errors: <strong>${escapeHtml(String(s.errors ?? 0))}</strong></span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderTraceTimeline() {
+    const wrap = $('#traceTimeline');
+    const spans = state.traces || [];
+    if (spans.length === 0) {
+      wrap.innerHTML = `
+        <div class="trace-row header">
+          <div>name</div><div>kind</div><div>dur</div><div>error</div><div>st</div>
+        </div>
+        <div class="empty">No spans recorded.</div>
+      `;
+      return;
+    }
+    const rows = spans.map(s => {
+      const start = s.startedAt ? new Date(s.startedAt) : null;
+      const end = s.endedAt ? new Date(s.endedAt) : null;
+      let dur = '';
+      if (start && end) {
+        dur = (end.getTime() - start.getTime()) + 'ms';
+      }
+      const ok = !s.error && s.status !== 'error';
+      const statusMark = ok ? '✓' : '✗';
+      return `
+        <div class="trace-row">
+          <div class="name">${escapeHtml(s.name || '')}</div>
+          <div class="kind">${escapeHtml(s.kind || '')}</div>
+          <div class="dur">${escapeHtml(dur)}</div>
+          <div class="err">${escapeHtml(s.error || '')}</div>
+          <div class="status ${ok ? 'ok' : 'err'}">${statusMark}</div>
+        </div>
+      `;
+    }).join('');
+    wrap.innerHTML = `
+      <div class="trace-row header">
+        <div>name</div><div>kind</div><div>dur</div><div>error</div><div>st</div>
+      </div>
+      ${rows}
+    `;
+  }
+
+  function startTraceAutoRefresh() {
+    stopTraceAutoRefresh();
+    $('#traceAuto').textContent = 'auto-refresh: on (2s)';
+    state.traceTimer = setInterval(loadTrace, 2000);
+  }
+  function stopTraceAutoRefresh() {
+    if (state.traceTimer) {
+      clearInterval(state.traceTimer);
+      state.traceTimer = null;
+    }
+  }
+
+  $('#btnTraceRefresh').addEventListener('click', loadTrace);
+  $('#btnTraceClear').addEventListener('click', async () => {
+    try {
+      await apiPost('/api/trace/clear');
+      await loadTrace();
+      showToast('Trace cleared', 'ok');
+    } catch (e) {
+      showToast('Clear failed: ' + e.message, 'err');
+    }
+  });
+
+  // ---------------------------------------------------------------------------
+  // Top bar buttons
+  // ---------------------------------------------------------------------------
+  $('#btnSaveAll').addEventListener('click', () => {
+    saveConfigNow();
+    showToast('Saving…', 'ok');
+  });
+
+  $('#btnReset').addEventListener('click', async () => {
+    if (!confirm('Reset config to template? This cannot be undone.')) return;
+    try {
+      state.config = await apiPost('/api/config/reset');
+      hydrateAll();
+      updateStatus();
+      showToast('Config reset', 'ok');
+    } catch (e) {
+      showToast('Reset failed: ' + e.message, 'err');
+    }
+  });
+
+  // ---------------------------------------------------------------------------
+  // Init
+  // ---------------------------------------------------------------------------
+  async function init() {
+    // Parallel load — config is the critical one
+    await Promise.all([
+      loadConfig(),
+      loadProviders(),
+      loadProfiles(),
+      loadSkills(),
+      loadSandboxPresets(),
+      loadChannelTemplates(),
+      loadTrace(),
+    ]);
+    updateStatus();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
