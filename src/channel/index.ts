@@ -1,5 +1,6 @@
 /**
- * Channel trait 实现：CLI, HTTP, Discord, Slack
+ * Channel trait 实现：CLI, HTTP, Discord, Slack, Telegram, 飞书, 微信, GitHub,
+ * WhatsApp, Signal, Email, SMS, Matrix, Mattermost, 钉钉, 企业微信
  *
  * 设计（调研 §四 ZeroClaw trait 驱动）：
  * - 单一 Channel 接口，加新通道只需实现 start/reply/stop
@@ -7,10 +8,30 @@
  * - HTTP：单端点 POST，无框架依赖（减重）
  * - Discord：Gateway WebSocket (zero discord.js dependency)
  * - Slack：Events API HTTP POST (zero @slack/bolt dependency)
+ * - Telegram/飞书/微信：WebhookChannel 基类复用
+ * - WhatsApp/SMS：Meta/Twilio 云 API + webhook
+ * - Signal：signal-cli-rest-api 本地部署轮询
+ * - Email：net 模块实现最小 IMAP/SMTP 客户端
+ * - Matrix/Mattermost：Client-Server API + WebSocket
+ * - 钉钉/企业微信：国内 IM 加签 + AES 加解密
  */
 
 export { DiscordChannel } from "./discord.js";
 export { SlackChannel } from "./slack.js";
+export { TelegramChannel } from "./telegram.js";
+export { FeishuChannel } from "./feishu.js";
+export { WeChatChannel } from "./wechat.js";
+export { GitHubChannel } from "./github.js";
+export { WhatsAppChannel } from "./whatsapp.js";
+export { SignalChannel } from "./signal.js";
+export { EmailChannel } from "./email.js";
+export { SmsChannel } from "./sms.js";
+export { MatrixChannel } from "./matrix.js";
+export { MattermostChannel } from "./mattermost.js";
+export { DingTalkChannel } from "./dingtalk.js";
+export { WeComChannel } from "./wecom.js";
+export { WebhookChannel } from "./webhook.js";
+export type { WebhookChannelOptions, ParsedEvent } from "./webhook.js";
 
 import readline from "node:readline";
 import http from "node:http";

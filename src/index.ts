@@ -42,6 +42,24 @@ export { WeChatChannel } from "./channel/wechat.js";
 export type { WeChatChannelOptions } from "./channel/wechat.js";
 export { TelegramChannel } from "./channel/telegram.js";
 export type { TelegramChannelOptions } from "./channel/telegram.js";
+export { WhatsAppChannel } from "./channel/whatsapp.js";
+export type { WhatsAppChannelOptions } from "./channel/whatsapp.js";
+export { SignalChannel } from "./channel/signal.js";
+export type { SignalChannelOptions } from "./channel/signal.js";
+export { EmailChannel } from "./channel/email.js";
+export type { EmailChannelOptions } from "./channel/email.js";
+export { SmsChannel } from "./channel/sms.js";
+export type { SmsChannelOptions } from "./channel/sms.js";
+export { MatrixChannel } from "./channel/matrix.js";
+export type { MatrixChannelOptions } from "./channel/matrix.js";
+export { MattermostChannel } from "./channel/mattermost.js";
+export type { MattermostChannelOptions } from "./channel/mattermost.js";
+export { DingTalkChannel } from "./channel/dingtalk.js";
+export type { DingTalkChannelOptions } from "./channel/dingtalk.js";
+export { WeComChannel } from "./channel/wecom.js";
+export type { WeComChannelOptions } from "./channel/wecom.js";
+export { RelayRouter } from "./channel/relay.js";
+export type { RelayRule, RelayConfig, RelayRouteResult, RelayableChannel } from "./channel/relay.js";
 
 // skills
 export { SqliteSkillStore } from "./skills/store.js";
@@ -53,6 +71,8 @@ export type { SoulSpec } from "./soul/index.js";
 // env
 export { collectEnv, renderEnv, fullScope, lightweightScope, readOnlyScope } from "./env/index.js";
 export type { CollectEnvOptions } from "./env/index.js";
+export { EnvManager } from "./env/manager.js";
+export type { EnvVar, EnvManagerOptions } from "./env/manager.js";
 
 // auth
 export { AuthError, canUseTool, canUseModel, canReadDomain, filterTools, filterSandboxGlobals, pickModel, sandboxTierSatisfies } from "./auth/scope.js";
@@ -82,6 +102,8 @@ export type { BrowserUseOptions } from "./tools/browser_use.js";
 export { DataAnalyzeTool, CsvReadTool } from "./tools/data.js";
 export { TestRunTool, TestAssertTool } from "./tools/test.js";
 export { ComputerUseTool } from "./tools/computer.js";
+export { ComputerService } from "./tools/computer_service.js";
+export type { ScreenshotResult, ClickOptions, TypeOptions, KeyCombo, WindowInfo, ComputerServiceOptions, HistoryEntry } from "./tools/computer_service.js";
 
 // 场景裁剪：按 profile 选工具集，可定制不是大杂烩
 export { PROFILES, toolsForProfile, toolsByCategory, listProfiles, recommendProfile, generateTrimSop } from "./core/profiles.js";
@@ -119,6 +141,12 @@ export type { AnthropicProviderOptions, GeminiProviderOptions, OllamaProviderOpt
 export { MoARouter } from "./provider/router.js";
 export type { TaskComplexity, RouterConfig, RouteResult } from "./provider/router.js";
 
+// Agent Team：MoA 与多智能体协作
+export { AgentTeam } from "./team/index.js";
+export type { TeamMode, TeamConfig, TeamRunResult, TeamStep, AgentFactory } from "./team/index.js";
+// 注意：team/index.js 的 TeamMember 与 workflows.js 的 TeamMember 不同，
+// 需要时请直接 import type { TeamMember } from "./team/index.js"
+
 // sandbox policy
 export { DEFAULT_POLICY, isCommandAllowed, toolNeedsApproval, policyFromEnv, presetPolicy } from "./sandbox/policy.js";
 export type { SandboxPolicy } from "./sandbox/policy.js";
@@ -149,6 +177,10 @@ export { SkillDiscoverer } from "./skills/discover.js";
 export type { RunObservation } from "./skills/discover.js";
 export { scoreSkill, shouldSediment, SEDIMENT_THRESHOLD } from "./skills/score.js";
 export type { ScoreInput } from "./skills/score.js";
+
+// skills installer（npm/GitHub/本地/URL 多来源 skill 安装器）
+export { SkillInstaller } from "./skills/installer.js";
+export type { SkillManifest, InstallResult, SkillInstallerOptions, SkillSource } from "./skills/installer.js";
 
 // core extensions
 export { SubAgentTool } from "./core/subagent.js";

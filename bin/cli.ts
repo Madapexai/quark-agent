@@ -34,7 +34,7 @@ Usage:
   quark-agent chat                         Interactive CLI
   quark-agent ask "<question>"             One-shot Q&A
   quark-agent serve [--port 8787]          Start HTTP channel
-  quark-agent setup [--non-interactive]    First-run setup wizard
+  quark-agent setup [--sort=price|efficient] [--non-interactive]    First-run setup wizard
   quark-agent dashboard [--port 8788]      Start webui config center
   quark-agent add <package>               Install a plugin/skill
   quark-agent list                        List installed plugins
@@ -373,6 +373,8 @@ Supported providers:
   - Gemini       → GEMINI_API_KEY + https://generativelanguage.googleapis.com/v1beta
   - Ollama       → No key needed (local) + http://127.0.0.1:11434
   - OpenRouter   → OPENROUTER_API_KEY + https://openrouter.ai/api/v1
+
+Or run \`quark-agent setup --sort price\` to pick by cost, or \`--sort efficient\` for SOTA.
 `);
 }
 
@@ -381,6 +383,8 @@ const PROVIDER_CHOICES = [
   { name: "Agnes AI (free)", envKey: "AGNES_API_KEY", defaultBase: "https://apihub.agnes-ai.com/v1", defaultModel: "agnes-2.0-flash" },
   { name: "Volcengine Ark (paid, cheap)", envKey: "ARK_API_KEY", defaultBase: "https://ark.cn-beijing.volces.com/api/coding/v3", defaultModel: "doubao-seed-code" },
   { name: "DeepSeek (paid, cheap)", envKey: "DEEPSEEK_API_KEY", defaultBase: "https://api.deepseek.com/v1", defaultModel: "deepseek-chat" },
+  { name: "Kimi / Moonshot", envKey: "MOONSHOT_API_KEY", defaultBase: "https://api.moonshot.cn/v1", defaultModel: "kimi-k2" },
+  { name: "Qwen / Aliyun", envKey: "DASHSCOPE_API_KEY", defaultBase: "https://dashscope.aliyuncs.com/compatible-mode/v1", defaultModel: "qwen-max" },
   { name: "OpenAI", envKey: "OPENAI_API_KEY", defaultBase: "https://api.openai.com/v1", defaultModel: "gpt-4o-mini" },
   { name: "Anthropic", envKey: "ANTHROPIC_API_KEY", defaultBase: "https://api.anthropic.com/v1", defaultModel: "claude-sonnet-4-5-20250929" },
   { name: "Gemini", envKey: "GEMINI_API_KEY", defaultBase: "https://generativelanguage.googleapis.com/v1beta", defaultModel: "gemini-1.5-flash" },
@@ -398,6 +402,8 @@ const SANDBOX_CHOICES = [
 
 async function runSetup(setupArgs: string[]): Promise<void> {
   const nonInteractive = setupArgs.includes("--non-interactive");
+  const sortArg = setupArgs.find(a => a.startsWith("--sort="))?.split("=")[1];
+  const sortMode = (sortArg === "price" || sortArg === "efficient") ? sortArg : null;
 
   if (nonInteractive) {
     runSetupNonInteractive();
@@ -411,15 +417,59 @@ async function runSetup(setupArgs: string[]): Promise<void> {
   try {
     console.log("\n🚀 quark-agent Setup Wizard\n");
 
-    // 1. Provider
-    console.log("Which LLM provider would you like to use?\n");
-    for (let i = 0; i < PROVIDER_CHOICES.length; i++) {
-      console.log(`  ${i + 1}. ${PROVIDER_CHOICES[i].name}`);
+    // 0. 优先策略：price / efficient / manual
+    let mode: "price" | "efficient" | "manual" = "manual";
+    if (sortMode) {
+      mode = sortMode;
+      console.log(`🎯 已指定模式: ${sortMode}\n`);
+    } else {
+      console.log("你更看重什么？\n");
+      console.log("  1. 💰 价格优先 — 优先免费/便宜模型（GLM-Flash 免费，DeepSeek $0.27/M）");
+      console.log("  2. ⭐ 效果优先 — 优先 SOTA 模型（GPT-5, Claude Opus 4.5, GLM-5）");
+      console.log("  3. 🛠  手动选择 — 列出所有 provider 让我挑");
+      const modeChoice = await rl.question("\nEnter choice (1-3) [3]: ");
+      if (modeChoice.trim() === "1") mode = "price";
+      else if (modeChoice.trim() === "2") mode = "efficient";
+      else mode = "manual";
+      console.log("");
     }
-    const providerIdx = await rl.question(`\nEnter choice (1-${PROVIDER_CHOICES.length}): `);
-    const pIdx = Math.max(0, Math.min(PROVIDER_CHOICES.length - 1, parseInt(providerIdx, 10) - 1));
-    const provider = PROVIDER_CHOICES[pIdx];
-    console.log(`  → Selected: ${provider.name}\n`);
+
+    // 1. Provider
+    let provider: { name: string; envKey: string; defaultBase: string; defaultModel: string };
+
+    if (mode === "price" || mode === "efficient") {
+      // 用 catalog 推荐
+      const { recommendByPrice, recommendByQuality, findProvider } = await import("../src/provider/catalog.js");
+      const recs = mode === "price" ? recommendByPrice() : recommendByQuality();
+      console.log(`📊 推荐组合（${mode === "price" ? "便宜优先" : "效果优先"}）：\n`);
+      for (let i = 0; i < recs.length; i++) {
+        const r = recs[i];
+        const p = findProvider(r.providerId);
+        console.log(`  ${i + 1}. ${p?.name || r.providerId} / ${r.modelId}`);
+        console.log(`     ${r.reason}`);
+      }
+      const idx = await rl.question(`\nEnter choice (1-${recs.length}) [1]: `);
+      const i = Math.max(0, Math.min(recs.length - 1, (parseInt(idx, 10) || 1) - 1));
+      const rec = recs[i];
+      const p = findProvider(rec.providerId)!;
+      provider = {
+        name: p.name,
+        envKey: p.envKey,
+        defaultBase: p.defaultBase,
+        defaultModel: rec.modelId,
+      };
+      console.log(`  → Selected: ${provider.name} / ${provider.defaultModel}\n`);
+    } else {
+      // 手动选择
+      console.log("Which LLM provider would you like to use?\n");
+      for (let i = 0; i < PROVIDER_CHOICES.length; i++) {
+        console.log(`  ${i + 1}. ${PROVIDER_CHOICES[i].name}`);
+      }
+      const providerIdx = await rl.question(`\nEnter choice (1-${PROVIDER_CHOICES.length}): `);
+      const pIdx = Math.max(0, Math.min(PROVIDER_CHOICES.length - 1, parseInt(providerIdx, 10) - 1));
+      provider = PROVIDER_CHOICES[pIdx];
+      console.log(`  → Selected: ${provider.name}\n`);
+    }
 
     // 2. API Key
     let apiKeyValue = "";

@@ -159,6 +159,11 @@ body {
 .btn.danger:hover { background: var(--red-bg); }
 .btn.small { padding: 4px 10px; font-size: 12px; }
 .btn.icon { padding: 6px; }
+.btn.active {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
 
 /* Tabs */
 .tabs {
@@ -284,6 +289,11 @@ body {
   color: var(--text-secondary);
   font-family: var(--font-mono);
 }
+.tag.green { background: var(--green-bg); color: var(--green); }
+.tag.blue { background: var(--blue-bg); color: var(--blue); }
+.tag.orange { background: var(--orange-bg); color: var(--orange); }
+.tag.red { background: var(--red-bg); color: var(--red); }
+.tag.purple { background: var(--yellow-bg); color: var(--purple); }
 
 /* Form */
 .form-grid {
@@ -516,7 +526,7 @@ body {
 }
 .collapsible > summary::-webkit-details-marker { display: none; }
 .collapsible > summary::before {
-  content: '▶';
+  content: '\25B6';
   font-size: 10px;
   color: var(--text-tertiary);
   transition: transform 200ms;
@@ -751,6 +761,286 @@ body {
 .toast.ok { border-color: var(--green); color: var(--green); }
 .toast.err { border-color: var(--red); color: var(--red); }
 
+/* Sort mode buttons */
+.sort-modes {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.sort-modes .btn { font-size: 12px; padding: 6px 12px; }
+
+/* Recommend card */
+.recommend-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  background: var(--bg-secondary);
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+}
+.recommend-card:hover { border-color: var(--text-tertiary); background: var(--bg-hover); }
+.recommend-card .rc-provider { font-size: 12px; color: var(--text-secondary); margin-bottom: 2px; }
+.recommend-card .rc-model { font-size: 14px; font-weight: 600; margin-bottom: 6px; font-family: var(--font-mono); }
+.recommend-card .rc-price { font-size: 12px; color: var(--text-secondary); }
+.recommend-card .rc-score { font-size: 11px; color: var(--text-tertiary); margin-top: 4px; }
+
+/* Env tab */
+.env-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.env-table th {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+.env-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: middle;
+}
+.env-table .key-cell { font-family: var(--font-mono); font-weight: 500; }
+.env-table .val-cell { font-family: var(--font-mono); max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.env-table .actions { white-space: nowrap; }
+.env-recommend-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.env-recommend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+.env-recommend-item .btn { padding: 2px 8px; font-size: 11px; }
+
+/* Team tab */
+.team-modes {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.team-modes label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  transition: var(--transition);
+}
+.team-modes label:has(input:checked) {
+  border-color: var(--blue);
+  background: var(--blue-bg);
+  color: var(--blue);
+}
+.member-list {
+  margin-bottom: 16px;
+}
+.member-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 100px 1fr 1fr 60px;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  background: var(--bg-primary);
+  margin-bottom: 6px;
+  font-size: 12px;
+  align-items: center;
+}
+.member-row .mono { font-family: var(--font-mono); font-weight: 500; }
+.member-form {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  background: var(--bg-secondary);
+  margin-bottom: 16px;
+}
+.timeline {
+  border-left: 2px solid var(--border);
+  padding-left: 20px;
+  margin-top: 12px;
+}
+.timeline-step {
+  position: relative;
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  background: var(--bg-primary);
+}
+.timeline-step::before {
+  content: '';
+  position: absolute;
+  left: -26px;
+  top: 14px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--blue);
+  border: 2px solid var(--bg-primary);
+}
+.timeline-step .ts-header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+.timeline-step .ts-header .ts-id { font-family: var(--font-mono); font-weight: 600; color: var(--blue); }
+.timeline-step .ts-header .ts-role { color: var(--text-secondary); }
+.timeline-step .ts-header .ts-ms { margin-left: auto; color: var(--text-tertiary); font-family: var(--font-mono); font-size: 11px; }
+.timeline-step .ts-body { font-size: 12px; color: var(--text-secondary); }
+.timeline-step .ts-body pre { white-space: pre-wrap; word-break: break-word; font-family: var(--font-mono); font-size: 11px; max-height: 120px; overflow: auto; }
+.candidates-panel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-top: 12px;
+  overflow: hidden;
+}
+.candidates-panel summary {
+  padding: 10px 14px;
+  font-weight: 500;
+  font-size: 13px;
+  cursor: pointer;
+  background: var(--bg-secondary);
+}
+.candidate-item {
+  padding: 8px 12px;
+  border-top: 1px solid var(--border-light);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Computer Use tab */
+.screenshot-area {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  padding: 12px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+.screenshot-area img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+  cursor: crosshair;
+}
+.ctrl-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.ctrl-panel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  background: var(--bg-secondary);
+}
+.ctrl-panel .pane-title { margin-bottom: 10px; }
+.ctrl-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.ctrl-row:last-child { margin-bottom: 0; }
+.ctrl-row label { font-size: 12px; min-width: 40px; color: var(--text-secondary); }
+.ctrl-row .input { flex: 1; }
+.window-list { margin-bottom: 16px; }
+.window-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  background: var(--bg-primary);
+  margin-bottom: 6px;
+  font-size: 12px;
+  align-items: center;
+}
+.window-item .wi-title { font-weight: 500; }
+.window-item .wi-app { color: var(--text-secondary); font-family: var(--font-mono); }
+.window-item .wi-focused { color: var(--green); font-weight: 600; font-size: 11px; }
+
+/* Relay tab */
+.rule-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.rule-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  background: var(--bg-secondary);
+}
+.rule-card .rc-id { font-family: var(--font-mono); font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+.rule-card .rc-route { font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; }
+.rule-card .rc-route .arrow { color: var(--blue); font-weight: 600; }
+.rule-card .rc-filters { font-size: 11px; color: var(--text-tertiary); margin-bottom: 8px; font-family: var(--font-mono); }
+.rule-card .rc-actions { display: flex; gap: 6px; align-items: center; }
+.rule-form {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  background: var(--bg-secondary);
+  margin-bottom: 16px;
+}
+.rule-form .form-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.test-area {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  background: var(--bg-secondary);
+}
+.test-result {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-family: var(--font-mono);
+  display: none;
+}
+.test-result.show { display: block; }
+.test-result.forwarded { background: var(--green-bg); color: var(--green); border: 1px solid var(--green); }
+.test-result.skipped { background: var(--orange-bg); color: var(--orange); border: 1px solid var(--orange); }
+
+/* Inline editing */
+.inline-edit {
+  border: 1px solid var(--blue);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  background: var(--bg-primary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-primary);
+  outline: none;
+  width: 100%;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -767,6 +1057,9 @@ body {
   .form-grid { grid-template-columns: 1fr; }
   .trace-row { grid-template-columns: 1fr 60px 30px; }
   .trace-row .kind, .trace-row .err { display: none; }
+  .ctrl-grid { grid-template-columns: 1fr; }
+  .member-row { grid-template-columns: 1fr; }
+  .rule-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -776,7 +1069,7 @@ body {
     <h1>quark-agent dashboard</h1>
     <div class="status-pill">
       <span class="status-dot" id="statusDot"></span>
-      <span id="statusText">Loading…</span>
+      <span id="statusText">Loading...</span>
     </div>
     <div class="spacer"></div>
     <button class="btn" id="btnReset" title="Reset config to template">Reset</button>
@@ -790,7 +1083,11 @@ body {
     <button class="tab" data-tab="sandbox">Sandbox</button>
     <button class="tab" data-tab="channels">Channels</button>
     <button class="tab" data-tab="checkpoint">Checkpoint</button>
+    <button class="tab" data-tab="env">Env</button>
+    <button class="tab" data-tab="team">Team</button>
     <button class="tab" data-tab="chat">Chat</button>
+    <button class="tab" data-tab="computer">Computer Use</button>
+    <button class="tab" data-tab="relay">Relay</button>
     <button class="tab" data-tab="trace">Trace</button>
   </nav>
 
@@ -801,7 +1098,21 @@ body {
       <div class="panel-title">Provider</div>
       <div class="panel-subtitle">Pick a provider preset, fill credentials, probe, then auto-save.</div>
 
-      <div class="section">
+      <!-- 排序模式切换 -->
+      <div class="sort-modes" id="providerSortModes">
+        <button class="btn active" data-mode="manual" id="sortManual">🛠 Manual</button>
+        <button class="btn" data-mode="price" id="sortPrice">💰 Price</button>
+        <button class="btn" data-mode="efficient" id="sortEfficient">⭐ Efficient</button>
+      </div>
+
+      <!-- 推荐卡片区域 -->
+      <div class="section" id="recommendSection" style="display:none;">
+        <div class="section-title" id="recommendTitle">Recommendations</div>
+        <div class="card-grid cols-3" id="recommendCards"></div>
+      </div>
+
+      <!-- 手动选择区域 -->
+      <div class="section" id="manualSection">
         <div class="section-title">Provider preset</div>
         <div class="card-grid cols-3" id="providerCards"></div>
       </div>
@@ -889,7 +1200,7 @@ body {
 
       <div class="section">
         <div class="section-title">Installed skills</div>
-        <div id="skillList"><div class="empty">Loading skills…</div></div>
+        <div id="skillList"><div class="empty">Loading skills...</div></div>
         <div style="margin-top:12px; display:flex; gap:8px; align-items:center;">
           <input class="input mono" id="skillPkg" type="text" placeholder="package name, e.g. lodash or @scope/pkg" style="flex:1;">
           <button class="btn primary" id="btnSkillAdd">Install</button>
@@ -1016,6 +1327,124 @@ body {
       </div>
     </section>
 
+    <!-- ============ Env ============ -->
+    <section class="panel" data-panel="env">
+      <div class="panel-title">Environment Variables</div>
+      <div class="panel-subtitle">Manage runtime environment variables. Sensitive values are masked by default.</div>
+
+      <div class="section">
+        <div class="section-title">Recommended</div>
+        <div class="env-recommend-list" id="envRecommendList"><div class="empty">Loading...</div></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Add variable</div>
+        <div class="form-grid" style="grid-template-columns: 1fr 1fr auto;">
+          <div class="field">
+            <label for="envNewKey">Key</label>
+            <input class="input mono" id="envNewKey" type="text" placeholder="API_KEY">
+          </div>
+          <div class="field">
+            <label for="envNewVal">Value</label>
+            <input class="input mono" id="envNewVal" type="password" placeholder="secret value" autocomplete="off">
+          </div>
+          <div style="align-self: end;">
+            <button class="btn primary" id="btnEnvSet">Set</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Variables</div>
+        <div style="overflow-x: auto;">
+          <table class="env-table" id="envTable">
+            <thead>
+              <tr><th>Key</th><th>Value</th><th>Source</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="envTableBody"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Team ============ -->
+    <section class="panel" data-panel="team">
+      <div class="panel-title">Agent Team</div>
+      <div class="panel-subtitle">Configure multi-agent teams. Pick a mode, define members, and run collaborative tasks.</div>
+
+      <div class="section">
+        <div class="section-title">Mode</div>
+        <div class="team-modes" id="teamModes">
+          <label><input type="radio" name="teamMode" value="sequential" checked> Sequential</label>
+          <label><input type="radio" name="teamMode" value="moa"> MoA</label>
+          <label><input type="radio" name="teamMode" value="orchestrator"> Orchestrator</label>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Presets</div>
+        <div class="card-grid cols-3" id="teamPresets"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Members</div>
+        <div class="member-list" id="memberList"><div class="empty">No members. Add one below or load a preset.</div></div>
+        <button class="btn" id="btnTeamAddMember">+ Add Member</button>
+        <div class="member-form" id="memberForm" style="display:none;">
+          <div class="form-grid">
+            <div class="field"><label>ID</label><input class="input mono" id="mfId" type="text" placeholder="agent-1"></div>
+            <div class="field"><label>Name</label><input class="input" id="mfName" type="text" placeholder="Researcher"></div>
+            <div class="field"><label>Role</label>
+              <select class="select" id="mfRole">
+                <option value="researcher">researcher</option>
+                <option value="coder">coder</option>
+                <option value="reviewer">reviewer</option>
+                <option value="planner">planner</option>
+                <option value="executor">executor</option>
+                <option value="critic">critic</option>
+              </select>
+            </div>
+            <div class="field"><label>System Prompt</label><input class="input" id="mfPrompt" type="text" placeholder="You are a helpful..."></div>
+            <div class="field"><label>Model</label><input class="input mono" id="mfModel" type="text" placeholder="gpt-4o-mini"></div>
+            <div class="field"><label>Provider</label><input class="input mono" id="mfProvider" type="text" placeholder="openai"></div>
+            <div class="field full"><label>Expertise <span class="hint">(comma-separated)</span></label><input class="input" id="mfExpertise" type="text" placeholder="coding, debugging"></div>
+          </div>
+          <div style="margin-top:12px; display:flex; gap:8px;">
+            <button class="btn primary" id="btnMemberSave">Save Member</button>
+            <button class="btn" id="btnMemberCancel">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Task</div>
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+          <textarea class="textarea" id="teamInput" placeholder="Enter the task for the team..." rows="3" style="flex:1;"></textarea>
+        </div>
+        <button class="btn primary" id="btnTeamRun">▶ Run Team</button>
+      </div>
+
+      <div class="section" id="teamResultSection" style="display:none;">
+        <div class="section-title">Result</div>
+        <div style="display:flex; gap:12px; margin-bottom:12px; font-size:12px; font-family:var(--font-mono); color:var(--text-secondary);">
+          <span>rounds: <strong id="teamRounds" style="color:var(--text-primary);">0</strong></span>
+          <span>memberCalls: <strong id="teamCalls" style="color:var(--text-primary);">0</strong></span>
+        </div>
+        <div style="border:1px solid var(--border); border-radius:var(--radius-md); padding:14px; background:var(--bg-secondary); margin-bottom:12px;">
+          <div style="font-size:12px; font-weight:600; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Output</div>
+          <div id="teamOutput" style="font-size:13px; white-space:pre-wrap; word-break:break-word;"></div>
+        </div>
+        <div class="section-title">Steps</div>
+        <div class="timeline" id="teamSteps"></div>
+        <div id="teamCandidatesWrap" style="display:none;">
+          <details class="candidates-panel">
+            <summary>Candidate Answers</summary>
+            <div id="teamCandidates"></div>
+          </details>
+        </div>
+      </div>
+    </section>
+
     <!-- ============ Chat ============ -->
     <section class="panel" data-panel="chat">
       <div class="panel-title">Chat</div>
@@ -1032,8 +1461,186 @@ body {
           <span class="stat" id="statRecovered" style="display:none; color: var(--orange);">recovered</span>
         </div>
         <div class="chat-input">
-          <textarea id="chatInput" placeholder="Send a message… (Enter to send, Shift+Enter for newline)" rows="1"></textarea>
+          <textarea id="chatInput" placeholder="Send a message... (Enter to send, Shift+Enter for newline)" rows="1"></textarea>
           <button class="btn primary" id="btnChatSend">Send</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Computer Use ============ -->
+    <section class="panel" data-panel="computer">
+      <div class="panel-title">Computer Use</div>
+      <div class="panel-subtitle">Control the desktop: take screenshots, click, type, manage windows, and browse.</div>
+
+      <!-- 截屏区域 -->
+      <div class="section">
+        <div class="section-title">Screenshot</div>
+        <div class="screenshot-area" id="screenshotArea">
+          <img id="screenshotImg" src="" alt="No screenshot yet" style="display:none;">
+          <div id="screenshotPlaceholder" class="empty">Click "Refresh Screenshot" to capture</div>
+          <div style="margin-top:8px;">
+            <button class="btn primary" id="btnScreenshot">Refresh Screenshot</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 控制面板 -->
+      <div class="ctrl-grid">
+        <!-- 鼠标控制 -->
+        <div class="ctrl-panel">
+          <div class="pane-title">Mouse</div>
+          <div class="ctrl-row">
+            <label>X</label>
+            <input class="input mono" id="clickX" type="number" min="0" max="9999" value="0" style="width:80px;">
+            <label>Y</label>
+            <input class="input mono" id="clickY" type="number" min="0" max="9999" value="0" style="width:80px;">
+          </div>
+          <div class="ctrl-row">
+            <label>Btn</label>
+            <select class="select" id="clickButton" style="width:80px;">
+              <option value="left">left</option>
+              <option value="right">right</option>
+              <option value="middle">middle</option>
+            </select>
+            <label style="display:flex;align-items:center;gap:4px;font-size:12px;">
+              <input type="checkbox" id="clickDouble"> Double
+            </label>
+          </div>
+          <div class="ctrl-row">
+            <button class="btn primary" id="btnClick">Click</button>
+          </div>
+        </div>
+
+        <!-- 键盘控制 -->
+        <div class="ctrl-panel">
+          <div class="pane-title">Keyboard</div>
+          <div class="ctrl-row">
+            <input class="input mono" id="typeText" type="text" placeholder="Text to type">
+            <button class="btn primary" id="btnType">Type</button>
+          </div>
+          <div class="ctrl-row">
+            <input class="input mono" id="hotkeyKeys" type="text" placeholder="e.g. ctrl+c">
+            <button class="btn primary" id="btnHotkey">Hotkey</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 窗口管理 -->
+      <div class="section">
+        <div class="section-title">Windows</div>
+        <div class="window-list" id="windowList"><div class="empty">Click "Refresh" to load windows</div></div>
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+          <button class="btn" id="btnWinRefresh">Refresh Windows</button>
+        </div>
+      </div>
+
+      <!-- 应用启动 -->
+      <div class="section">
+        <div class="section-title">Launch App</div>
+        <div class="ctrl-row">
+          <input class="input mono" id="launchName" type="text" placeholder="App name, e.g. Safari">
+          <button class="btn primary" id="btnLaunch">Launch</button>
+        </div>
+      </div>
+
+      <!-- 剪贴板 -->
+      <div class="section">
+        <div class="section-title">Clipboard</div>
+        <div class="ctrl-row">
+          <button class="btn" id="btnClipGet">Get Clipboard</button>
+          <span id="clipValue" style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">—</span>
+        </div>
+        <div class="ctrl-row" style="margin-top:6px;">
+          <input class="input mono" id="clipSet" type="text" placeholder="Set clipboard text">
+          <button class="btn primary" id="btnClipSet">Set</button>
+        </div>
+      </div>
+
+      <!-- 浏览器控制 -->
+      <div class="section">
+        <div class="section-title">Browser</div>
+        <div class="ctrl-row">
+          <input class="input mono" id="browserUrl" type="text" placeholder="https://example.com">
+          <button class="btn primary" id="btnBrowserOpen">Open</button>
+        </div>
+        <div class="ctrl-row" style="margin-top:6px;">
+          <input class="input mono" id="browserScript" type="text" placeholder="document.title">
+          <button class="btn" id="btnBrowserEval">Eval</button>
+          <span id="browserEvalResult" style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">—</span>
+        </div>
+        <div class="ctrl-row" style="margin-top:6px;">
+          <button class="btn" id="btnBrowserScreenshot">Browser Screenshot</button>
+        </div>
+      </div>
+
+      <!-- 操作历史 -->
+      <div class="section">
+        <details class="collapsible" id="computerHistoryWrap">
+          <summary>Operation History <span class="badge" id="historyBadge">0</span></summary>
+          <div class="body">
+            <div id="computerHistory"><div class="empty">No history yet.</div></div>
+            <div style="margin-top:8px;">
+              <button class="btn danger small" id="btnClearHistory">Clear History</button>
+            </div>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ============ Relay ============ -->
+    <section class="panel" data-panel="relay">
+      <div class="panel-title">Relay</div>
+      <div class="panel-subtitle">Configure message relay rules between channels with keyword and pattern filters.</div>
+
+      <div style="margin-bottom:16px;">
+        <button class="btn primary" id="btnRelayAdd">+ Add Rule</button>
+      </div>
+
+      <!-- 规则表单 -->
+      <div class="rule-form" id="ruleForm" style="display:none;">
+        <div class="section-title" id="ruleFormTitle">Add Rule</div>
+        <div class="form-grid">
+          <div class="field"><label>id *</label><input class="input mono" id="rfId" type="text" placeholder="my-rule"></div>
+          <div class="field"><label>from *</label><select class="select" id="rfFrom"></select></div>
+          <div class="field"><label>to *</label><input class="input mono" id="rfTo" type="text" placeholder="channel1,channel2 (comma-sep)"></div>
+          <div class="field"><label>keywords</label><input class="input" id="rfKeywords" type="text" placeholder="comma-separated"></div>
+          <div class="field"><label>pattern</label><input class="input mono" id="rfPattern" type="text" placeholder="regex pattern"></div>
+          <div class="field"><label>fromUsers</label><input class="input" id="rfFromUsers" type="text" placeholder="comma-separated user IDs"></div>
+          <div class="field"><label>prefix</label><input class="input" id="rfPrefix" type="text" placeholder="[RELAY]"></div>
+          <div class="field">
+            <label>enabled</label>
+            <label class="toggle" style="margin-top:4px;">
+              <input type="checkbox" id="rfEnabled" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+        <div style="margin-top:12px; display:flex; gap:8px;">
+          <button class="btn primary" id="btnRuleSave">Save Rule</button>
+          <button class="btn" id="btnRuleCancel">Cancel</button>
+        </div>
+      </div>
+
+      <!-- 规则列表 -->
+      <div class="section">
+        <div class="section-title">Rules</div>
+        <div class="rule-grid" id="relayRuleGrid"><div class="empty">Loading...</div></div>
+      </div>
+
+      <!-- 测试区域 -->
+      <div class="section">
+        <div class="section-title">Test Route</div>
+        <div class="test-area">
+          <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+            <div class="field"><label>channel</label><input class="input mono" id="testChannel" type="text" placeholder="slack"></div>
+            <div class="field"><label>sessionId</label><input class="input mono" id="testSessionId" type="text" placeholder="optional"></div>
+            <div class="field"><label>userId</label><input class="input mono" id="testUserId" type="text" placeholder="optional"></div>
+            <div class="field full"><label>text</label><input class="input" id="testText" type="text" placeholder="Message text to test"></div>
+          </div>
+          <div style="margin-top:10px;">
+            <button class="btn primary" id="btnRelayTest">Test Route</button>
+          </div>
+          <div class="test-result" id="relayTestResult"></div>
         </div>
       </div>
     </section>
@@ -1093,6 +1700,21 @@ body {
     chatBusy: false,
     traceTimer: null,
     selectedSandboxPreset: null,
+    // Provider sort mode
+    providerSortMode: 'manual',
+    recommendItems: [],
+    // Env
+    envVars: [],
+    envRecommended: [],
+    // Team
+    teamMembers: [],
+    teamPresets: [],
+    teamEditingMemberIdx: -1,
+    // Computer
+    computerHistory: [],
+    // Relay
+    relayRules: [],
+    relayEditingId: null,
   };
 
   // ---------------------------------------------------------------------------
@@ -1127,7 +1749,7 @@ body {
 
   async function apiGet(path) {
     const r = await fetch(path);
-    if (!r.ok) throw new Error('GET ' + path + ' → HTTP ' + r.status);
+    if (!r.ok) throw new Error('GET ' + path + ' \u2192 HTTP ' + r.status);
     return r.json();
   }
   async function apiPost(path, body) {
@@ -1136,8 +1758,20 @@ body {
       headers: { 'Content-Type': 'application/json' },
       body: body == null ? '{}' : JSON.stringify(body),
     });
-    if (!r.ok) throw new Error('POST ' + path + ' → HTTP ' + r.status);
+    if (!r.ok) throw new Error('POST ' + path + ' \u2192 HTTP ' + r.status);
     return r.json();
+  }
+  async function apiDelete(path) {
+    const r = await fetch(path, { method: 'DELETE' });
+    if (!r.ok) throw new Error('DELETE ' + path + ' \u2192 HTTP ' + r.status);
+    return r.json();
+  }
+
+  // 掩码敏感值
+  function maskValue(v) {
+    if (!v || typeof v !== 'string') return v;
+    if (v.length <= 4) return '****';
+    return v.slice(0, 2) + '****' + v.slice(-2);
   }
 
   // ---------------------------------------------------------------------------
@@ -1153,6 +1787,11 @@ body {
     $$('.panel').forEach(p => p.classList.toggle('active', p.dataset.panel === name));
     if (name === 'trace') startTraceAutoRefresh();
     else stopTraceAutoRefresh();
+    // 懒加载数据
+    if (name === 'env' && state.envVars.length === 0) loadEnvVars();
+    if (name === 'team' && state.teamPresets.length === 0) loadTeamPresets();
+    if (name === 'computer') loadComputerWindows();
+    if (name === 'relay' && state.relayRules.length === 0) loadRelayRules();
   }
 
   // ---------------------------------------------------------------------------
@@ -1255,7 +1894,7 @@ body {
     $('#provBaseURL').value = state.config.baseURL || '';
     $('#provModel').value = state.config.model || '';
     $('#mModel').value = state.config.model || '';
-    // mark selected provider card by matching baseURL/model
+    // 标记选中的 provider 卡片
     $$('#providerCards .card').forEach(card => {
       const p = JSON.parse(card.dataset.provider || '{}');
       const match = p.defaultBase === state.config.baseURL ||
@@ -1290,7 +1929,7 @@ body {
     $('#sbApprove').value = sb.toolAutoApprove || 'safe';
     $('#sbDeny').value = (sb.shellDenylist || []).join('\n');
     $('#sbSafe').value = (sb.safeTools || []).join('\n');
-    // detect matching preset
+    // 检测匹配的预设
     const presets = state.sandboxPresets || {};
     let matchedPreset = null;
     for (const k of Object.keys(presets)) {
@@ -1316,7 +1955,7 @@ body {
       $$('#channel-' + name + ' [data-field]').forEach(el => {
         if (data[el.dataset.field] != null) el.value = data[el.dataset.field];
       });
-      // update badge
+      // 更新 badge
       const filled = Object.values(data).filter(v => v && String(v).trim()).length;
       const badge = $('#channel-' + name + '-badge');
       if (badge) badge.textContent = filled ? filled + ' field(s) set' : 'not configured';
@@ -1347,7 +1986,7 @@ body {
     dot.className = 'status-dot';
     if (hasKey && hasModel && hasBase) {
       dot.classList.add('green');
-      txt.textContent = 'Configured · ' + (c.model || '');
+      txt.textContent = 'Configured \u00b7 ' + (c.model || '');
     } else if (hasKey || hasModel || hasBase) {
       dot.classList.add('yellow');
       txt.textContent = 'Partially configured';
@@ -1358,7 +1997,7 @@ body {
   }
 
   // ---------------------------------------------------------------------------
-  // Provider tab
+  // Provider tab - 排序模式切换
   // ---------------------------------------------------------------------------
   async function loadProviders() {
     try {
@@ -1379,19 +2018,104 @@ body {
     wrap.innerHTML = state.providers.map(p => `
       <div class="card" data-provider="${escapeHtml(JSON.stringify(p))}" data-name="${escapeHtml(p.name)}">
         <div class="card-title">${escapeHtml(p.name)}</div>
-        <div class="card-desc">${escapeHtml(p.defaultBase || '')}${p.defaultModel ? ' · ' + escapeHtml(p.defaultModel) : ''}</div>
+        <div class="card-desc">${escapeHtml(p.defaultBase || '')}${p.defaultModel ? ' \u00b7 ' + escapeHtml(p.defaultModel) : ''}</div>
         <div class="card-meta"><span class="tag">${escapeHtml(p.envKey || '')}</span></div>
       </div>
     `).join('');
     $$('#providerCards .card').forEach(card => {
       card.addEventListener('click', () => {
         $$('#providerCards .card').forEach(c => c.classList.remove('selected'));
+        $$('#recommendCards .recommend-card').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
         const p = JSON.parse(card.dataset.provider);
         if (p.defaultBase) $('#provBaseURL').value = p.defaultBase;
         if (p.defaultModel) {
           $('#provModel').value = p.defaultModel;
           $('#mModel').value = p.defaultModel;
+        }
+        saveConfigDebounced();
+      });
+    });
+  }
+
+  // 排序模式切换事件
+  $$('#providerSortModes .btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      $$('#providerSortModes .btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.providerSortMode = btn.dataset.mode;
+      onProviderSortModeChange();
+    });
+  });
+
+  async function onProviderSortModeChange() {
+    const mode = state.providerSortMode;
+    const manualSection = $('#manualSection');
+    const recommendSection = $('#recommendSection');
+
+    if (mode === 'manual') {
+      manualSection.style.display = '';
+      recommendSection.style.display = 'none';
+      return;
+    }
+
+    // Price 或 Efficient 模式
+    manualSection.style.display = 'none';
+    recommendSection.style.display = '';
+    $('#recommendTitle').textContent = mode === 'price' ? 'Top 5 by Price' : 'Top 5 by Quality';
+
+    try {
+      state.recommendItems = await apiGet('/api/catalog/recommend?mode=' + mode);
+    } catch (e) {
+      state.recommendItems = [];
+      showToast('Failed to load recommendations: ' + e.message, 'err');
+    }
+    renderRecommendCards();
+  }
+
+  function renderRecommendCards() {
+    const wrap = $('#recommendCards');
+    const items = state.recommendItems || [];
+    if (items.length === 0) {
+      wrap.innerHTML = '<div class="empty">No recommendations available.</div>';
+      return;
+    }
+    wrap.innerHTML = items.map((item, i) => {
+      const provider = item.provider || item.providerName || '';
+      const model = item.model || item.modelName || '';
+      const priceIn = item.pricePerTokenIn || item.inputPrice || item.priceIn || '';
+      const priceOut = item.pricePerTokenOut || item.outputPrice || item.priceOut || '';
+      const free = item.free || item.isFree || false;
+      const score = item.qualityScore || item.score || '';
+      return `
+        <div class="recommend-card" data-idx="${i}">
+          <div class="rc-provider">${escapeHtml(provider)}</div>
+          <div class="rc-model">${escapeHtml(model)}</div>
+          <div class="rc-price">
+            ${priceIn ? 'in: ' + escapeHtml(String(priceIn)) : ''}${priceIn && priceOut ? ' / ' : ''}${priceOut ? 'out: ' + escapeHtml(String(priceOut)) : ''}
+            ${free ? ' <span class="tag green">FREE</span>' : ''}
+          </div>
+          ${score ? `<div class="rc-score">quality: ${escapeHtml(String(score))}</div>` : ''}
+        </div>
+      `;
+    }).join('');
+    $$('#recommendCards .recommend-card').forEach(card => {
+      card.addEventListener('click', () => {
+        $$('#recommendCards .recommend-card').forEach(c => c.classList.remove('selected'));
+        $$('#providerCards .card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        const idx = parseInt(card.dataset.idx, 10);
+        const item = state.recommendItems[idx];
+        if (!item) return;
+        // 自动填充字段
+        if (item.baseURL || item.defaultBase) $('#provBaseURL').value = item.baseURL || item.defaultBase || '';
+        if (item.model || item.modelName || item.defaultModel) {
+          const m = item.model || item.modelName || item.defaultModel || '';
+          $('#provModel').value = m;
+          $('#mModel').value = m;
+        }
+        if (item.envKey || item.apiKey) {
+          // 不自动填充 apiKey，只设置 baseURL 和 model
         }
         saveConfigDebounced();
       });
@@ -1406,25 +2130,25 @@ body {
     const model = $('#provModel').value.trim();
     if (!apiKey || !baseURL || !model) {
       result.className = 'probe-result show err';
-      result.textContent = '✗ apiKey, baseURL and model are all required';
+      result.textContent = '\u2717 apiKey, baseURL and model are all required';
       return;
     }
     const btn = $('#btnProbe');
     btn.disabled = true;
     result.className = 'probe-result show loading';
-    result.textContent = 'Probing…';
+    result.textContent = 'Probing...';
     try {
       const r = await apiPost('/api/probe', { apiKey, baseURL, model });
       if (r.ok) {
         result.className = 'probe-result show ok';
-        result.textContent = '✓ ok · ' + (r.latencyMs ?? '?') + 'ms';
+        result.textContent = '\u2713 ok \u00b7 ' + (r.latencyMs ?? '?') + 'ms';
       } else {
         result.className = 'probe-result show err';
-        result.textContent = '✗ ' + (r.error || 'unknown error');
+        result.textContent = '\u2717 ' + (r.error || 'unknown error');
       }
     } catch (e) {
       result.className = 'probe-result show err';
-      result.textContent = '✗ ' + e.message;
+      result.textContent = '\u2717 ' + e.message;
     } finally {
       btn.disabled = false;
     }
@@ -1485,7 +2209,7 @@ body {
 
   async function loadProfileTools(name) {
     const wrap = $('#profileTools');
-    wrap.innerHTML = '<div class="empty">Loading tools…</div>';
+    wrap.innerHTML = '<div class="empty">Loading tools...</div>';
     try {
       const tools = await apiGet('/api/profiles/' + encodeURIComponent(name) + '/tools');
       state.currentProfileTools = tools;
@@ -1521,7 +2245,7 @@ body {
         <div class="row">
           <div style="flex:1; min-width:0;">
             <div class="name">${escapeHtml(s.name)}</div>
-            <div class="meta">${escapeHtml(s.package || '')} · ${escapeHtml(s.source || '')}${s.installedAt ? ' · ' + escapeHtml(s.installedAt) : ''}</div>
+            <div class="meta">${escapeHtml(s.package || '')} \u00b7 ${escapeHtml(s.source || '')}${s.installedAt ? ' \u00b7 ' + escapeHtml(s.installedAt) : ''}</div>
           </div>
           <button class="btn danger small" data-remove="${escapeHtml(s.name)}">Remove</button>
         </div>
@@ -1548,7 +2272,7 @@ body {
     if (!pkg) return;
     const btn = $('#btnSkillAdd');
     btn.disabled = true;
-    btn.textContent = 'Installing…';
+    btn.textContent = 'Installing...';
     try {
       const r = await apiPost('/api/skills/add', { package: pkg });
       showToast('Installed ' + pkg + (r.source ? ' (' + r.source + ')' : ''), 'ok');
@@ -1591,7 +2315,7 @@ body {
         p.allowNetwork ? 'net' : 'no-net',
         p.allowFilesystem ? 'fs' : 'no-fs',
         p.toolAutoApprove || '?',
-      ].join(' · ');
+      ].join(' \u00b7 ');
       return `
         <div class="card" data-name="${escapeHtml(name)}">
           <div class="card-title">${escapeHtml(name)}</div>
@@ -1671,7 +2395,7 @@ body {
         </details>
       `;
     }).join('');
-    // wire autosave
+    // 自动保存事件
     names.forEach(name => {
       $$('#channel-' + name + ' [data-field]').forEach(el => {
         el.addEventListener('input', () => {
@@ -1689,6 +2413,347 @@ body {
     $('#' + id).addEventListener('input', saveConfigDebounced);
     $('#' + id).addEventListener('change', saveConfigDebounced);
   });
+
+  // ---------------------------------------------------------------------------
+  // Env tab - 环境变量
+  // ---------------------------------------------------------------------------
+  async function loadEnvVars() {
+    try {
+      const [vars, rec] = await Promise.all([
+        apiGet('/api/env'),
+        apiGet('/api/env/recommended').catch(() => []),
+      ]);
+      state.envVars = vars || [];
+      state.envRecommended = rec || [];
+    } catch (e) {
+      state.envVars = [];
+      state.envRecommended = [];
+    }
+    renderEnvTable();
+    renderEnvRecommended();
+  }
+
+  function renderEnvRecommended() {
+    const wrap = $('#envRecommendList');
+    const items = state.envRecommended || [];
+    if (items.length === 0) {
+      wrap.innerHTML = '<div class="empty">No recommended variables.</div>';
+      return;
+    }
+    wrap.innerHTML = items.map(r => `
+      <div class="env-recommend-item">
+        <span>${escapeHtml(r.key || r.name || r)}</span>
+        <button class="btn small" data-env-key="${escapeHtml(r.key || r.name || r)}">+ Add</button>
+      </div>
+    `).join('');
+    $$('#envRecommendList [data-env-key]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.envKey;
+        $('#envNewKey').value = key;
+        $('#envNewVal').focus();
+      });
+    });
+  }
+
+  function renderEnvTable() {
+    const tbody = $('#envTableBody');
+    const vars = state.envVars || [];
+    if (vars.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" class="empty">No environment variables set.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = vars.map(v => {
+      const key = v.key || v.name || '';
+      const val = v.value || v.val || '';
+      const source = v.source || 'dotenv';
+      const masked = maskValue(val);
+      const sourceClass = source === 'system' ? 'tag red' : source === 'process' ? 'tag blue' : 'tag';
+      return `
+        <tr data-env-key="${escapeHtml(key)}">
+          <td class="key-cell">${escapeHtml(key)}</td>
+          <td class="val-cell">
+            <span class="val-masked">${escapeHtml(masked)}</span>
+            <span class="val-raw" style="display:none;">${escapeHtml(val)}</span>
+            <button class="btn icon small" data-toggle-val title="Show/Hide" style="margin-left:4px;">👁</button>
+          </td>
+          <td><span class="${sourceClass}">${escapeHtml(source)}</span></td>
+          <td class="actions">
+            <button class="btn small" data-env-edit="${escapeHtml(key)}">Edit</button>
+            <button class="btn danger small" data-env-del="${escapeHtml(key)}">Delete</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    // 显示/隐藏值
+    tbody.querySelectorAll('[data-toggle-val]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tr = btn.closest('tr');
+        const masked = tr.querySelector('.val-masked');
+        const raw = tr.querySelector('.val-raw');
+        if (masked.style.display === 'none') {
+          masked.style.display = '';
+          raw.style.display = 'none';
+        } else {
+          masked.style.display = 'none';
+          raw.style.display = '';
+        }
+      });
+    });
+
+    // 编辑
+    tbody.querySelectorAll('[data-env-edit]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.envEdit;
+        const row = vars.find(v => (v.key || v.name) === key);
+        const currentVal = row ? (row.value || row.val || '') : '';
+        const newVal = prompt('Edit value for ' + key + ':', currentVal);
+        if (newVal === null) return;
+        apiPost('/api/env', { key, value: newVal }).then(() => {
+          showToast('Updated ' + key, 'ok');
+          loadEnvVars();
+        }).catch(e => showToast('Failed: ' + e.message, 'err'));
+      });
+    });
+
+    // 删除
+    tbody.querySelectorAll('[data-env-del]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.envDel;
+        if (!confirm('Delete environment variable "' + key + '"?')) return;
+        apiDelete('/api/env?key=' + encodeURIComponent(key)).then(() => {
+          showToast('Deleted ' + key, 'ok');
+          loadEnvVars();
+        }).catch(e => showToast('Delete failed: ' + e.message, 'err'));
+      });
+    });
+  }
+
+  // 新增环境变量
+  $('#btnEnvSet').addEventListener('click', async () => {
+    const key = $('#envNewKey').value.trim();
+    const val = $('#envNewVal').value.trim();
+    if (!key) { showToast('Key is required', 'err'); return; }
+    try {
+      await apiPost('/api/env', { key, value: val });
+      showToast('Set ' + key, 'ok');
+      $('#envNewKey').value = '';
+      $('#envNewVal').value = '';
+      await loadEnvVars();
+    } catch (e) {
+      showToast('Set failed: ' + e.message, 'err');
+    }
+  });
+
+  // ---------------------------------------------------------------------------
+  // Team tab - Agent Team
+  // ---------------------------------------------------------------------------
+  async function loadTeamPresets() {
+    try {
+      state.teamPresets = await apiGet('/api/team/presets');
+    } catch (e) {
+      state.teamPresets = [];
+    }
+    renderTeamPresets();
+  }
+
+  function renderTeamPresets() {
+    const wrap = $('#teamPresets');
+    const presets = state.teamPresets || [];
+    if (presets.length === 0) {
+      wrap.innerHTML = '<div class="empty">No team presets available.</div>';
+      return;
+    }
+    wrap.innerHTML = presets.map((p, i) => `
+      <div class="card" data-preset-idx="${i}">
+        <div class="card-title">${escapeHtml(p.name || 'Preset ' + (i + 1))}</div>
+        <div class="card-desc">${escapeHtml(p.description || p.mode || '')}</div>
+        <div class="card-meta"><span class="tag">${escapeHtml(p.mode || '')}</span></div>
+      </div>
+    `).join('');
+    $$('#teamPresets .card').forEach(card => {
+      card.addEventListener('click', () => {
+        const idx = parseInt(card.dataset.presetIdx, 10);
+        const preset = state.teamPresets[idx];
+        if (!preset) return;
+        // 加载预设的 config
+        state.teamMembers = (preset.members || preset.config?.members || []).map(m => ({ ...m }));
+        // 设置模式
+        if (preset.mode || preset.config?.mode) {
+          const mode = preset.mode || preset.config?.mode;
+          const radio = document.querySelector(`input[name="teamMode"][value="${mode}"]`);
+          if (radio) radio.checked = true;
+        }
+        renderMemberList();
+        showToast('Loaded preset: ' + (preset.name || ''), 'ok');
+      });
+    });
+  }
+
+  function renderMemberList() {
+    const wrap = $('#memberList');
+    const members = state.teamMembers || [];
+    if (members.length === 0) {
+      wrap.innerHTML = '<div class="empty">No members. Add one below or load a preset.</div>';
+      return;
+    }
+    wrap.innerHTML = members.map((m, i) => `
+      <div class="member-row" data-member-idx="${i}">
+        <span class="mono">${escapeHtml(m.id || '')}</span>
+        <span>${escapeHtml(m.name || '')}</span>
+        <span><span class="tag">${escapeHtml(m.role || '')}</span></span>
+        <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-secondary);">${escapeHtml(m.model || '')}</span>
+        <span style="font-size:11px;color:var(--text-tertiary);">${escapeHtml((m.expertise || []).join(', '))}</span>
+        <span>
+          <button class="btn small" data-member-edit="${i}">✎</button>
+          <button class="btn danger small" data-member-del="${i}">✕</button>
+        </span>
+      </div>
+    `).join('');
+
+    // 编辑成员
+    wrap.querySelectorAll('[data-member-edit]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.memberEdit, 10);
+        openMemberForm(idx);
+      });
+    });
+
+    // 删除成员
+    wrap.querySelectorAll('[data-member-del]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.memberDel, 10);
+        const m = state.teamMembers[idx];
+        if (!confirm('Remove member "' + (m.name || m.id || idx) + '"?')) return;
+        state.teamMembers.splice(idx, 1);
+        renderMemberList();
+      });
+    });
+  }
+
+  function openMemberForm(editIdx) {
+    state.teamEditingMemberIdx = editIdx != null ? editIdx : -1;
+    const form = $('#memberForm');
+    form.style.display = '';
+    if (editIdx >= 0 && state.teamMembers[editIdx]) {
+      const m = state.teamMembers[editIdx];
+      $('#mfId').value = m.id || '';
+      $('#mfName').value = m.name || '';
+      $('#mfRole').value = m.role || 'researcher';
+      $('#mfPrompt').value = m.systemPrompt || '';
+      $('#mfModel').value = m.model || '';
+      $('#mfProvider').value = m.provider || '';
+      $('#mfExpertise').value = (m.expertise || []).join(', ');
+    } else {
+      $('#mfId').value = '';
+      $('#mfName').value = '';
+      $('#mfRole').value = 'researcher';
+      $('#mfPrompt').value = '';
+      $('#mfModel').value = '';
+      $('#mfProvider').value = '';
+      $('#mfExpertise').value = '';
+    }
+  }
+
+  $('#btnTeamAddMember').addEventListener('click', () => openMemberForm(null));
+
+  $('#btnMemberSave').addEventListener('click', () => {
+    const member = {
+      id: $('#mfId').value.trim() || ('agent-' + (state.teamMembers.length + 1)),
+      name: $('#mfName').value.trim(),
+      role: $('#mfRole').value,
+      systemPrompt: $('#mfPrompt').value.trim(),
+      model: $('#mfModel').value.trim(),
+      provider: $('#mfProvider').value.trim(),
+      expertise: $('#mfExpertise').value.split(',').map(s => s.trim()).filter(Boolean),
+    };
+    if (state.teamEditingMemberIdx >= 0) {
+      state.teamMembers[state.teamEditingMemberIdx] = member;
+    } else {
+      state.teamMembers.push(member);
+    }
+    state.teamEditingMemberIdx = -1;
+    $('#memberForm').style.display = 'none';
+    renderMemberList();
+  });
+
+  $('#btnMemberCancel').addEventListener('click', () => {
+    state.teamEditingMemberIdx = -1;
+    $('#memberForm').style.display = 'none';
+  });
+
+  // Run Team
+  $('#btnTeamRun').addEventListener('click', async () => {
+    const input = $('#teamInput').value.trim();
+    if (!input) { showToast('Please enter a task', 'err'); return; }
+    if (state.teamMembers.length === 0) { showToast('Add at least one member', 'err'); return; }
+
+    const mode = document.querySelector('input[name="teamMode"]:checked')?.value || 'sequential';
+    const btn = $('#btnTeamRun');
+    btn.disabled = true;
+    btn.textContent = 'Running...';
+
+    try {
+      const config = { mode, members: state.teamMembers };
+      const r = await apiPost('/api/team/run', { config, input });
+      renderTeamResult(r);
+    } catch (e) {
+      showToast('Team run failed: ' + e.message, 'err');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '\u25B6 Run Team';
+    }
+  });
+
+  function renderTeamResult(r) {
+    const section = $('#teamResultSection');
+    section.style.display = '';
+    $('#teamRounds').textContent = String(r.rounds ?? 0);
+    $('#teamCalls').textContent = String(r.memberCalls ?? 0);
+    $('#teamOutput').textContent = r.output || '(no output)';
+
+    // 步骤时间线
+    const stepsWrap = $('#teamSteps');
+    const steps = r.steps || [];
+    if (steps.length === 0) {
+      stepsWrap.innerHTML = '<div class="empty">No steps recorded.</div>';
+    } else {
+      stepsWrap.innerHTML = steps.map(s => {
+        const inputStr = typeof s.input === 'string' ? s.input : JSON.stringify(s.input || '');
+        const outputStr = typeof s.output === 'string' ? s.output : JSON.stringify(s.output || '');
+        return `
+          <div class="timeline-step">
+            <div class="ts-header">
+              <span class="ts-id">${escapeHtml(s.memberId || '')}</span>
+              <span class="ts-role">${escapeHtml(s.role || '')}</span>
+              <span class="ts-ms">${escapeHtml(String(s.ms || s.durationMs || ''))}</span>
+            </div>
+            <div class="ts-body">
+              <div><strong>Input:</strong></div>
+              <pre>${escapeHtml(inputStr.length > 500 ? inputStr.slice(0, 500) + '...' : inputStr)}</pre>
+              <div style="margin-top:4px;"><strong>Output:</strong></div>
+              <pre>${escapeHtml(outputStr.length > 500 ? outputStr.slice(0, 500) + '...' : outputStr)}</pre>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // MoA 候选答案
+    const candidates = r.candidates || [];
+    const candWrap = $('#teamCandidatesWrap');
+    const candEl = $('#teamCandidates');
+    if (candidates.length > 0) {
+      candWrap.style.display = '';
+      candEl.innerHTML = candidates.map((c, i) => `
+        <div class="candidate-item">
+          <strong>#${i + 1}</strong> ${escapeHtml(typeof c === 'string' ? c : JSON.stringify(c))}
+        </div>
+      `).join('');
+    } else {
+      candWrap.style.display = 'none';
+    }
+  }
 
   // ---------------------------------------------------------------------------
   // Chat tab
@@ -1716,7 +2781,7 @@ body {
     div.className = 'chat-msg ' + role;
     const roleLabel = role === 'user' ? 'you' : 'assistant';
     const toolCallsHtml = (opts && opts.toolCalls && opts.toolCalls.length)
-      ? `<div class="toolcalls" data-toggle>toolCalls: ${opts.toolCalls.length} ▾</div>
+      ? `<div class="toolcalls" data-toggle>toolCalls: ${opts.toolCalls.length} \u25BE</div>
          <div class="toolcalls-list">${escapeHtml(opts.toolCalls.map(t => (typeof t === 'string' ? t : JSON.stringify(t))).join('\n'))}</div>`
       : '';
     div.innerHTML = `
@@ -1767,13 +2832,389 @@ body {
       $('#statRecovered').style.display = r.recovered ? 'inline' : 'none';
     } catch (e) {
       thinking.remove();
-      appendChatMsg('assistant', '⚠️ ' + e.message);
+      appendChatMsg('assistant', '\u26A0\uFE0F ' + e.message);
     } finally {
       state.chatBusy = false;
       chatSendBtn.disabled = false;
       chatInput.focus();
     }
   }
+
+  // ---------------------------------------------------------------------------
+  // Computer Use tab
+  // ---------------------------------------------------------------------------
+  // 截屏
+  $('#btnScreenshot').addEventListener('click', async () => {
+    const btn = $('#btnScreenshot');
+    btn.disabled = true;
+    btn.textContent = 'Capturing...';
+    try {
+      const r = await apiPost('/api/computer/screenshot');
+      const img = $('#screenshotImg');
+      img.src = 'data:image/png;base64,' + r.data;
+      img.style.display = '';
+      $('#screenshotPlaceholder').style.display = 'none';
+    } catch (e) {
+      showToast('Screenshot failed: ' + e.message, 'err');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Refresh Screenshot';
+    }
+  });
+
+  // 点击截屏图片时自动填充坐标
+  $('#screenshotImg').addEventListener('click', (e) => {
+    const img = e.target;
+    const rect = img.getBoundingClientRect();
+    const x = Math.round((e.clientX - rect.left) / rect.width * (img.naturalWidth || 1920));
+    const y = Math.round((e.clientY - rect.top) / rect.height * (img.naturalHeight || 1080));
+    $('#clickX').value = x;
+    $('#clickY').value = y;
+    showToast('Coordinates set: ' + x + ', ' + y, 'ok');
+  });
+
+  // 鼠标点击
+  $('#btnClick').addEventListener('click', async () => {
+    const body = {
+      x: parseInt($('#clickX').value, 10) || 0,
+      y: parseInt($('#clickY').value, 10) || 0,
+      button: $('#clickButton').value,
+      doubleClick: $('#clickDouble').checked,
+    };
+    try {
+      await apiPost('/api/computer/click', body);
+      showToast('Click at ' + body.x + ',' + body.y, 'ok');
+    } catch (e) { showToast('Click failed: ' + e.message, 'err'); }
+  });
+
+  // 键盘输入
+  $('#btnType').addEventListener('click', async () => {
+    const text = $('#typeText').value;
+    if (!text) return;
+    try {
+      await apiPost('/api/computer/type', { text });
+      showToast('Typed successfully', 'ok');
+    } catch (e) { showToast('Type failed: ' + e.message, 'err'); }
+  });
+
+  // 快捷键
+  $('#btnHotkey').addEventListener('click', async () => {
+    const keys = $('#hotkeyKeys').value.split(/[+,]/).map(s => s.trim()).filter(Boolean);
+    if (keys.length === 0) return;
+    try {
+      await apiPost('/api/computer/hotkey', { keys });
+      showToast('Hotkey: ' + keys.join('+'), 'ok');
+    } catch (e) { showToast('Hotkey failed: ' + e.message, 'err'); }
+  });
+
+  // 窗口管理
+  async function loadComputerWindows() {
+    try {
+      const windows = await apiGet('/api/computer/windows');
+      renderWindowList(windows || []);
+    } catch (e) {
+      renderWindowList([]);
+    }
+  }
+
+  function renderWindowList(windows) {
+    const wrap = $('#windowList');
+    if (windows.length === 0) {
+      wrap.innerHTML = '<div class="empty">No windows found.</div>';
+      return;
+    }
+    wrap.innerHTML = windows.map(w => {
+      const bounds = w.bounds ? `${w.bounds.x},${w.bounds.y} ${w.bounds.width}x${w.bounds.height}` : '';
+      return `
+        <div class="window-item">
+          <div>
+            <div class="wi-title">${escapeHtml(w.title || '')}</div>
+            <div class="wi-app">${escapeHtml(w.appName || '')} ${escapeHtml(bounds ? '\u00b7 ' + bounds : '')}</div>
+          </div>
+          <span class="wi-focused">${w.focused ? '\u2713 Focused' : ''}</span>
+          <button class="btn small" data-focus-id="${escapeHtml(w.id || '')}">Focus</button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  $('#btnWinRefresh').addEventListener('click', loadComputerWindows);
+
+  // 应用启动
+  $('#btnLaunch').addEventListener('click', async () => {
+    const name = $('#launchName').value.trim();
+    if (!name) return;
+    try {
+      await apiPost('/api/computer/launch', { name });
+      showToast('Launched ' + name, 'ok');
+      setTimeout(loadComputerWindows, 2000);
+    } catch (e) { showToast('Launch failed: ' + e.message, 'err'); }
+  });
+
+  // 剪贴板
+  $('#btnClipGet').addEventListener('click', async () => {
+    try {
+      const r = await apiGet('/api/computer/clipboard');
+      $('#clipValue').textContent = r.value || '(empty)';
+    } catch (e) { showToast('Get clipboard failed: ' + e.message, 'err'); }
+  });
+
+  $('#btnClipSet').addEventListener('click', async () => {
+    const text = $('#clipSet').value.trim();
+    if (!text) return;
+    try {
+      await apiPost('/api/computer/clipboard', { text });
+      showToast('Clipboard set', 'ok');
+      $('#clipSet').value = '';
+    } catch (e) { showToast('Set clipboard failed: ' + e.message, 'err'); }
+  });
+
+  // 浏览器控制
+  $('#btnBrowserOpen').addEventListener('click', async () => {
+    const url = $('#browserUrl').value.trim();
+    if (!url) return;
+    try {
+      await apiPost('/api/computer/browser/open', { url });
+      showToast('Opened ' + url, 'ok');
+    } catch (e) { showToast('Open failed: ' + e.message, 'err'); }
+  });
+
+  $('#btnBrowserEval').addEventListener('click', async () => {
+    const script = $('#browserScript').value.trim();
+    if (!script) return;
+    try {
+      const r = await apiPost('/api/computer/browser/eval', { script });
+      $('#browserEvalResult').textContent = String(r.result ?? JSON.stringify(r));
+    } catch (e) {
+      $('#browserEvalResult').textContent = 'Error: ' + e.message;
+    }
+  });
+
+  $('#btnBrowserScreenshot').addEventListener('click', async () => {
+    try {
+      const r = await apiGet('/api/computer/browser/screenshot');
+      const img = $('#screenshotImg');
+      img.src = 'data:image/png;base64,' + r.data;
+      img.style.display = '';
+      $('#screenshotPlaceholder').style.display = 'none';
+      showToast('Browser screenshot captured', 'ok');
+    } catch (e) { showToast('Browser screenshot failed: ' + e.message, 'err'); }
+  });
+
+  // 操作历史
+  async function loadComputerHistory() {
+    try {
+      state.computerHistory = await apiGet('/api/computer/history');
+    } catch (e) {
+      state.computerHistory = [];
+    }
+    renderComputerHistory();
+  }
+
+  function renderComputerHistory() {
+    const wrap = $('#computerHistory');
+    const items = state.computerHistory || [];
+    $('#historyBadge').textContent = String(items.length);
+    if (items.length === 0) {
+      wrap.innerHTML = '<div class="empty">No history yet.</div>';
+      return;
+    }
+    wrap.innerHTML = items.map(h => `
+      <div class="list-item">
+        <div class="row">
+          <span class="name">${escapeHtml(h.action || '')}</span>
+          <span class="meta">${escapeHtml(JSON.stringify(h.args || {}))}</span>
+          <span class="meta">${escapeHtml(h.timestamp || '')}</span>
+          <span class="meta">${escapeHtml(String(h.ms || ''))}ms</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  $('#btnClearHistory').addEventListener('click', async () => {
+    if (!confirm('Clear operation history?')) return;
+    try {
+      await apiPost('/api/computer/history/clear');
+      state.computerHistory = [];
+      renderComputerHistory();
+      showToast('History cleared', 'ok');
+    } catch (e) {
+      // 后端可能不支持清除，前端直接清空
+      state.computerHistory = [];
+      renderComputerHistory();
+    }
+  });
+
+  // ---------------------------------------------------------------------------
+  // Relay tab - 消息中继
+  // ---------------------------------------------------------------------------
+  async function loadRelayRules() {
+    try {
+      state.relayRules = await apiGet('/api/relay/rules');
+    } catch (e) {
+      state.relayRules = [];
+    }
+    renderRelayRules();
+    populateRelayFromSelect();
+  }
+
+  function populateRelayFromSelect() {
+    const sel = $('#rfFrom');
+    // 收集 channel 名
+    const channelNames = Object.keys(state.channelTemplates || {});
+    const builtIn = ['CLI', 'HTTP'];
+    const all = [...builtIn, ...channelNames];
+    sel.innerHTML = all.map(n => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
+  }
+
+  function renderRelayRules() {
+    const wrap = $('#relayRuleGrid');
+    const rules = state.relayRules || [];
+    if (rules.length === 0) {
+      wrap.innerHTML = '<div class="empty">No relay rules configured.</div>';
+      return;
+    }
+    wrap.innerHTML = rules.map(r => {
+      const toArr = Array.isArray(r.to) ? r.to : [r.to];
+      const filters = [];
+      if (r.keywords && r.keywords.length) filters.push('kw: ' + r.keywords.join(','));
+      if (r.pattern) filters.push('rx: ' + r.pattern);
+      if (r.fromUsers && r.fromUsers.length) filters.push('users: ' + r.fromUsers.join(','));
+      return `
+        <div class="rule-card" data-rule-id="${escapeHtml(r.id)}">
+          <div class="rc-id">${escapeHtml(r.id)}</div>
+          <div class="rc-route">${escapeHtml(r.from || '')} <span class="arrow">\u2192</span> ${escapeHtml(toArr.join(', '))}</div>
+          ${filters.length ? `<div class="rc-filters">${escapeHtml(filters.join(' | '))}</div>` : ''}
+          ${r.prefix ? `<div style="font-size:11px;color:var(--text-tertiary);margin-bottom:6px;">prefix: ${escapeHtml(r.prefix)}</div>` : ''}
+          <div class="rc-actions">
+            <label class="toggle" style="margin-right:8px;">
+              <input type="checkbox" ${r.enabled !== false ? 'checked' : ''} data-toggle-rule="${escapeHtml(r.id)}">
+              <span class="slider"></span>
+            </label>
+            <button class="btn small" data-edit-rule="${escapeHtml(r.id)}">Edit</button>
+            <button class="btn danger small" data-del-rule="${escapeHtml(r.id)}">Delete</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // toggle enabled
+    wrap.querySelectorAll('[data-toggle-rule]').forEach(cb => {
+      cb.addEventListener('change', async () => {
+        const id = cb.dataset.toggleRule;
+        const enabled = cb.checked;
+        try {
+          await apiPost('/api/relay/rules/toggle', { id, enabled });
+          showToast(id + ' ' + (enabled ? 'enabled' : 'disabled'), 'ok');
+        } catch (e) { showToast('Toggle failed: ' + e.message, 'err'); }
+      });
+    });
+
+    // 编辑
+    wrap.querySelectorAll('[data-edit-rule]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.editRule;
+        openRuleForm(id);
+      });
+    });
+
+    // 删除
+    wrap.querySelectorAll('[data-del-rule]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.delRule;
+        if (!confirm('Delete rule "' + id + '"?')) return;
+        try {
+          await apiDelete('/api/relay/rules?id=' + encodeURIComponent(id));
+          showToast('Deleted ' + id, 'ok');
+          await loadRelayRules();
+        } catch (e) { showToast('Delete failed: ' + e.message, 'err'); }
+      });
+    });
+  }
+
+  function openRuleForm(editId) {
+    state.relayEditingId = editId || null;
+    const form = $('#ruleForm');
+    form.style.display = '';
+    $('#ruleFormTitle').textContent = editId ? 'Edit Rule' : 'Add Rule';
+    populateRelayFromSelect();
+
+    if (editId) {
+      const rule = state.relayRules.find(r => r.id === editId);
+      if (rule) {
+        $('#rfId').value = rule.id || '';
+        $('#rfId').disabled = true;
+        $('#rfFrom').value = rule.from || '';
+        $('#rfTo').value = Array.isArray(rule.to) ? rule.to.join(',') : (rule.to || '');
+        $('#rfKeywords').value = Array.isArray(rule.keywords) ? rule.keywords.join(',') : (rule.keywords || '');
+        $('#rfPattern').value = rule.pattern || '';
+        $('#rfFromUsers').value = Array.isArray(rule.fromUsers) ? rule.fromUsers.join(',') : (rule.fromUsers || '');
+        $('#rfPrefix').value = rule.prefix || '';
+        $('#rfEnabled').checked = rule.enabled !== false;
+      }
+    } else {
+      $('#rfId').value = '';
+      $('#rfId').disabled = false;
+      $('#rfFrom').selectedIndex = 0;
+      $('#rfTo').value = '';
+      $('#rfKeywords').value = '';
+      $('#rfPattern').value = '';
+      $('#rfFromUsers').value = '';
+      $('#rfPrefix').value = '';
+      $('#rfEnabled').checked = true;
+    }
+  }
+
+  $('#btnRelayAdd').addEventListener('click', () => openRuleForm(null));
+
+  $('#btnRuleSave').addEventListener('click', async () => {
+    const rule = {
+      id: $('#rfId').value.trim(),
+      from: $('#rfFrom').value,
+      to: $('#rfTo').value.split(',').map(s => s.trim()).filter(Boolean),
+      keywords: $('#rfKeywords').value.split(',').map(s => s.trim()).filter(Boolean),
+      pattern: $('#rfPattern').value.trim() || undefined,
+      fromUsers: $('#rfFromUsers').value.split(',').map(s => s.trim()).filter(Boolean),
+      prefix: $('#rfPrefix').value.trim() || undefined,
+      enabled: $('#rfEnabled').checked,
+    };
+    if (!rule.id) { showToast('Rule ID is required', 'err'); return; }
+    try {
+      await apiPost('/api/relay/rules', rule);
+      showToast('Saved rule: ' + rule.id, 'ok');
+      $('#ruleForm').style.display = 'none';
+      $('#rfId').disabled = false;
+      await loadRelayRules();
+    } catch (e) { showToast('Save failed: ' + e.message, 'err'); }
+  });
+
+  $('#btnRuleCancel').addEventListener('click', () => {
+    $('#ruleForm').style.display = 'none';
+    $('#rfId').disabled = false;
+    state.relayEditingId = null;
+  });
+
+  // 测试路由
+  $('#btnRelayTest').addEventListener('click', async () => {
+    const body = {
+      channel: $('#testChannel').value.trim(),
+      sessionId: $('#testSessionId').value.trim() || undefined,
+      userId: $('#testUserId').value.trim() || undefined,
+      text: $('#testText').value.trim(),
+    };
+    if (!body.channel || !body.text) { showToast('Channel and text are required', 'err'); return; }
+    const result = $('#relayTestResult');
+    result.className = 'test-result';
+    try {
+      const r = await apiPost('/api/relay/test', body);
+      result.className = 'test-result show ' + (r.forwarded ? 'forwarded' : 'skipped');
+      result.textContent = (r.forwarded ? '\u2713 Forwarded' : '\u2717 Skipped') +
+        (r.reason ? ' \u2014 ' + r.reason : '');
+    } catch (e) {
+      result.className = 'test-result show skipped';
+      result.textContent = 'Error: ' + e.message;
+    }
+  });
 
   // ---------------------------------------------------------------------------
   // Trace tab
@@ -1833,7 +3274,7 @@ body {
         dur = (end.getTime() - start.getTime()) + 'ms';
       }
       const ok = !s.error && s.status !== 'error';
-      const statusMark = ok ? '✓' : '✗';
+      const statusMark = ok ? '\u2713' : '\u2717';
       return `
         <div class="trace-row">
           <div class="name">${escapeHtml(s.name || '')}</div>
@@ -1880,7 +3321,7 @@ body {
   // ---------------------------------------------------------------------------
   $('#btnSaveAll').addEventListener('click', () => {
     saveConfigNow();
-    showToast('Saving…', 'ok');
+    showToast('Saving...', 'ok');
   });
 
   $('#btnReset').addEventListener('click', async () => {
@@ -1899,7 +3340,7 @@ body {
   // Init
   // ---------------------------------------------------------------------------
   async function init() {
-    // Parallel load — config is the critical one
+    // 并行加载
     await Promise.all([
       loadConfig(),
       loadProviders(),
@@ -1908,6 +3349,10 @@ body {
       loadSandboxPresets(),
       loadChannelTemplates(),
       loadTrace(),
+      loadEnvVars(),
+      loadTeamPresets(),
+      loadRelayRules(),
+      loadComputerHistory(),
     ]);
     updateStatus();
   }

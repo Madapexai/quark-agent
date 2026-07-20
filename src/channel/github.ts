@@ -7,6 +7,7 @@
  * - issue 作者 = userId
  * - 回复通过 GitHub Issues Comments API
  * - 支持 secret 校验签名（X-Hub-Signature-256）
+ * - 可选轮询模式（polling: true）：定时拉 issue/PR 评论，无需公网 webhook
  *
  * 仅依赖 node:http + fetch，无 octokit 依赖（减重）。
  */
@@ -20,7 +21,7 @@ export interface GitHubChannelOptions {
   host?: string;
   /** GitHub webhook secret（签名校验） */
   webhookSecret?: string;
-  /** GitHub Personal Access Token（发评论用） */
+  /** GitHub Personal Access Token（发评论 + 轮询拉评论用） */
   accessToken?: string;
   /** 触发动作：默认 opened/created/commented */
   triggerActions?: string[];
@@ -28,6 +29,12 @@ export interface GitHubChannelOptions {
   defaultScope?: Scope;
   /** 鉴权回调：根据 GitHub login 返回该用户 scope */
   resolveScope?: (login: string) => Scope | undefined;
+  /** 启用轮询模式（默认 false，用 webhook）。轮询模式无需公网 IP */
+  polling?: boolean;
+  /** 轮询间隔 ms，默认 30000 */
+  pollingIntervalMs?: number;
+  /** 轮询目标 repo（owner/repo），可多个；轮询模式必填 */
+  repos?: string[];
 }
 
 interface WebhookPayload {
@@ -60,13 +67,20 @@ export class GitHubChannel implements Channel {
   readonly name = "github";
   private server?: http.Server;
   private pending = new Map<string, (reply: ChannelReply) => void>();
+  private pollingTimer?: ReturnType<typeof setInterval>;
+  /** 轮询模式：每个 repo 的 issue/PR 最新评论 ID 缓存，避免重复派发 */
+  private seenCommentIds = new Set<string>();
   private opts: Required<
-    Omit<GitHubChannelOptions, "accessToken" | "webhookSecret" | "defaultScope" | "resolveScope">
+    Omit<
+      GitHubChannelOptions,
+      "accessToken" | "webhookSecret" | "defaultScope" | "resolveScope" | "repos"
+    >
   > & {
     accessToken: string;
     webhookSecret: string;
     defaultScope?: Scope;
     resolveScope?: (login: string) => Scope | undefined;
+    repos: string[];
   };
 
   constructor(opts: GitHubChannelOptions = {}) {
@@ -78,10 +92,22 @@ export class GitHubChannel implements Channel {
       webhookSecret: opts.webhookSecret ?? "",
       defaultScope: opts.defaultScope,
       resolveScope: opts.resolveScope,
+      polling: opts.polling ?? false,
+      pollingIntervalMs: opts.pollingIntervalMs ?? 30_000,
+      repos: opts.repos ?? [],
     };
   }
 
   async start(emit: (event: ChannelEvent) => void): Promise<void> {
+    if (this.opts.polling) {
+      await this.startPolling(emit);
+      return;
+    }
+    await this.startWebhook(emit);
+  }
+
+  /** webhook 模式：HTTP server 接收 GitHub 事件 */
+  private async startWebhook(emit: (event: ChannelEvent) => void): Promise<void> {
     this.server = http.createServer(async (req, res) => {
       if (req.method !== "POST" || !req.url?.startsWith("/github/webhook")) {
         res.writeHead(404).end('{"error":"not found"}');
@@ -148,13 +174,96 @@ export class GitHubChannel implements Channel {
     });
   }
 
+  /** 轮询模式：定时拉每个 repo 的最新 issue/PR 评论，无需公网 webhook */
+  private async startPolling(emit: (event: ChannelEvent) => void): Promise<void> {
+    if (!this.opts.accessToken) {
+      throw new Error("GitHub 轮询模式需要 accessToken");
+    }
+    if (this.opts.repos.length === 0) {
+      throw new Error("GitHub 轮询模式需要至少一个 repo（owner/repo）");
+    }
+
+    const poll = async () => {
+      for (const repo of this.opts.repos) {
+        await this.pollRepoComments(repo, emit).catch(() => undefined);
+      }
+    };
+    // 立即跑一次，再定时
+    void poll();
+    this.pollingTimer = setInterval(poll, this.opts.pollingIntervalMs);
+    console.log(`[github] 轮询模式：${this.opts.repos.join(", ")}（每 ${this.opts.pollingIntervalMs}ms）`);
+  }
+
+  /** 拉某个 repo 最近 issue 评论 + PR 评论（issue comments API 兼容 PR 评论） */
+  private async pollRepoComments(repo: string, emit: (event: ChannelEvent) => void): Promise<void> {
+    // 拉 issue comments（GitHub Issues Comments API 覆盖 issue + PR 评论）
+    const url = `https://api.github.com/repos/${repo}/issues/comments?sort=created&direction=desc&per_page=10`;
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${this.opts.accessToken}`,
+        Accept: "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+      },
+    });
+    if (!res.ok) return;
+    const comments = (await res.json()) as Array<{
+      id?: number;
+      body?: string;
+      user?: { login?: string };
+      issue_url?: string;
+      created_at?: string;
+    }>;
+    if (!Array.isArray(comments)) return;
+
+    // 按时间正序处理（先旧后新）
+    for (const c of comments.reverse()) {
+      if (!c.id || !c.body || !c.user?.login) continue;
+      const key = `${repo}#${c.id}`;
+      if (this.seenCommentIds.has(key)) continue;
+      this.seenCommentIds.add(key);
+      // 缓存上限 5000 条，防内存膨胀
+      if (this.seenCommentIds.size > 5000) {
+        const first = this.seenCommentIds.values().next().value;
+        if (first) this.seenCommentIds.delete(first);
+      }
+
+      // 从 issue_url 解析 number
+      const match = c.issue_url?.match(/\/issues\/(\d+)$/);
+      if (!match) continue;
+      const number = parseInt(match[1], 10);
+      const sessionId = `${repo}#issue-${number}`;
+      const userId = c.user.login;
+      const scope = this.opts.resolveScope?.(userId) ?? this.opts.defaultScope;
+      const event: ChannelEvent = {
+        userId,
+        sessionId,
+        text: c.body,
+        from: userId,
+        receivedAt: c.created_at ? Date.parse(c.created_at) : Date.now(),
+        scope,
+        meta: { repo, number, event: "issue_comment", commentId: c.id },
+      };
+
+      // 等 agent 回复后发评论
+      const reply = await new Promise<ChannelReply>((resolve) => {
+        this.pending.set(sessionId, resolve);
+        emit(event);
+      });
+      await this.postComment(repo, number, reply.text).catch(() => undefined);
+      this.pending.delete(sessionId);
+    }
+  }
+
   async reply(sessionId: string, reply: ChannelReply): Promise<void> {
     const resolve = this.pending.get(sessionId);
     if (resolve) resolve(reply);
   }
 
   async stop(): Promise<void> {
-    await new Promise<void>((resolve) => this.server?.close(() => resolve()));
+    if (this.pollingTimer) clearInterval(this.pollingTimer);
+    if (this.server) {
+      await new Promise<void>((resolve) => this.server?.close(() => resolve()));
+    }
   }
 
   private parseEvent(
