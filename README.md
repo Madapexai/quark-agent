@@ -2,14 +2,14 @@
 
 # Quark Agent
 
-**A 5KB agent kernel that composes everything you need.**
+**A zero-dependency agentic framework with 22 LLM providers, 17 channels, and multi-agent orchestration.**
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178c6?style=flat-square?logo=typescript)](https://www.typescriptlang.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178c6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](./LICENSE)
-[![npm](https://img.shields.io/badge/npm-quark--agent-cb3837?style=flat-square?logo=npm)](https://www.npmjs.com/)
+[![npm](https://img.shields.io/badge/npm-quark--agent-cb3837?style=flat-square&logo=npm)](https://www.npmjs.com/)
 [![Pass Rate](https://img.shields.io/badge/Benchmark-89.0%25-brightgreen?style=flat-square)](./e2e/FULL-EVAL-REPORT.md)
 [![GitHub stars](https://img.shields.io/github/stars/Madapexai/quark-agent?style=flat-square)](https://github.com/Madapexai/quark-agent/stargazers)
-[![GitHub Discussions](https://img.shields.io/badge/Discussions-Join-blue?style=flat-square?logo=github)](https://github.com/Madapexai/quark-agent/discussions)
+[![v1.0.0](https://img.shields.io/badge/release-v1.0.0-blue?style=flat-square)](https://github.com/Madapexai/quark-agent/releases/tag/v1.0.0)
 
 **Like quarks compose into protons, compose the agent you need from the smallest possible kernel.**
 
@@ -19,61 +19,26 @@
 
 ---
 
-> Not another all-in-one framework. The kernel is **<5KB gzipped**, and tools, channels, models — **everything is a plug-and-play Skill**.
-
-## Table of Contents
-
-- [Why Quark Agent](#why-quark-agent)
-- [Benchmark](#benchmark)
-- [30-Second Quick Start](#30-second-quick-start)
-- [16 Tools, 7 Categories](#16-tools-7-categories)
-- [One Agent, Seven Entrypoints](#one-agent-seven-entrypoints)
-- [Self-Evolution (GEPA)](#self-evolution-gepa)
-- [A2A: Agents Talking to Agents](#a2a-agents-talking-to-agents)
-- [Architecture](#architecture)
-- [Project Structure](#project-structure)
-- [Testing](#testing)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [Community](#community)
-- [License](#license)
-
----
-
 ## Why Quark Agent
 
-**Others** give you a fixed toolset, take it or leave it.
-
-**Quark Agent**: 16 tools across 7 categories, 6 profile presets, mix-and-match however you like. Define a new Skill with one `defineAction`.
-
-| | Quark Agent | Claude Code | Codex CLI |
-|---|:---:|:---:|:---:|
-| Kernel size | **<5KB** | — | — |
-| Composable tools | ✅ | ❌ fixed | ❌ fixed |
-| Self-evolution (GEPA) | ✅ | ❌ | ❌ |
-| Channel entries | 7 | CLI | CLI |
-| A2A protocol | built-in | — | — |
-| Profile presets | 6 | — | — |
-| MoA routing | ✅ | ❌ | ❌ |
-| Sandbox policy | ✅ | ❌ | ❌ |
-| Setup wizard | ✅ | ❌ | ❌ |
-
----
-
-## Benchmark
-
-Evaluated on the industry-standard **AgentBench (THUDM)** and **GAIA (Meta/HF)** — 200 tasks total, real LLM, real tool calls. Full trace-level report: [`e2e/FULL-EVAL-REPORT.md`](./e2e/FULL-EVAL-REPORT.md) / interactive HTML: [`e2e/FULL-EVAL-REPORT.html`](./e2e/FULL-EVAL-REPORT.html).
-
-| Benchmark | Total | Pass | Fail | Error | Pass Rate |
-|-----------|------:|----:|----:|------:|----------:|
-| GAIA (Meta/HF) | 100 | 93 | 7 | 0 | **93.0%** |
-| AgentBench (THUDM) | 100 | 85 | 9 | 6 | **85.0%** |
-| **Overall** | **200** | **178** | **16** | **6** | **89.0%** |
-
-**GAIA by difficulty** — L1: 97.5% · L2: 94.3% · L3: 84.0%
-**AgentBench by category** — DB-Bench: 76.0% · OS-Interaction: 93.3% · Knowledge-Graph: 95.0%
-
-> Reproduce: `PORT=3465 node e2e/full-eval.mjs --bench all` — ~75 minutes, ~200 real LLM calls.
+| | Quark Agent | AstrBot | Claude Code | Codex CLI |
+|---|:---:|:---:|:---:|:---:|
+| Runtime dependencies | **0** | 20+ | — | — |
+| LLM Providers | **22** | ~6 | 1 | 1 |
+| IM Channels | **17** | ~6 | CLI | CLI |
+| Multi-Agent (MoA/Orchestrator) | ✅ | ❌ | ❌ | ❌ |
+| Computer Use | ✅ | ❌ | ✅ | ❌ |
+| Self-Evolution | ✅ | ❌ | ❌ | ❌ |
+| OpenAI Compatible API | ✅ | ❌ | ❌ | ❌ |
+| RAG / Knowledge Base | ✅ | ✅ | ❌ | ❌ |
+| MCP Protocol | ✅ | ✅ | ✅ | ❌ |
+| Workflow DAG Engine | ✅ | ❌ | ❌ | ❌ |
+| Voice STT/TTS | ✅ | ✅ | ❌ | ❌ |
+| Cron Scheduler | ✅ | ✅ | ❌ | ❌ |
+| Multimodal (image/file) | ✅ | ✅ | ✅ | ❌ |
+| Desktop (Electron) | ✅ | ❌ | ✅ | ❌ |
+| A2A Protocol | ✅ | ❌ | — | — |
+| Kernel size | **<5KB** | — | — | — |
 
 ---
 
@@ -91,148 +56,85 @@ npx tsx bin/cli.ts setup                 # Setup wizard
 npx tsx bin/cli.ts chat                  # Start chatting!
 ```
 
-> **New in v0.3.0**: `quark-agent setup` walks you through choosing a provider, model, channels, and sandbox policy. No more manual `.env` editing!
+> **You need to bring your own LLM API key.** Quark Agent is model-agnostic but does not ship with a built-in model. See [Get a Free API Key](#-get-a-free-api-key) below.
 
-> **⚠️ You need to bring your own LLM API key.** Quark Agent is model-agnostic (speaks the OpenAI-compatible API) but does **not** ship with a built-in model. Grab a free key in 2 minutes — see [Get a Free API Key](#-get-a-free-api-key) below.
+### CLI Commands
+
+```bash
+quark-agent setup            # Interactive setup wizard
+quark-agent chat             # Interactive chat (default)
+quark-agent ask "question"   # One-shot Q&A
+quark-agent serve --port     # HTTP + SSE server
+quark-agent dashboard        # WebUI dashboard (port 8788)
+quark-agent add <package>    # Install plugin from npm/Git
+quark-agent list             # List installed plugins
+quark-agent evolve           # Run prompt self-evolution
+```
+
+---
+
+## 22 LLM Providers, 49 Models
+
+Every provider uses real API endpoints — no stubs. Zero SDK dependencies (all HTTP via Node `fetch`).
+
+| # | Provider | Free Tier | Default Model |
+|---|----------|:---------:|---------------|
+| 1 | ZhipuAI (GLM) | ✅ | glm-4-flash |
+| 2 | Agnes AI | ✅ | agnes-2.0-flash |
+| 3 | DeepSeek | — | deepseek-chat |
+| 4 | Volcengine Ark | — | doubao-seed-code |
+| 5 | Moonshot | — | moonshot-v1 |
+| 6 | Qwen (Tongyi) | — | qwen-turbo |
+| 7 | MiniMax | — | abab6.5s-chat |
+| 8 | Baichuan | — | baichuan2-turbo |
+| 9 | Yi (01.AI) | — | yi-lightning |
+| 10 | StepFun | — | step-1-8k |
+| 11 | SiliconFlow | — | Qwen/Qwen2.5-7B-Instruct |
+| 12 | OpenAI | — | gpt-4o |
+| 13 | Anthropic | — | claude-sonnet-4-20250514 |
+| 14 | Gemini | — | gemini-2.0-flash |
+| 15 | OpenRouter | — | auto |
+| 16 | Together | — | meta-llama/Llama-3 |
+| 17 | Groq | — | llama-3.1-8b-instant |
+| 18 | Fireworks | — | llama-v3p1-70b-instruct |
+| 19 | Mistral | — | mistral-large-latest |
+| 20 | Ollama (local) | ✅ | llama3.2 |
+| 21 | LM Studio (local) | ✅ | — |
+| 22 | vLLM (local) | ✅ | — |
 
 ### 🔑 Get a Free API Key
 
-Quark Agent probes each provider at startup and picks the first healthy one, with automatic fallback. You only need to fill in **one** of these in `e2e/.env`:
-
-| Provider | Model | Cost | Where to get a key |
-|---|---|---|---|
-| **GLM / ZhipuAI** | `glm-4-flash` | 🆓 Free | https://open.bigmodel.cn/ — register, grab API key |
-| **Agnes AI** | `agnes-2.0-flash` | 🆓 Free ($0/1M tokens) | https://wiki.agnes-ai.com/ |
-| **Volcengine Ark** | `doubao-seed-code` | 💰 Paid (cheap) | https://www.volcengine.com/product/ark |
-
-**Or use any OpenAI-compatible endpoint:**
-
-| Provider | Env vars to set |
-|---|---|
-| OpenAI | `OPENAI_API_KEY=sk-...` |
-| Ollama (local, no key) | `OPENAI_API_KEY=ollama` · `OPENAI_BASE_URL=http://localhost:11434/v1` · `OPENAI_MODEL=llama3.2` |
-| DeepSeek | `DEEPSEEK_API_KEY=...` |
-| Together / Groq / OpenRouter / vLLM | `OPENAI_API_KEY=...` · `OPENAI_BASE_URL=...` · `OPENAI_MODEL=...` |
-
-**Easiest path (free, 2 minutes):**
-
-```bash
-# 1. Go to https://open.bigmodel.cn/ → register → get API key
-# 2. Put it in e2e/.env:
-GLM_API_KEY=your_key_here
-GLM_BASE_URL=https://open.bigmodel.cn/api/paas/v4
-GLM_MODEL=glm-4-flash
-# 3. Run
-npx tsx e2e/demo-server.ts
-```
-
-Spin up an agent in three lines of code:
-
-```ts
-import { createAgent } from "quark-agent";
-
-const { agent } = await createAgent({
-  apiKey: process.env.GLM_API_KEY!,
-  profile: "coding",          // coding-only tools
-  extraCategories: ["web"],   // plus the Web category
-});
-```
-
-<details>
-<summary><b>Other installation options</b></summary>
-
-```bash
-# Run the ReAct demo directly (no UI)
-npx tsx examples/basic.ts
-
-# Headless E2E test against the running server
-node e2e/test-tools.mjs
-
-# Browser E2E test (requires Chrome)
-node e2e/e2e-browser-test.mjs
-```
-
-</details>
-
-<details>
-<summary><b>Full configuration reference</b></summary>
-
-```bash
-cp e2e/.env.example e2e/.env
-```
-
-```env
-# Priority 1: Volcengine Ark (OpenAI-compatible)
-ARK_API_KEY=
-ARK_BASE_URL=https://ark.cn-beijing.volces.com/api/coding/v3
-ARK_MODEL=doubao-seed-code
-
-# Priority 2: Agnes AI (free, OpenAI-compatible)
-AGNES_API_KEY=
-AGNES_BASE_URL=https://apihub.agnes-ai.com/v1
-AGNES_MODEL=agnes-2.0-flash
-
-# Priority 3: GLM / ZhipuAI (free, OpenAI-compatible)
-GLM_API_KEY=
-GLM_BASE_URL=https://open.bigmodel.cn/api/paas/v4
-GLM_MODEL=glm-4-flash
-
-# Priority 4: Model Proxy (Anthropic format, local)
-MODEL_PROXY_URL=http://127.0.0.1:43191
-MODEL_PROXY_KEY=
-MODEL_PROXY_MODEL=GLM-4.5-Air
-
-# Priority 5: Direct OpenAI-compatible API
-OPENAI_API_KEY=
-DEEPSEEK_API_KEY=
-```
-
-At startup each provider is probed; the first healthy one becomes primary. If the primary fails at runtime, requests automatically fall back to the next provider in the chain.
-
-</details>
+| Provider | Cost | Where to get |
+|---|---|---|
+| **GLM / ZhipuAI** | Free | https://open.bigmodel.cn/ |
+| **Agnes AI** | Free ($0/1M tokens) | https://wiki.agnes-ai.com/ |
+| **Ollama** (local) | Free | https://ollama.ai/ |
 
 ---
 
-## 16 Tools, 7 Categories
+## 17 Channels
 
-You don't need to load them all. The `profile` parameter decides what loads:
+Same agent — just swap the channel. All channels have real API implementations (no stubs).
 
-| Category | Tools | minimal | coding | research | full |
-|---|---|:---:|:---:|:---:|:---:|
-| File | `read_file` `write_file` `edit_file` `list_dir` | | ✅ | | ✅ |
-| Search | `search_files` `find_files` | | ✅ | | ✅ |
-| Shell | `shell` | | ✅ | | ✅ |
-| Web | `web_search` `web_fetch` | | | ✅ | ✅ |
-| Code | `run_code` | ✅ | ✅ | | ✅ |
-| Image | `generate_image` | | | | ✅ |
-| Task | `todo_write` `task_list` | | | ✅ | ✅ |
-| Memory | `memory_save` `memory_search` | | | ✅ | ✅ |
-
-Define a Skill with one `defineAction` — it auto-exposes to Agent / HTTP / CLI / MCP / A2A:
-
-```ts
-import { defineAction } from "quark-agent";
-
-export const sendEmail = defineAction({
-  name: "send_email",
-  description: "Send an email to someone",
-  parameters: {
-    to: { type: "string" },
-    subject: { type: "string" },
-    body: { type: "string" },
-  },
-  handler: async ({ to, subject, body }) => {
-    // your logic
-    return { sent: true };
-  },
-});
-```
-
----
-
-## One Agent, Seven Entrypoints
-
-Same agent instance — just swap the channel:
+| # | Channel | Protocol | Auth |
+|---|---------|----------|------|
+| 1 | **CLI** | stdin/stdout | — |
+| 2 | **HTTP + SSE** | REST + streaming | JWT |
+| 3 | **Discord** | Gateway WebSocket | Bot token |
+| 4 | **Slack** | Events API | Bot token + signing secret |
+| 5 | **Telegram** | Bot API (polling) | Bot token |
+| 6 | **Feishu (Lark)** | Event subscription | App ID + secret |
+| 7 | **WeChat** | HTTP callback | Token + encoding AES key |
+| 8 | **WhatsApp** | Cloud API webhook | Verify token + app secret |
+| 9 | **Signal** | signal-cli-rest-api | Phone number |
+| 10 | **Email** | IMAP + SMTP (self-built) | User/pass (TLS) |
+| 11 | **SMS (Twilio)** | Webhook + REST | Account SID + auth token |
+| 12 | **Matrix** | Client-Server API (/sync) | Access token |
+| 13 | **Mattermost** | REST + WebSocket | Access token |
+| 14 | **DingTalk** | Outgoing webhook | Sign secret |
+| 15 | **WeCom (Enterprise WeChat)** | Callback + AES decrypt | Corp ID + secret + encoding key |
+| 16 | **Relay** | Cross-channel routing | Config-based |
+| 17 | **WebUI Dashboard** | HTTP + SSE | JWT login |
 
 ```ts
 // Terminal
@@ -243,36 +145,261 @@ new CliChannel({ agent }).start();
 import { HttpChannel } from "quark-agent";
 new HttpChannel({ agent, port: 3456 }).start();
 
-// Feishu / WeCom / Telegram / GitHub / Webhook
-// all supported, same integration contract
+// WhatsApp, Signal, Matrix, DingTalk, WeCom...
+// All supported, same integration contract
 ```
+
+---
+
+## Multi-Agent Orchestration
+
+Three collaboration patterns for teams of agents:
+
+```ts
+import { AgentTeam } from "quark-agent";
+
+// 1. Sequential Pipeline — agents run in order
+const team = new AgentTeam(workers, { mode: "sequential" });
+
+// 2. Mixture of Agents (MoA) — parallel workers + aggregator
+const team = new AgentTeam(workers, { mode: "moa", aggregator });
+
+// 3. Orchestrator-Worker — main agent dispatches tasks
+const team = new AgentTeam(workers, { mode: "orchestrator", orchestrator });
+
+// Both sync and streaming execution
+const result = await team.run("Analyze this codebase");
+for await (const event of team.stream("Analyze this codebase")) {
+  console.log(event);
+}
+```
+
+---
+
+## MCP Protocol
+
+Full Model Context Protocol support — both as server and client:
+
+```ts
+// Expose tools as an MCP server (stdio or SSE)
+import { createQuarkMCPServer } from "quark-agent";
+const mcp = await createQuarkMCPServer();
+await mcp.runStdio();        // stdio transport
+mcp.runSSE(3000);            // SSE transport
+
+// Connect to external MCP servers
+import { MCPRegistry } from "quark-agent";
+const registry = new MCPRegistry();
+await registry.connect({ name: "filesystem", command: "npx", args: ["@modelcontextprotocol/server-filesystem", "/tmp"] });
+const tools = registry.listAllTools();
+```
+
+---
+
+## RAG / Knowledge Base
+
+Document upload, chunking, vectorization, and retrieval-augmented generation:
+
+```ts
+import { knowledgeBase } from "quark-agent";
+
+// Add documents
+await knowledgeBase.addDocument("guide.md", "# How to use...\n...");
+
+// Search
+const results = await knowledgeBase.search("how to deploy", 5);
+
+// Get context for LLM prompt
+const context = await knowledgeBase.getContext("deployment instructions", 2000);
+```
+
+**API Endpoints**: `POST /api/kb/documents` · `POST /api/kb/search` · `GET /api/kb/documents`
+
+---
+
+## OpenAI Compatible API
+
+Drop-in replacement for OpenAI's chat completions — use any tool that expects the OpenAI API:
+
+```bash
+# List models
+curl http://localhost:8788/v1/models
+
+# Chat completion (non-streaming)
+curl -X POST http://localhost:8788/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model":"quark-agent","messages":[{"role":"user","content":"hello"}]}'
+
+# Chat completion (SSE streaming)
+curl -X POST http://localhost:8788/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model":"quark-agent","messages":[{"role":"user","content":"hello"}],"stream":true}'
+```
+
+Works with any OpenAI SDK — just change the `baseURL`:
+
+```python
+from openai import OpenAI
+client = OpenAI(base_url="http://localhost:8788/v1", api_key="any")
+response = client.chat.completions.create(model="quark-agent", messages=[...])
+```
+
+---
+
+## Function Calling
+
+Standardized OpenAI function calling format:
+
+```ts
+import { toolsToOpenAIFormat, executeToolCalls } from "quark-agent";
+
+// Convert quark-agent tools to OpenAI format
+const openaiTools = toolsToOpenAIFormat(myTools);
+
+// Execute tool calls from LLM response
+const results = await executeToolCalls(toolCalls, toolMap);
+```
+
+---
+
+## Computer Use
+
+Screenshot, click, type, drag, scroll, window management, and Chrome DevTools Protocol control:
+
+```ts
+import { ComputerService } from "quark-agent";
+const computer = new ComputerService();
+
+await computer.screenshot();                    // Take screenshot
+await computer.click(100, 200);                 // Click at coordinates
+await computer.type("Hello world");             // Type text
+await computer.launchApp("Safari");             // Launch application
+await computer.listWindows();                   // List windows
+// CDP browser control
+await computer.cdpNavigate("https://example.com");
+await computer.cdpEvaluate("document.title");
+```
+
+Native WebSocket CDP connection — no curl dependency.
+
+---
+
+## Workflow DAG Engine
+
+Visual workflow orchestration with 7 node types:
+
+```ts
+import { workflowEngine } from "quark-agent";
+
+const wf = workflowEngine.createWorkflow("data-pipeline", "Process and summarize data");
+
+// Add nodes
+workflowEngine.addNode(wf.id, { type: "input", name: "raw_data", config: {}, position: { x: 0, y: 0 } });
+workflowEngine.addNode(wf.id, { type: "llm", name: "summarize", config: { prompt: "Summarize: ${raw_data}" }, position: { x: 200, y: 0 } });
+workflowEngine.addNode(wf.id, { type: "output", name: "result", config: { outputFormat: "markdown" }, position: { x: 400, y: 0 } });
+
+// Connect nodes
+workflowEngine.addEdge(wf.id, { from: "raw_data_node_id", to: "summarize_node_id" });
+workflowEngine.addEdge(wf.id, { from: "summarize_node_id", to: "result_node_id" });
+
+// Execute
+const result = await workflowEngine.run(wf.id, "Some input data");
+```
+
+**Node types**: `input` · `llm` · `tool` · `condition` · `code` · `delay` · `output`
+
+---
+
+## Voice (STT/TTS)
+
+Speech-to-text and text-to-speech with multiple providers:
+
+```ts
+import { voiceManager } from "quark-agent";
+
+// List available voices
+voiceManager.listVoices();  // 10 preset voices
+
+// Speech-to-text
+voiceManager.setSTTProvider("openai", apiKey);
+const result = await voiceManager.transcribe(audioBuffer, "wav");
+
+// Text-to-speech
+voiceManager.setTTSProvider("edge-tts");
+const tts = await voiceManager.synthesize("Hello world", { voice: "zh-CN-XiaoxiaoNeural" });
+```
+
+Providers: **OpenAI Whisper** (STT) · **Local whisper CLI** (STT) · **OpenAI TTS-1** (TTS) · **Edge TTS** (TTS) · **Web Speech API** (browser fallback)
+
+---
+
+## Cron Scheduler
+
+Schedule recurring tasks with standard cron expressions:
+
+```ts
+import { scheduler } from "quark-agent";
+
+scheduler.setRunner(async (prompt) => {
+  const result = await agent.run(prompt);
+  return result.reply;
+});
+
+scheduler.addTask("morning-brief", "0 9 * * 1-5", "Summarize today's schedule");
+scheduler.addTask("weekly-report", "0 17 * * 5", "Generate weekly progress report");
+
+scheduler.start();  // Checks every 60 seconds
+```
+
+**API Endpoints**: `GET/POST /api/scheduler/tasks` · `PUT/DELETE /api/scheduler/tasks/:id` · `POST /api/scheduler/run/:id`
+
+---
+
+## Multimodal Input
+
+Upload images, files, and audio — automatically converted to LLM vision format:
+
+```ts
+import { multimodalManager } from "quark-agent";
+
+// Save uploaded file
+const attachment = multimodalManager.saveAttachment("photo.png", "image/png", buffer);
+
+// Convert to OpenAI vision format
+const content = multimodalManager.toOpenAIContent("What's in this image?", [attachment]);
+// → [{ type: "text", text: "..." }, { type: "image_url", image_url: { url: "data:image/png;base64,..." } }]
+
+// Convert to Anthropic format
+const anthropicContent = multimodalManager.toAnthropicContent("What's in this image?", [attachment]);
+```
+
+**Upload**: `POST /api/upload` (multipart or base64 JSON) · WebUI: drag & drop / paste / click 📎
 
 ---
 
 ## Self-Evolution (GEPA)
 
-Hand the agent a set of test cases and let it tune its own prompts and tool-selection policy:
+Hand the agent test cases and let it tune its own prompts and tool-selection policy:
 
 ```ts
 import { Evolver } from "quark-agent";
-
 const evolver = new Evolver({ agent, evalCases: [...], generations: 10 });
 await evolver.evolve();
 ```
 
+The **Dreaming Engine** watches for failures, identifies root causes (timeout/permission/ENOENT/syntax/rate-limit), and autonomously creates skills, modifies prompts, or adjusts sandbox rules.
+
 ---
 
-## A2A: Agents Talking to Agents
+## Plugin Hot Reload
+
+Plugins are watched for changes and auto-reloaded without restart:
 
 ```ts
-import { getA2ARegistry } from "quark-agent";
-
-getA2ARegistry().register({
-  name: "code-reviewer",
-  skills: [{ name: "review", description: "Review pull requests" }],
-});
-
-// other agents can now invoke it directly
+import { PluginHotReloader } from "quark-agent";
+const reloader = new PluginHotReloader(".quark-plugins");
+reloader.on("reload", (event) => console.log(`${event.type}: ${event.pluginName}`));
+reloader.start();
 ```
 
 ---
@@ -280,29 +407,25 @@ getA2ARegistry().register({
 ## Architecture
 
 ```
-┌──────────────────────────────────────────┐
-│              Channels (7)                │
-│  CLI · HTTP · Feishu · WeCom · Tg · GH · Hook
-├──────────────────────────────────────────┤
-│            Agent Runtime                 │
-│  ReAct · Planner · Sub-Agent · Healer   │
-├───────┬───────┬───────┬─────────────────┤
-│ Tools │ Skills│Provider│    Plugins      │
-│  16   │ Store │ Multi  │ A2A·SSE·MCP·Hub │
-├───────┴───────┴───────┴─────────────────┤
-│          Kernel (<5KB gzip)              │
-│      Agent · Context · Runtime · Types   │
-└──────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│                    Desktop (Electron)                     │
+├──────────────────────────────────────────────────────────┤
+│              WebUI Dashboard (HTML/CSS/JS)                │
+├──────────────────────────────────────────────────────────┤
+│           Dashboard Server (HTTP + SSE + Auth)            │
+├──────────────────────────────────────────────────────────┤
+│             Core Agent Runtime (TypeScript)               │
+│  ReAct · Planner · Sub-Agent · Healer · MoA · Orchestrator│
+├────────┬──────────┬──────────┬──────────┬────────────────┤
+│Channels│  Tools   │  Skills  │ Provider │   Extensions    │
+│  17    │  20+     │  Store   │  22/49   │ MCP·RAG·Voice   │
+│        │ Computer │ HotLoad  │          │ Workflow·Cron    │
+│        │ Multimod │ Evolve   │          │ OpenAI API·A2A   │
+├────────┴──────────┴──────────┴──────────┴────────────────┤
+│                    Kernel (<5KB gzip)                      │
+│            Agent · Context · Runtime · Types               │
+└──────────────────────────────────────────────────────────┘
 ```
-
-Pay for what you use: kernel only → add plugins → add extensions → full stack. Your call.
-
-| Layer | Package | Contents |
-|---|---|---|
-| Kernel | `packages/core` | Agent, Context, Runtime, Types — zero deps |
-| Plugins | `packages/plugins` | A2A, SSE, Workspace, defineAction |
-| Extensions | `packages/extensions` | Sessions, Healer, Skill scoring |
-| Full | `src/` | all tools, channels, providers |
 
 ---
 
@@ -311,70 +434,161 @@ Pay for what you use: kernel only → add plugins → add extensions → full st
 ```
 quark-agent/
 ├── src/
-│   ├── core/          kernel: Agent, Context, Runtime
-│   ├── tools/         16+ built-in tools
-│   ├── channel/       7 channels
-│   ├── provider/      OpenAI / Anthropic / Gemini / Ollama
-│   ├── plugin/        plugin registry + built-in plugins
-│   ├── skills/        skill discovery, scoring, persistence
-│   ├── evolve/        GEPA self-evolution
-│   ├── a2a/           agent-to-agent protocol
+│   ├── core/          Kernel: Agent, Context, Runtime, Types
+│   ├── tools/         20+ built-in tools + Computer Use + Function Calling
+│   ├── channel/       17 channels (Discord, Slack, WhatsApp, Signal...)
+│   ├── provider/      22 providers / 49 models
+│   ├── mcp/           MCP server + client registry
+│   ├── rag/           Knowledge base + RAG
+│   ├── voice/         STT/TTS
+│   ├── scheduler/     Cron task scheduler
+│   ├── workflow/      DAG workflow engine
+│   ├── multimodal/    Image/file upload + vision format conversion
+│   ├── api/           OpenAI compatible API
+│   ├── skills/        Skill discovery, scoring, persistence, hot reload
+│   ├── team/          Multi-agent orchestration (MoA/Sequential/Orchestrator)
+│   ├── chatroom/      Chat rooms with agent team integration
+│   ├── dreaming/      Self-evolution engine
+│   ├── a2a/           Agent-to-agent protocol
+│   ├── observe/       Langfuse + LogViewer
+│   ├── env/           .env management
+│   ├── config/        Model manager + hot switching
+│   ├── auth/          JWT auth + PBKDF2 + rate limiting
+│   ├── sandbox/       VM sandbox
 │   ├── sync/          EventBus + SSE
 │   ├── memory/        SQLite storage + compression
-│   └── sandbox/       VM sandbox
-├── packages/
-│   ├── core/          zero-dep kernel
-│   ├── plugins/       official plugins
-│   └── extensions/    high-order extensions
-└── e2e/               demo + tests + benchmark + UI
+│   └── dashboard/     WebUI + server
+├── desktop/           Electron wrapper (main.cjs + preload.cjs)
+├── mobile/            Capacitor config (iOS/Android)
+├── docs/              Documentation + Rust Roadmap
+├── packages/          Zero-dep kernel + plugins + extensions
+└── e2e/               Demo + tests + benchmark
 ```
 
 ---
 
-## Testing
+## API Endpoints
 
-```bash
-# API integration tests
-node e2e/test-tools.mjs
+### Core
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/auth/login` | JWT login |
+| POST | `/api/auth/register` | Create account |
+| GET/POST | `/api/sessions` | Chat sessions |
+| POST | `/api/sessions/:id/chat` | Chat (SSE streaming) |
+| GET/PUT | `/api/config` | Agent configuration |
 
-# browser E2E tests (requires Chrome)
-node e2e/e2e-browser-test.mjs
+### OpenAI Compatible
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/v1/models` | List models |
+| POST | `/v1/chat/completions` | Chat (SSE streaming supported) |
+| POST | `/v1/embeddings` | Embeddings (placeholder) |
 
-# full benchmark suite (200 tasks, ~75 min)
-PORT=3465 node e2e/full-eval.mjs --bench all
-```
+### MCP
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/mcp/tools` | List tools |
+| GET | `/api/mcp/servers` | List connected servers |
+| POST | `/api/mcp/connect` | Connect to MCP server |
+| POST | `/api/mcp/disconnect` | Disconnect from server |
 
-- 13/13 API tests pass
-- 12/12 browser E2E tests pass
-- 178/200 benchmark tasks pass (**89.0%**)
-- All 16 tools verified against a real LLM
+### Knowledge Base
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/kb/documents` | List documents |
+| POST | `/api/kb/documents` | Add document |
+| DELETE | `/api/kb/documents/:id` | Delete document |
+| POST | `/api/kb/search` | Search (RAG) |
+| DELETE | `/api/kb/clear` | Clear all |
+
+### Scheduler
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/scheduler/tasks` | List tasks |
+| POST | `/api/scheduler/tasks` | Create task |
+| PUT | `/api/scheduler/tasks/:id` | Update task |
+| DELETE | `/api/scheduler/tasks/:id` | Delete task |
+| POST | `/api/scheduler/run/:id` | Trigger manually |
+| GET | `/api/scheduler/history` | Run history |
+
+### Workflow
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/workflows` | List workflows |
+| POST | `/api/workflows` | Create workflow |
+| GET/PUT/DELETE | `/api/workflows/:id` | CRUD |
+| POST | `/api/workflows/:id/run` | Execute workflow |
+| POST | `/api/workflows/:id/nodes` | Add node |
+
+### Voice & Upload
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/voices` | List voices |
+| POST | `/api/voice/stt` | Speech-to-text |
+| POST | `/api/voice/tts` | Text-to-speech |
+| POST | `/api/upload` | Upload file/image |
 
 ---
 
-## What's New in v0.3.0
+## Benchmark
 
-- **Setup Wizard** — `quark-agent setup` walks you through provider, model, channels, and sandbox policy
-- **MoA Intelligent Routing** — task complexity detection (simple/medium/complex) → auto-routes to fast/medium/powerful models
-- **Sandbox Security Policy** — shell allowlist/denylist, network/filesystem control, preset policies (strict/balanced/permissive)
-- **Tool Authorization** — configurable auto-approve: `all` / `safe` (read-only auto-approved) / `none`
-- **Unified Config** — `.quark-agent.json` config file + env vars + CLI flags with priority chain
-- **Checkpoint & Long-Running Programming** — state persistence, auto-save, crash recovery, resume from checkpoint
-- **Multi-Provider** — OpenAI, Anthropic, Gemini, Ollama, OpenRouter all built-in, zero SDK dependencies
+Evaluated on **AgentBench (THUDM)** and **GAIA (Meta/HF)** — 200 tasks total, real LLM, real tool calls. Full report: [`e2e/FULL-EVAL-REPORT.md`](./e2e/FULL-EVAL-REPORT.md).
+
+| Benchmark | Total | Pass | Fail | Error | Pass Rate |
+|-----------|------:|----:|----:|------:|----------:|
+| GAIA (Meta/HF) | 100 | 93 | 7 | 0 | **93.0%** |
+| AgentBench (THUDM) | 100 | 85 | 9 | 6 | **85.0%** |
+| **Overall** | **200** | **178** | **16** | **6** | **89.0%** |
+
+---
+
+## What's New in v1.0.0
+
+### P1 — Critical
+- **MCP Protocol**: Server (stdio/SSE) + Client Registry — connect external MCP servers
+- **CDP Native WebSocket**: Replace curl with persistent WebSocket, fix screenshot dimensions
+- **Multimodal Input**: Image/file upload, drag & paste, OpenAI/Anthropic vision format
+- **Streaming Output**: Fix SSE parsing, token-by-token display, tool progress bar
+- **OpenAI Compatible API**: `/v1/chat/completions` (SSE streaming) + Function Calling standardization
+- **Security Hardening**: PBKDF2+salt, random admin password, JWT persistence, CORS lockdown, rate limiting, security headers
+
+### P2 — Medium
+- **Knowledge Base / RAG**: Document chunking, TF-IDF embedding, cosine search
+- **Voice STT/TTS**: OpenAI Whisper + local whisper + edge-tts
+- **Cron Scheduler**: 5-field cron parser, task CRUD, run history
+- **Workflow DAG Engine**: 7 node types, conditional branching
+- **Plugin Hot Reload**: fs.watch with debounce
+
+### P3 — Low
+- **Electron Desktop**: main.cjs + preload.cjs
+- **Capacitor Mobile**: iOS/Android config
+- **Rust Roadmap**: 6-phase upgrade plan (10-50x perf target)
+
+---
 
 ## Roadmap
 
-- [x] 5KB kernel + 16 composable tools
-- [x] 7 channels (CLI / HTTP / Feishu / WeCom / Tg / GH / Hook)
-- [x] A2A protocol + GEPA self-evolution
-- [x] 200-task benchmark suite (AgentBench + GAIA)
-- [x] Standalone docs site (GitHub Pages, MkDocs Material)
-- [x] `npx quark-agent` one-line installer + setup wizard
-- [x] Plugin marketplace (`quark-agent add`)
-- [x] MoA intelligent routing + sandbox policy + tool authorization
-- [x] Checkpoint & long-running programming support
-- [ ] Computer-use tool (screenshot + click + type)
-- [ ] Browser-use agent (Puppeteer-driven)
+- [x] 5KB kernel + composable tools
+- [x] 17 channels (CLI/HTTP/Discord/Slack/Telegram/Feishu/WeChat/WhatsApp/Signal/Email/SMS/Matrix/Mattermost/DingTalk/WeCom/Relay/WebUI)
+- [x] 22 LLM providers / 49 models
+- [x] Multi-agent orchestration (MoA/Sequential/Orchestrator)
+- [x] Computer Use (screenshot/click/type/CDP)
+- [x] MCP protocol (server + client)
+- [x] OpenAI compatible API
+- [x] RAG / Knowledge Base
+- [x] Workflow DAG engine
+- [x] Voice STT/TTS
+- [x] Cron scheduler
+- [x] Multimodal input (image/file upload)
+- [x] Self-evolution (GEPA + Dreaming Engine)
+- [x] Plugin marketplace + hot reload
+- [x] Desktop (Electron) + Mobile (Capacitor)
+- [x] Security hardening (PBKDF2/JWT/CORS/rate-limit/security headers)
+- [ ] Rust native modules (see [docs/RUST_ROADMAP.md](./docs/RUST_ROADMAP.md))
 - [ ] npm publish for `npx quark-agent`
+- [ ] Fine-grained RBAC permissions
+- [ ] Distributed multi-node deployment
 
 ---
 
@@ -390,12 +604,12 @@ See the [open issues](https://github.com/Madapexai/quark-agent/issues) for thing
 
 ## Community
 
-- 💬 [GitHub Discussions](https://github.com/Madapexai/quark-agent/discussions) — ask questions, share use cases
-- 🐛 [Issue Tracker](https://github.com/Madapexai/quark-agent/issues) — bugs and feature requests
-- 📚 [Benchmark Report](./e2e/FULL-EVAL-REPORT.md) — full trace-level evaluation
-- 🐦 Twitter: [@quark_agent](https://twitter.com/) (coming soon)
+- [GitHub Discussions](https://github.com/Madapexai/quark-agent/discussions) — ask questions, share use cases
+- [Issue Tracker](https://github.com/Madapexai/quark-agent/issues) — bugs and feature requests
+- [Benchmark Report](./e2e/FULL-EVAL-REPORT.md) — full trace-level evaluation
+- [Rust Roadmap](./docs/RUST_ROADMAP.md) — performance upgrade plan
 
-If Quark Agent helps you, please consider giving it a ⭐ — it helps others discover the project.
+If Quark Agent helps you, please consider giving it a star — it helps others discover the project.
 
 ---
 
