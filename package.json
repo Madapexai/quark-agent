@@ -1,6 +1,6 @@
 {
   "name": "quark-agent",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "description": "Quark Agent — A 5KB agent kernel that composes everything you need. Model-agnostic, tool-composable, channel-pluggable.",
   "type": "module",
   "main": "./dist/index.js",
