@@ -21,7 +21,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "tsx bin/cli.ts",
-    "start": "node bin/run-cli.js",
+    "start": "node bin/run-cli.cjs",
     "typecheck": "tsc --noEmit",
     "example": "tsx examples/basic.ts",
     "prepublishOnly": "npm run build"

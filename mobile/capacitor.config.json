@@ -1,0 +1,15 @@
+{
+  "appId": "com.quarkagent.app",
+  "appName": "Quark Agent",
+  "webDir": "../src/dashboard/web",
+  "server": {
+    "url": "http://127.0.0.1:8788",
+    "cleartext": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#0d1117"
+    }
+  }
+}

@@ -364,6 +364,49 @@ body {
 }
 .chat-send-btn:hover { background: var(--blue-hover); }
 .chat-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.chat-input-row { display: flex; gap: 8px; align-items: flex-end; width: 100%; }
+.chat-attachments-preview { display: none; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.chat-attachments-preview.drag-over { outline: 2px dashed var(--blue); outline-offset: 2px; }
+.chat-input-area.drag-over { background: var(--bg-input); }
+.chat-upload-btn {
+  flex: 0 0 auto; width: 38px; height: 38px; padding: 0;
+  background: var(--bg-secondary); color: var(--text-secondary);
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  font-size: 18px; cursor: pointer; transition: var(--transition);
+  display: flex; align-items: center; justify-content: center;
+}
+.chat-upload-btn:hover { background: var(--bg-input); color: var(--blue); border-color: var(--blue); }
+.chat-upload-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.chat-attachment-thumb, .chat-attachment-chip {
+  position: relative; display: flex; align-items: center; gap: 6px;
+  padding: 4px 8px; background: var(--bg-secondary); border: 1px solid var(--border);
+  border-radius: var(--radius-md); font-size: 12px; color: var(--text-secondary); max-width: 220px;
+}
+.chat-attachment-thumb { padding: 4px; }
+.chat-attachment-thumb img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
+.chat-attachment-thumb .att-name, .chat-attachment-chip .att-name {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px;
+}
+.att-icon { font-size: 16px; }
+.att-size { color: var(--text-tertiary); font-size: 11px; }
+.att-remove {
+  position: absolute; top: -6px; right: -6px; width: 18px; height: 18px;
+  border-radius: 50%; border: none; background: var(--danger, #e5484d); color: #fff;
+  font-size: 12px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.att-remove:hover { opacity: 0.85; }
+.msg-attachments { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.msg-attachments .chat-attachment-thumb img { width: 80px; height: 80px; }
+.stream-cursor { display: inline-block; width: 7px; height: 1em; background: var(--blue); margin-left: 2px; vertical-align: text-bottom; animation: caret-blink 1s step-end infinite; }
+@keyframes caret-blink { 0%,50% { opacity: 1; } 51%,100% { opacity: 0; } }
+.tool-progress {
+  display: flex; align-items: center; gap: 6px; margin: 6px 0; padding: 4px 8px;
+  background: var(--bg-secondary); border: 1px solid var(--border-light); border-radius: var(--radius-sm);
+  font-size: 12px; color: var(--text-secondary);
+}
+.tool-progress .tool-icon { font-size: 13px; }
+.tool-progress .tool-status { color: var(--text-tertiary); margin-left: auto; }
+.tool-progress.done .tool-status { color: var(--green, #16a34a); }
 
 /* typing 动画 */
 .typing-indicator { display: flex; gap: 4px; padding: 4px 0; }
@@ -416,6 +459,11 @@ body {
 .pie-chart { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .pie-legend-item { display: flex; align-items: center; gap: 4px; font-size: 12px; }
 .pie-legend-color { width: 10px; height: 10px; border-radius: 2px; }
+
+/* Item Card */
+.item-card { background: var(--bg-card, #212121); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+.card-title { font-size: 15px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary); }
+.streaming { opacity: 0.85; border-left: 3px solid var(--blue); padding-left: 12px; }
 
 /* Trace / Log 列表 */
 .section-title { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
@@ -720,6 +768,12 @@ body {
   display: none; position: fixed; inset: 0; z-index: 40;
 }
 .dropdown-overlay.open { display: block; }
+
+@media (max-width: 768px) {
+  #mobile-menu-btn { display: flex !important; }
+  .icon-sidebar { display: none; }
+  .icon-sidebar.open { display: flex; position: fixed; left: 0; top: 0; bottom: 0; z-index: 1000; background: var(--bg-sidebar); }
+}
 </style>
 </head>
 <body>
@@ -747,6 +801,7 @@ body {
   <!-- 顶栏 -->
   <div class="topbar">
     <span class="brand">◉ quark-agent</span>
+    <button id="mobile-menu-btn" class="icon-btn" style="display:none" onclick="toggleMobileMenu()">☰</button>
     <div class="spacer"></div>
     <select class="model-selector" id="model-selector"></select>
     <button class="locale-btn" id="locale-btn"></button>
@@ -813,8 +868,13 @@ body {
             </div>
           </div>
           <div class="chat-input-area">
-            <textarea class="chat-input" id="chat-input" rows="1" placeholder=""></textarea>
-            <button class="chat-send-btn" id="chat-send-btn"><span data-i18n="chat.sendMessage"></span> ↑</button>
+            <div class="chat-attachments-preview" id="chat-attachments-preview"></div>
+            <div class="chat-input-row">
+              <input type="file" id="chat-file-input" multiple accept="image/*,application/pdf,text/*,.md,.txt,.json,.csv,audio/*" hidden>
+              <button class="chat-upload-btn" id="chat-upload-btn" title="上传图片/文件">📎</button>
+              <textarea class="chat-input" id="chat-input" rows="1" placeholder=""></textarea>
+              <button class="chat-send-btn" id="chat-send-btn"><span data-i18n="chat.sendMessage"></span> ↑</button>
+            </div>
           </div>
         </div>
       </div>
@@ -1018,7 +1078,7 @@ const i18n = {
     sidebar: { chat: '聊天', rooms: '聊天室', dashboard: '仪表盘', skills: '技能', tools: '工具', settings: '设置' },
     chat: { newSession: '新对话', sendMessage: '发送', thinking: '思考中...', noSessions: '暂无会话', deleteSession: '删除会话', renameSession: '重命名', typePlaceholder: '输入消息...', enterSend: '按 Enter 发送' },
     rooms: { createRoom: '创建房间', joinRoom: '加入', leaveRoom: '离开', bindTeam: '绑定团队', askAgent: '询问 Agent', typePlaceholder: '输入消息...', noRooms: '暂无房间', roomName: '房间名' },
-    dashboard: { usage: '使用量趋势', cost: '费用', tokens: 'Token', sessions: '会话', traces: '追踪', logs: '日志', today: '今天', total: '总计' },
+    dashboard: { usage: '使用量趋势', cost: '费用', tokens: 'Token', sessions: '会话', traces: '追踪', logs: '日志', today: '今天', total: '总计', yesterday: '昨天', earlier: '更早' },
     skills: { installed: '已安装', search: '搜索技能...', install: '安装', dreaming: '自进化', learn: '/learn 提炼', evolve: '进化', autoWatch: '自动监视', noSkill: '选择一个技能查看详情', tools: '工具', env: '环境变量' },
     tools: { computerUse: '电脑控制', relay: '转发', screenshot: '截图', click: '点击', type: '输入', browser: '浏览器', screenshotBtn: '截取屏幕', clickBtn: '点击', typeBtn: '输入', openUrl: '打开', evalJs: '执行', urlPlaceholder: '输入 URL...', jsPlaceholder: '输入 JS 代码...', clipboard: '剪贴板', coordX: 'X 坐标', coordY: 'Y 坐标', textToType: '输入文本', windows: '窗口', relayRules: '转发规则', addRule: '添加规则' },
     settings: { provider: '提供商与密钥', models: '模型', channels: '渠道', sandbox: '安全策略', checkpoint: '检查点', env: '环境变量', langfuse: '可观测性', about: '关于', apiKey: 'API 密钥', baseURL: '接口地址', probe: '探测', save: '保存', model: '模型', temperature: '温度', maxTokens: '最大 Token', profile: 'Profile', preset: '预设', strict: '严格', balanced: '均衡', permissive: '宽松', enabled: '已启用', disabled: '已禁用', autoSaveInterval: '自动保存间隔(秒)', maxPerSession: '每会话最大数', addEnv: '添加变量', key: '键', value: '值', publicKey: '公钥', secretKey: '密钥', baseUrl: '服务地址', testConnection: '测试连接', flush: 'Flush', version: '版本', docs: '文档', reset: '重置', resetConfirm: '确定要重置所有配置吗？', addModel: '添加模型', switchModel: '切换', probeModel: '探测', name: '名称', addChannel: '添加渠道' },
@@ -1029,7 +1089,7 @@ const i18n = {
     sidebar: { chat: 'Chat', rooms: 'Rooms', dashboard: 'Dashboard', skills: 'Skills', tools: 'Tools', settings: 'Settings' },
     chat: { newSession: 'New Chat', sendMessage: 'Send', thinking: 'Thinking...', noSessions: 'No sessions yet', deleteSession: 'Delete', renameSession: 'Rename', typePlaceholder: 'Type a message...', enterSend: 'Press Enter to send' },
     rooms: { createRoom: 'Create Room', joinRoom: 'Join', leaveRoom: 'Leave', bindTeam: 'Bind Team', askAgent: 'Ask Agent', typePlaceholder: 'Type a message...', noRooms: 'No rooms yet', roomName: 'Room name' },
-    dashboard: { usage: 'Usage Trend', cost: 'Cost', tokens: 'Tokens', sessions: 'Sessions', traces: 'Traces', logs: 'Logs', today: 'Today', total: 'Total' },
+    dashboard: { usage: 'Usage Trend', cost: 'Cost', tokens: 'Tokens', sessions: 'Sessions', traces: 'Traces', logs: 'Logs', today: 'Today', total: 'Total', yesterday: 'Yesterday', earlier: 'Earlier' },
     skills: { installed: 'Installed', search: 'Search skills...', install: 'Install', dreaming: 'Dreaming', learn: '/learn', evolve: 'Evolve', autoWatch: 'Auto Watch', noSkill: 'Select a skill to see details', tools: 'Tools', env: 'Env Vars' },
     tools: { computerUse: 'Computer Use', relay: 'Relay', screenshot: 'Screenshot', click: 'Click', type: 'Type', browser: 'Browser', screenshotBtn: 'Take Screenshot', clickBtn: 'Click', typeBtn: 'Type', openUrl: 'Open', evalJs: 'Eval', urlPlaceholder: 'Enter URL...', jsPlaceholder: 'Enter JS code...', clipboard: 'Clipboard', coordX: 'X coord', coordY: 'Y coord', textToType: 'Text to type', windows: 'Windows', relayRules: 'Relay Rules', addRule: 'Add Rule' },
     settings: { provider: 'Provider & Keys', models: 'Models', channels: 'Channels', sandbox: 'Security', checkpoint: 'Checkpoint', env: 'Env Vars', langfuse: 'Observability', about: 'About', apiKey: 'API Key', baseURL: 'Base URL', probe: 'Probe', save: 'Save', model: 'Model', temperature: 'Temperature', maxTokens: 'Max Tokens', profile: 'Profile', preset: 'Preset', strict: 'Strict', balanced: 'Balanced', permissive: 'Permissive', enabled: 'Enabled', disabled: 'Disabled', autoSaveInterval: 'Auto Save Interval (s)', maxPerSession: 'Max Per Session', addEnv: 'Add Var', key: 'Key', value: 'Value', publicKey: 'Public Key', secretKey: 'Secret Key', baseUrl: 'Base URL', testConnection: 'Test Connection', flush: 'Flush', version: 'Version', docs: 'Docs', reset: 'Reset', resetConfirm: 'Reset all configuration?', addModel: 'Add Model', switchModel: 'Switch', probeModel: 'Probe', name: 'Name', addChannel: 'Add Channel' },
@@ -1057,6 +1117,7 @@ const state = {
   activeModel: null,
   config: {},
   isStreaming: false,
+  pendingAttachments: [],
   isLoginMode: true, // true=登录, false=注册
 };
 
@@ -1098,13 +1159,16 @@ function renderMD(text) {
     .replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) =>
       `<pre><code>${esc(code.trim())}</code></pre>`)
     // 行内代码
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/`([^`]+)`/g, (_, code) => '<code>'+esc(code)+'</code>')
     // 粗体
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     // 斜体
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
     // 链接
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color:var(--blue)">$1</a>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, text, url) => {
+      var safe = /^(https?:|\/)/.test(url) ? url : '#';
+      return '<a href="'+esc(safe)+'" target="_blank" style="color:var(--blue)">'+esc(text)+'</a>';
+    })
     // 换行
     .replace(/\n/g, '<br>');
   return html;
@@ -1163,6 +1227,8 @@ function switchPage(page) {
 function showLogin() {
   state.token = '';
   localStorage.removeItem('qa-token');
+  document.getElementById('login-username').value = '';
+  document.getElementById('login-password').value = '';
   document.getElementById('login-page').classList.add('active');
   document.getElementById('app').classList.remove('active');
   updateLoginUI();
@@ -1224,7 +1290,8 @@ async function checkAuth() {
     } else {
       showLogin();
     }
-  } catch {
+  } catch(e) {
+    console.error('Auth check failed:', e);
     showLogin();
   }
 }
@@ -1269,7 +1336,7 @@ async function loadModels() {
         sel.value = active.id;
         state.activeModel = active;
       }
-    } catch {}
+    } catch(e) { console.error('Failed to load active model:', e); }
     // 如果没有模型，从配置加载
     if (state.models.length === 0) {
       try {
@@ -1281,10 +1348,10 @@ async function loadModels() {
         opt.textContent = cfg.model || 'gpt-4o-mini';
         sel.appendChild(opt);
         sel.value = 'default';
-      } catch {}
+      } catch(e) { console.error('Failed to load models:', e); }
     }
     updateModelBadge();
-  } catch {}
+  } catch(e) { console.error('Failed to load models:', e); }
 }
 
 async function switchModel(id) {
@@ -1295,7 +1362,7 @@ async function switchModel(id) {
       body: JSON.stringify({ id })
     });
     updateModelBadge();
-  } catch {}
+  } catch(e) { console.error('Failed to switch model:', e); }
 }
 
 function updateModelBadge() {
@@ -1312,7 +1379,7 @@ async function loadSessions() {
     const res = await fetchWithAuth('/api/sessions');
     state.sessions = await res.json();
     renderSessionList();
-  } catch {
+  } catch(e) { console.error('Failed to load sessions:', e);
     state.sessions = [];
     renderSessionList();
   }
@@ -1331,11 +1398,11 @@ function renderSessionList() {
     for (const s of groups.today) html += renderSessionItem(s);
   }
   if (groups.yesterday.length) {
-    html += `<div class="session-group-label">Yesterday</div>`;
+    html += `<div class="session-group-label">${t('dashboard.yesterday')}</div>`;
     for (const s of groups.yesterday) html += renderSessionItem(s);
   }
   if (groups.earlier.length) {
-    html += `<div class="session-group-label">Earlier</div>`;
+    html += `<div class="session-group-label">${t('dashboard.earlier')}</div>`;
     for (const s of groups.earlier) html += renderSessionItem(s);
   }
   container.innerHTML = html;
@@ -1346,7 +1413,7 @@ function renderSessionItem(s) {
   const preview = s.messageCount > 0 ? `${s.messageCount} msgs` : '';
   return `<div class="session-item ${active}" data-sid="${s.id}" onclick="selectSession('${s.id}')">
     <div class="s-info">
-      <div class="s-title">${esc(s.title)}</div>
+      <div class="s-title">${esc(s.name)}</div>
       <div class="s-preview">${preview}</div>
     </div>
     <div class="s-actions">
@@ -1364,7 +1431,8 @@ async function selectSession(id) {
     const res = await fetchWithAuth(`/api/sessions/${id}/messages`);
     state.currentSessionMessages = await res.json();
     renderMessages();
-  } catch {
+  } catch(e) {
+    console.error('Failed to load session messages:', e);
     state.currentSessionMessages = [];
     renderMessages();
   }
@@ -1380,7 +1448,10 @@ async function createSession() {
     state.sessions.unshift(s);
     renderSessionList();
     await selectSession(s.id);
-  } catch {}
+  } catch(e) {
+    console.error('Failed to create session:', e);
+    alert(t('common.error'));
+  }
 }
 
 async function deleteSession(id) {
@@ -1394,7 +1465,7 @@ async function deleteSession(id) {
       renderMessages();
     }
     renderSessionList();
-  } catch {}
+  } catch(e) { console.error('Failed to delete session:', e); }
 }
 
 async function renameSession(id) {
@@ -1403,12 +1474,12 @@ async function renameSession(id) {
   try {
     await fetchWithAuth(`/api/sessions/${id}`, {
       method: 'PUT',
-      body: JSON.stringify({ title: newTitle })
+      body: JSON.stringify({ name: newTitle })
     });
     const s = state.sessions.find(s => s.id === id);
-    if (s) s.title = newTitle;
+    if (s) s.name = newTitle;
     renderSessionList();
-  } catch {}
+  } catch(e) { console.error('Failed to rename session:', e); }
 }
 
 // ============================================================================
@@ -1423,7 +1494,11 @@ function renderMessages() {
   let html = '';
   for (const m of state.currentSessionMessages) {
     if (m.role === 'user') {
-      html += `<div class="msg user"><div class="msg-role">You</div><div class="msg-content">${esc(m.content)}</div></div>`;
+      let attHtml = '';
+      if (m.attachments && m.attachments.length) {
+        attHtml = '<div class="msg-attachments">' + m.attachments.map(renderAttachmentChip).join('') + '</div>';
+      }
+      html += `<div class="msg user"><div class="msg-role">You</div><div class="msg-content">${esc(m.content)}${attHtml}</div></div>`;
     } else {
       html += `<div class="msg agent"><div class="msg-role">Agent</div><div class="msg-content">${renderMD(m.content)}</div></div>`;
     }
@@ -1456,13 +1531,119 @@ function finalizeStreamMessage() {
   if (msgEl) msgEl.classList.remove('streaming');
 }
 
+
 // ============================================================================
-// Chat - 发送消息（SSE 流式）
+// Chat - 附件 / 多模态上传
+// ============================================================================
+let __scrollScheduled = false;
+/** 平滑滚动聊天容器到底部（按帧合并，避免高频 token 抖动） */
+function scrollChatSmooth() {
+  if (__scrollScheduled) return;
+  __scrollScheduled = true;
+  requestAnimationFrame(() => {
+    const container = document.getElementById('chat-messages');
+    if (container) container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+    __scrollScheduled = false;
+  });
+}
+
+function attachmentIcon(type) { return type === 'image' ? '🖼️' : type === 'audio' ? '🎵' : '📄'; }
+function formatSize(n) {
+  if (n == null) return '';
+  if (n < 1024) return n + 'B';
+  if (n < 1024 * 1024) return (n / 1024).toFixed(1) + 'KB';
+  return (n / 1024 / 1024).toFixed(1) + 'MB';
+}
+
+/** 渲染单个附件 chip（用于消息气泡内） */
+function renderAttachmentChip(att) {
+  if (att.type === 'image' && att.dataUrl) {
+    return `<div class="chat-attachment-thumb"><img src="${att.dataUrl}" alt="${esc(att.filename)}"><span class="att-name">${esc(att.filename)}</span></div>`;
+  }
+  return `<div class="chat-attachment-chip"><span class="att-icon">${attachmentIcon(att.type)}</span><span class="att-name">${esc(att.filename)}</span><span class="att-size">${formatSize(att.size)}</span></div>`;
+}
+
+/** 追加用户消息（含附件） */
+function appendUserMessage(text, attachments) {
+  const container = document.getElementById('chat-messages');
+  const empty = container.querySelector('.empty-state');
+  if (empty) empty.remove();
+  const msgEl = document.createElement('div');
+  msgEl.className = 'msg user';
+  let attHtml = '';
+  if (attachments && attachments.length) {
+    attHtml = '<div class="msg-attachments">' + attachments.map(renderAttachmentChip).join('') + '</div>';
+  }
+  msgEl.innerHTML = `<div class="msg-role">You</div><div class="msg-content">${esc(text)}${attHtml}</div>`;
+  container.appendChild(msgEl);
+  scrollChatSmooth();
+}
+
+function readAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+
+async function uploadFile(file) {
+  const fd = new FormData();
+  fd.append('file', file);
+  const headers = {};
+  if (state.token) headers['Authorization'] = `Bearer ${state.token}`;
+  // 不设置 Content-Type，让浏览器自动加上 multipart boundary
+  const res = await fetch('/api/upload', { method: 'POST', headers, body: fd });
+  if (!res.ok) {
+    const d = await res.json().catch(() => ({}));
+    throw new Error(d.error || '上传失败');
+  }
+  return await res.json();
+}
+
+async function handleFileSelect(files) {
+  if (!files || !files.length) return;
+  for (const file of files) {
+    if (file.size > 10 * 1024 * 1024) {
+      alert(`${file.name} 超过 10MB 限制`);
+      continue;
+    }
+    try {
+      const r = await uploadFile(file);
+      if (r && r.attachment) {
+        const att = r.attachment;
+        if (att.type === 'image') att.dataUrl = await readAsDataUrl(file);
+        state.pendingAttachments.push(att);
+      }
+    } catch (e) {
+      alert(`上传 ${file.name} 失败: ${e.message}`);
+    }
+  }
+  renderPendingAttachments();
+}
+
+function renderPendingAttachments() {
+  const c = document.getElementById('chat-attachments-preview');
+  if (!c) return;
+  if (!state.pendingAttachments.length) { c.innerHTML = ''; c.style.display = 'none'; return; }
+  c.style.display = 'flex';
+  c.innerHTML = state.pendingAttachments.map((att, i) => {
+    const idx = `data-idx="${i}"`;
+    if (att.type === 'image' && att.dataUrl) {
+      return `<div class="chat-attachment-thumb pending"><img src="${att.dataUrl}" alt="${esc(att.filename)}"><button class="att-remove" ${idx}>×</button><span class="att-name">${esc(att.filename)}</span></div>`;
+    }
+    return `<div class="chat-attachment-chip pending"><span class="att-icon">${attachmentIcon(att.type)}</span><span class="att-name">${esc(att.filename)}</span><span class="att-size">${formatSize(att.size)}</span><button class="att-remove" ${idx}>×</button></div>`;
+  }).join('');
+}
+// ============================================================================
+// Chat - 发送消息（SSE 流式，token-by-token）
 // ============================================================================
 async function sendMessage() {
   const input = document.getElementById('chat-input');
   const text = input.value.trim();
-  if (!text || state.isStreaming) return;
+  const attachments = state.pendingAttachments.slice();
+  if ((!text && !attachments.length) || state.isStreaming) return;
 
   // 如果没有会话，先创建
   if (!state.currentSessionId) {
@@ -1471,12 +1652,17 @@ async function sendMessage() {
   }
 
   input.value = '';
+  input.style.height = 'auto';
   state.isStreaming = true;
   document.getElementById('chat-send-btn').disabled = true;
+  document.getElementById('chat-upload-btn').disabled = true;
+  // 清空待发附件预览
+  state.pendingAttachments = [];
+  renderPendingAttachments();
 
-  // 显示用户消息
-  appendStreamMessage('user', text);
-  state.currentSessionMessages.push({ role: 'user', content: text, ts: Date.now() });
+  // 显示用户消息（含附件）
+  appendUserMessage(text, attachments);
+  state.currentSessionMessages.push({ role: 'user', content: text, attachments, ts: Date.now() });
 
   // 显示 typing 动画
   const container = document.getElementById('chat-messages');
@@ -1484,16 +1670,34 @@ async function sendMessage() {
   typingEl.className = 'msg agent streaming';
   typingEl.innerHTML = `<div class="msg-role">Agent</div><div class="msg-content"><div class="typing-indicator"><span></span><span></span><span></span></div></div>`;
   container.appendChild(typingEl);
-  container.scrollTop = container.scrollHeight;
+  scrollChatSmooth();
 
   let fullReply = '';
+  let agentEl = null;
+  let toolEl = null;
+
+  // 用 agentEl 替换 typing 气泡，按 token 增量渲染
+  const ensureAgentBubble = () => {
+    if (agentEl) return agentEl;
+    if (typingEl.parentNode) typingEl.remove();
+    agentEl = document.createElement('div');
+    agentEl.className = 'msg agent streaming';
+    agentEl.innerHTML = `<div class="msg-role">Agent</div><div class="msg-content"></div>`;
+    container.appendChild(agentEl);
+    return agentEl;
+  };
+  const updateAgentContent = () => {
+    if (!agentEl) return;
+    agentEl.querySelector('.msg-content').innerHTML = renderMD(fullReply) + '<span class="stream-cursor"></span>';
+    scrollChatSmooth();
+  };
 
   try {
     // 使用 SSE 流式接口
     const url = `/api/sessions/${state.currentSessionId}/chat`;
     const res = await fetchWithAuth(url, {
       method: 'POST',
-      body: JSON.stringify({ text })
+      body: JSON.stringify({ text, attachments })
     });
 
     if (!res.ok) {
@@ -1505,56 +1709,95 @@ async function sendMessage() {
     const decoder = new TextDecoder();
     let buffer = '';
 
+    const handleEvent = (eventType, dataStr) => {
+      let data;
+      try { data = JSON.parse(dataStr); } catch { return; }
+      if (eventType === 'done') {
+        if (data.reply) fullReply = data.reply;
+      } else if (eventType === 'error') {
+        fullReply = `❌ ${data.error || '未知错误'}`;
+      } else if (eventType === 'chunk' || eventType === 'token') {
+        // 增量 token：data 可能是 {delta} 或嵌套在 data 字段里
+        const delta = (data.data && data.data.delta) || data.delta || data.token || '';
+        if (delta) {
+          ensureAgentBubble();
+          fullReply += delta;
+          updateAgentContent();
+        }
+      } else if (eventType === 'tool_call' || eventType === 'tool_start') {
+        const tool = (data.data && data.data.tool) || data.tool || 'tool';
+        ensureAgentBubble();
+        toolEl = document.createElement('div');
+        toolEl.className = 'tool-progress';
+        toolEl.innerHTML = `<span class="tool-icon">🔧</span><span class="tool-name">${esc(tool)}</span><span class="tool-status">执行中…</span>`;
+        agentEl.querySelector('.msg-content').appendChild(toolEl);
+        scrollChatSmooth();
+      } else if (eventType === 'tool_result' || eventType === 'tool_end') {
+        if (toolEl) {
+          toolEl.querySelector('.tool-status').textContent = '完成';
+          toolEl.classList.add('done');
+          toolEl = null;
+        }
+      } else if (eventType === 'run_start' || eventType === 'connected') {
+        // 仍显示 typing 动画，等待首个 chunk
+      }
+    };
+
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
       buffer += decoder.decode(value, { stream: true });
-      // 解析 SSE 事件
-      const lines = buffer.split('\n');
-      buffer = '';
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        if (line.startsWith('event: done')) {
-          // 下一行是 data
-          const dataLine = lines[i + 1];
-          if (dataLine && dataLine.startsWith('data: ')) {
-            try {
-              const data = JSON.parse(dataLine.slice(6));
-              fullReply = data.reply || fullReply;
-            } catch {}
-          }
-        } else if (line.startsWith('event: error')) {
-          const dataLine = lines[i + 1];
-          if (dataLine && dataLine.startsWith('data: ')) {
-            try {
-              const data = JSON.parse(dataLine.slice(6));
-              fullReply = `❌ ${data.error}`;
-            } catch {}
-          }
+      // SSE 事件以空行分隔；保留不完整尾部在 buffer 中
+      const events = buffer.split('\n\n');
+      buffer = events.pop() ?? '';
+      for (const evt of events) {
+        if (!evt.trim()) continue;
+        let eventType = '';
+        const dataLines = [];
+        for (const line of evt.split('\n')) {
+          if (line.startsWith('event:')) eventType = line.slice(6).trim();
+          else if (line.startsWith('data:')) dataLines.push(line.slice(5).replace(/^ /, ''));
+          else if (line.startsWith(':')) continue; // SSE 注释
         }
+        if (eventType && dataLines.length) handleEvent(eventType, dataLines.join('\n'));
       }
     }
+    // 处理缓冲区中残留的最后一个事件
+    if (buffer.trim()) {
+      let eventType = '';
+      const dataLines = [];
+      for (const line of buffer.split('\n')) {
+        if (line.startsWith('event:')) eventType = line.slice(6).trim();
+        else if (line.startsWith('data:')) dataLines.push(line.slice(5).replace(/^ /, ''));
+      }
+      if (eventType && dataLines.length) handleEvent(eventType, dataLines.join('\n'));
+    }
 
-    // 如果没有获取到流式数据，可能是普通响应
+    // 如果没有任何流式数据，尝试按普通 JSON 响应解析
     if (!fullReply) {
       try {
         const data = await resJSON(res);
         fullReply = data?.reply || '';
-      } catch {}
+      } catch (e) { console.error('Error:', e); }
     }
   } catch (e) {
     fullReply = `❌ ${e.message}`;
   }
 
-  // 更新消息
+  // 收尾：移除 typing、定稿 agent 气泡
   if (typingEl.parentNode) typingEl.remove();
-  if (fullReply) {
+  if (agentEl) {
+    agentEl.querySelector('.msg-content').innerHTML = renderMD(fullReply);
+  } else if (fullReply) {
     appendStreamMessage('agent', fullReply);
+  }
+  if (fullReply) {
     state.currentSessionMessages.push({ role: 'assistant', content: fullReply, ts: Date.now() });
   }
 
   state.isStreaming = false;
   document.getElementById('chat-send-btn').disabled = false;
+  document.getElementById('chat-upload-btn').disabled = false;
   finalizeStreamMessage();
 }
 
@@ -1570,35 +1813,35 @@ async function loadDashboard() {
     document.getElementById('stat-cost').textContent = '$' + (usage.totalCost || 0).toFixed(2);
     const totalTokens = (usage.totalInputTokens || 0) + (usage.totalOutputTokens || 0);
     document.getElementById('stat-tokens').textContent = totalTokens > 1000 ? (totalTokens / 1000).toFixed(1) + 'K' : totalTokens;
-  } catch {}
+  } catch(e) { console.error('Dashboard load error:', e); }
 
   // 加载趋势
   try {
     const res = await fetchWithAuth('/api/analytics/trend?days=7');
     const trend = await res.json();
     renderBarChart(trend);
-  } catch {}
+  } catch(e) { console.error('Dashboard load error:', e); }
 
   // 加载模型分布
   try {
     const res = await fetchWithAuth('/api/analytics/models');
     const models = await res.json();
     renderModelPie(models);
-  } catch {}
+  } catch(e) { console.error('Dashboard load error:', e); }
 
   // 加载 Traces
   try {
     const res = await fetchWithAuth('/api/trace');
     const traces = await res.json();
     renderTraces(traces);
-  } catch {}
+  } catch(e) { console.error('Dashboard load error:', e); }
 
   // 加载 Logs
   try {
     const res = await fetchWithAuth('/api/logs?limit=20');
     const data = await res.json();
     renderLogs(data.entries || data);
-  } catch {}
+  } catch(e) { console.error('Dashboard load error:', e); }
 }
 
 function renderBarChart(trend) {
@@ -1656,7 +1899,7 @@ async function loadRooms() {
     const res = await fetchWithAuth('/api/chatrooms');
     state.rooms = await res.json();
     renderRoomList();
-  } catch {
+  } catch(e) { console.error('Failed to load rooms:', e);
     state.rooms = [];
     renderRoomList();
   }
@@ -1689,7 +1932,7 @@ async function loadRoomMessages(id) {
     const res = await fetchWithAuth(`/api/chatrooms/${id}/messages?limit=50`);
     const messages = await res.json();
     renderRoomMessages(messages);
-  } catch {
+  } catch(e) { console.error('Failed to load room messages:', e);
     renderRoomMessages([]);
   }
 }
@@ -1719,7 +1962,7 @@ async function createRoom() {
       body: JSON.stringify({ name })
     });
     await loadRooms();
-  } catch {}
+  } catch(e) { console.error('Failed to create room:', e); }
 }
 
 async function sendRoomMessage() {
@@ -1733,7 +1976,7 @@ async function sendRoomMessage() {
       body: JSON.stringify({ userId: state.user?.id || 'admin', content: text })
     });
     await loadRoomMessages(state.currentRoomId);
-  } catch {}
+  } catch(e) { console.error('Failed to send room message:', e); }
 }
 
 // ============================================================================
@@ -1744,7 +1987,7 @@ async function loadSkills() {
     const res = await fetchWithAuth('/api/skills');
     state.skills = await res.json();
     renderSkillList();
-  } catch {
+  } catch(e) { console.error('Failed to load skills:', e);
     state.skills = [];
     renderSkillList();
   }
@@ -1785,7 +2028,7 @@ async function selectSkill(name) {
         </div>
       </div>`;
     }
-  } catch {}
+  } catch(e) { console.error('Failed to load dreaming history:', e); }
 
   document.getElementById('skills-detail').innerHTML = `
     <div class="skill-detail-header">
@@ -1813,7 +2056,7 @@ async function installSkill() {
       body: JSON.stringify({ package: pkg })
     });
     await loadSkills();
-  } catch {}
+  } catch(e) { console.error('Failed to install skill:', e); }
 }
 
 async function removeSkill(name) {
@@ -1828,7 +2071,7 @@ async function removeSkill(name) {
       document.getElementById('skills-detail').innerHTML = `<div class="empty-state"><span class="empty-icon">🧠</span><span class="empty-text">${t('skills.noSkill')}</span></div>`;
     }
     await loadSkills();
-  } catch {}
+  } catch(e) { console.error('Failed to remove skill:', e); }
 }
 
 async function doLearn(sessionId) {
@@ -1838,13 +2081,13 @@ async function doLearn(sessionId) {
       body: JSON.stringify({ sessionId: sessionId || 'manual' })
     });
     if (state.currentSkillName) await selectSkill(state.currentSkillName);
-  } catch {}
+  } catch(e) { console.error('Failed to learn:', e); }
 }
 
 async function doDreamingWatch() {
   try {
     await fetchWithAuth('/api/dreaming/watch/start', { method: 'POST' });
-  } catch {}
+  } catch(e) { console.error('Failed to start dreaming watch:', e); }
 }
 
 // ============================================================================
@@ -1938,14 +2181,14 @@ async function doClick() {
   const y = parseInt(document.getElementById('click-y').value);
   try {
     await fetchWithAuth('/api/computer/click', { method: 'POST', body: JSON.stringify({ x, y }) });
-  } catch {}
+  } catch(e) { console.error('Click failed:', e); }
 }
 
 async function doType() {
   const text = document.getElementById('type-text').value;
   try {
     await fetchWithAuth('/api/computer/type', { method: 'POST', body: JSON.stringify({ text }) });
-  } catch {}
+  } catch(e) { console.error('Type failed:', e); }
 }
 
 async function loadWindows() {
@@ -1960,7 +2203,7 @@ async function loadWindows() {
         ${w.focused ? '<span class="win-focused">focused</span>' : ''}
       </div>`
     ).join('');
-  } catch {}
+  } catch(e) { console.error('Failed to load windows:', e); }
 }
 
 async function getClipboard() {
@@ -1968,14 +2211,14 @@ async function getClipboard() {
     const res = await fetchWithAuth('/api/computer/clipboard');
     const data = await res.json();
     document.getElementById('clipboard-text').value = data.text || '';
-  } catch {}
+  } catch(e) { console.error('Failed to get clipboard:', e); }
 }
 
 async function setClipboard() {
   const text = document.getElementById('clipboard-text').value;
   try {
     await fetchWithAuth('/api/computer/clipboard', { method: 'POST', body: JSON.stringify({ text }) });
-  } catch {}
+  } catch(e) { console.error('Failed to set clipboard:', e); }
 }
 
 async function browserOpen() {
@@ -1983,7 +2226,7 @@ async function browserOpen() {
   if (!url) return;
   try {
     await fetchWithAuth('/api/computer/browser/open', { method: 'POST', body: JSON.stringify({ url }) });
-  } catch {}
+  } catch(e) { console.error('Failed to open browser:', e); }
 }
 
 async function browserEval() {
@@ -1993,7 +2236,7 @@ async function browserEval() {
     const res = await fetchWithAuth('/api/computer/browser/eval', { method: 'POST', body: JSON.stringify({ script }) });
     const data = await res.json();
     alert(JSON.stringify(data.result, null, 2));
-  } catch {}
+  } catch(e) { console.error('Failed to eval browser js:', e); }
 }
 
 async function loadRelayRules() {
@@ -2008,7 +2251,7 @@ async function loadRelayRules() {
         <span class="tag ${r.enabled !== false ? 'green' : 'red'}">${r.enabled !== false ? t('common.enabled') : t('common.disabled')}</span>
       </div>`
     ).join('');
-  } catch {}
+  } catch(e) { console.error('Failed to load relay rules:', e); }
 }
 
 async function addRelayRule() {
@@ -2017,7 +2260,7 @@ async function addRelayRule() {
   try {
     await fetchWithAuth('/api/relay/rules', { method: 'POST', body: JSON.stringify({ id, channel: 'discord', pattern: '*', enabled: true }) });
     loadRelayRules();
-  } catch {}
+  } catch(e) { console.error('Failed to add relay rule:', e); }
 }
 
 // ============================================================================
@@ -2069,7 +2312,7 @@ async function loadProviderSettings(body) {
       </div>
       <div id="probe-result" style="margin-top:8px;font-size:12px"></div>
     `;
-  } catch {}
+  } catch(e) { console.error('Failed to load provider settings:', e); }
 }
 
 async function saveProviderConfig() {
@@ -2080,7 +2323,7 @@ async function saveProviderConfig() {
   };
   try {
     await fetchWithAuth('/api/config', { method: 'POST', body: JSON.stringify(config) });
-  } catch {}
+  } catch(e) { console.error('Failed to save provider config:', e); }
 }
 
 async function probeProvider() {
@@ -2120,14 +2363,14 @@ async function loadModelsSettings(body) {
       `).join('')}
       <button class="btn" onclick="addModelConfig()" style="margin-top:8px">${t('settings.addModel')}</button>
     `;
-  } catch {}
+  } catch(e) { console.error('Failed to load models settings:', e); }
 }
 
 async function switchModelById(id) {
   try {
     await fetchWithAuth('/api/models/switch', { method: 'POST', body: JSON.stringify({ id }) });
     await loadModels();
-  } catch {}
+  } catch(e) { console.error('Failed to switch model by id:', e); }
 }
 
 async function probeModelById(id) {
@@ -2146,7 +2389,7 @@ async function addModelConfig() {
     const body = document.getElementById('acc-models-body');
     body.dataset.loaded = 'false';
     await loadModelsSettings(body);
-  } catch {}
+  } catch(e) { console.error('Failed to add model config:', e); }
 }
 
 async function loadChannelsSettings(body) {
@@ -2165,7 +2408,7 @@ async function loadChannelsSettings(body) {
         `).join('')}
       </div>
     `;
-  } catch {}
+  } catch(e) { console.error('Failed to load channels settings:', e); }
 }
 
 async function loadSandboxSettings(body) {
@@ -2197,14 +2440,14 @@ async function loadSandboxSettings(body) {
       </div>
       <button class="btn primary" onclick="saveSandboxConfig()">${t('common.save')}</button>
     `;
-  } catch {}
+  } catch(e) { console.error('Failed to load sandbox settings:', e); }
 }
 
 async function applySandboxPreset(name) {
   try {
     const cfg = { ...state.config, sandbox: { ...state.config.sandbox, _preset: name } };
     await fetchWithAuth('/api/config', { method: 'POST', body: JSON.stringify({ sandbox: cfg.sandbox }) });
-  } catch {}
+  } catch(e) { console.error('Failed to apply sandbox preset:', e); }
 }
 
 async function saveSandboxConfig() {
@@ -2215,7 +2458,7 @@ async function saveSandboxConfig() {
   };
   try {
     await fetchWithAuth('/api/config', { method: 'POST', body: JSON.stringify({ sandbox }) });
-  } catch {}
+  } catch(e) { console.error('Failed to save sandbox config:', e); }
 }
 
 async function loadCheckpointSettings(body) {
@@ -2241,7 +2484,7 @@ async function saveCheckpointConfig() {
   };
   try {
     await fetchWithAuth('/api/config', { method: 'POST', body: JSON.stringify({ checkpoint }) });
-  } catch {}
+  } catch(e) { console.error('Failed to save checkpoint config:', e); }
 }
 
 async function loadEnvSettings(body) {
@@ -2270,7 +2513,7 @@ async function loadEnvSettings(body) {
         <button class="btn primary" onclick="addEnv()">${t('settings.addEnv')}</button>
       </div>
     `;
-  } catch {}
+  } catch(e) { console.error('Failed to load env settings:', e); }
 }
 
 async function addEnv() {
@@ -2282,7 +2525,7 @@ async function addEnv() {
     const body = document.getElementById('acc-env-body');
     body.dataset.loaded = 'false';
     await loadEnvSettings(body);
-  } catch {}
+  } catch(e) { console.error('Failed to add env var:', e); }
 }
 
 async function deleteEnv(key) {
@@ -2291,7 +2534,7 @@ async function deleteEnv(key) {
     const body = document.getElementById('acc-env-body');
     body.dataset.loaded = 'false';
     await loadEnvSettings(body);
-  } catch {}
+  } catch(e) { console.error('Failed to delete env var:', e); }
 }
 
 async function loadLangfuseSettings(body) {
@@ -2315,7 +2558,7 @@ async function loadLangfuseSettings(body) {
         <button class="btn" onclick="flushLangfuse()">${t('settings.flush')}</button>
       </div>
     `;
-  } catch {}
+  } catch(e) { console.error('Failed to load langfuse settings:', e); }
 }
 
 async function saveLangfuseConfig() {
@@ -2327,7 +2570,7 @@ async function saveLangfuseConfig() {
   };
   try {
     await fetchWithAuth('/api/langfuse/config', { method: 'POST', body: JSON.stringify(config) });
-  } catch {}
+  } catch(e) { console.error('Failed to save langfuse config:', e); }
 }
 
 async function testLangfuse() {
@@ -2341,7 +2584,7 @@ async function testLangfuse() {
 async function flushLangfuse() {
   try {
     await fetchWithAuth('/api/langfuse/flush', { method: 'POST' });
-  } catch {}
+  } catch(e) { console.error('Failed to flush langfuse:', e); }
 }
 
 function loadAboutSettings(body) {
@@ -2361,7 +2604,7 @@ async function resetConfig() {
     await fetchWithAuth('/api/config/reset', { method: 'POST' });
     // 重新加载所有手风琴
     document.querySelectorAll('.accordion-body').forEach(b => { b.dataset.loaded = 'false'; });
-  } catch {}
+  } catch(e) { console.error('Failed to reset config:', e); }
 }
 
 // ============================================================================
@@ -2371,7 +2614,7 @@ async function loadSettings() {
   try {
     const res = await fetchWithAuth('/api/config');
     state.config = await res.json();
-  } catch {}
+  } catch(e) { console.error('Failed to load settings:', e); }
 }
 
 // ============================================================================
@@ -2397,6 +2640,11 @@ function applyI18n() {
   if (roomInput) roomInput.placeholder = t('rooms.typePlaceholder');
   // 重新渲染 session 列表
   if (state.sessions.length) renderSessionList();
+}
+
+function toggleMobileMenu() {
+  const sidebar = document.querySelector('.icon-sidebar');
+  if (sidebar) sidebar.classList.toggle('open');
 }
 
 // ============================================================================
@@ -2458,6 +2706,40 @@ function bindEvents() {
   document.getElementById('chat-input').addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   });
+  // 多模态上传：按钮触发文件选择
+  document.getElementById('chat-upload-btn').addEventListener('click', () => {
+    document.getElementById('chat-file-input').click();
+  });
+  document.getElementById('chat-file-input').addEventListener('change', function() {
+    handleFileSelect(this.files);
+    this.value = '';
+  });
+  // 粘贴图片自动上传
+  document.getElementById('chat-input').addEventListener('paste', e => {
+    const items = e.clipboardData?.items || [];
+    const files = [];
+    for (const it of items) {
+      if (it.kind === 'file') { const f = it.getAsFile(); if (f) files.push(f); }
+    }
+    if (files.length) { e.preventDefault(); handleFileSelect(files); }
+  });
+  // 拖拽上传
+  const chatInputArea = document.querySelector('.chat-input-area');
+  if (chatInputArea) {
+    chatInputArea.addEventListener('dragover', e => { e.preventDefault(); chatInputArea.classList.add('drag-over'); });
+    chatInputArea.addEventListener('dragleave', () => chatInputArea.classList.remove('drag-over'));
+    chatInputArea.addEventListener('drop', e => {
+      e.preventDefault(); chatInputArea.classList.remove('drag-over');
+      handleFileSelect(e.dataTransfer?.files);
+    });
+  }
+  // 附件移除（事件委托）
+  document.getElementById('chat-attachments-preview').addEventListener('click', e => {
+    const btn = e.target.closest('.att-remove');
+    if (!btn) return;
+    const idx = parseInt(btn.dataset.idx, 10);
+    if (!isNaN(idx)) { state.pendingAttachments.splice(idx, 1); renderPendingAttachments(); }
+  });
   // 自动调整高度
   document.getElementById('chat-input').addEventListener('input', function() {
     this.style.height = 'auto';
@@ -2496,7 +2778,7 @@ function bindEvents() {
         body: JSON.stringify({ messageId: 'latest' })
       });
       await loadRoomMessages(state.currentRoomId);
-    } catch {}
+    } catch(e) { console.error('Error:', e); }
   });
 }
 

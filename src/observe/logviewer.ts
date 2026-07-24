@@ -219,6 +219,15 @@ export class LogViewer {
   }
 
   // --------------------------------------------------------------------------
+  // 便捷方法
+  // --------------------------------------------------------------------------
+
+  info(source: string, message: string, data?: Record<string, unknown>): void { this.log("info", source, message, data); }
+  warn(source: string, message: string, data?: Record<string, unknown>): void { this.log("warn", source, message, data); }
+  error(source: string, message: string, data?: Record<string, unknown>): void { this.log("error", source, message, data); }
+  debug(source: string, message: string, data?: Record<string, unknown>): void { this.log("debug", source, message, data); }
+
+  // --------------------------------------------------------------------------
   // 清空日志
   // --------------------------------------------------------------------------
 

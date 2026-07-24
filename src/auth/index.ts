@@ -4,7 +4,7 @@
  * 提供 JWT 签发/验证、用户注册/登录、密码哈希。
  * 仅依赖 Node 内置 crypto，不引入 jose 等第三方库。
  *
- * - 密码：SHA-256 哈希
+ * - 密码：PBKDF2 加盐哈希（100,000 轮 SHA-256）
  * - Token：简化 JWT（base64 编码的 header.payload.signature）
  * - 签名：HMAC-SHA256
  * - 用户数据：JSON 文件（.quark-users.json）
@@ -43,9 +43,6 @@ type UserListItem = Pick<AuthUser, "id" | "username" | "role" | "createdAt">;
 /** JWT 有效期：7 天（毫秒） */
 const TOKEN_TTL = 7 * 24 * 60 * 60 * 1000;
 
-/** HMAC 签名密钥：启动时随机生成，进程重启后旧 token 失效 */
-const SECRET_KEY = crypto.randomBytes(32).toString("hex");
-
 /** JWT header 固定值 */
 const JWT_HEADER = { alg: "HS256", typ: "JWT" };
 
@@ -63,27 +60,34 @@ function b64Decode(str: string): string {
   return Buffer.from(str, "base64url").toString("utf8");
 }
 
-/** SHA-256 哈希 */
-function hashPassword(password: string): string {
-  return crypto.createHash("sha256").update(password).digest("hex");
+/** PBKDF2 密码哈希（加盐） */
+function hashPassword(password: string, salt?: Buffer): { hash: string; salt: string } | string {
+  if (salt) {
+    // verify mode — return computed hash for comparison
+    return crypto.pbkdf2Sync(password, salt, 100000, 32, "sha256").toString("hex");
+  }
+  // generate mode — return both hash and salt
+  const s = crypto.randomBytes(16);
+  return {
+    hash: crypto.pbkdf2Sync(password, s, 100000, 32, "sha256").toString("hex"),
+    salt: s.toString("hex"),
+  };
 }
 
-/** HMAC-SHA256 签名 */
-function hmacSign(payload: string): string {
-  return crypto.createHmac("sha256", SECRET_KEY).update(payload).digest("base64url");
-}
 
 // ============================================================================
 // AuthManager
 // ============================================================================
 
 export class AuthManager {
+  private readonly SECRET_KEY: string;
   private readonly dbPath: string;
   private users: Map<string, AuthUser> = new Map();
   private dirty = false;
 
-  constructor(userDbPath?: string) {
+  constructor(userDbPath?: string, jwtSecret?: string) {
     this.dbPath = userDbPath ?? path.join(process.cwd(), ".quark-users.json");
+    this.SECRET_KEY = jwtSecret || crypto.randomBytes(32).toString("hex");
     this.load();
   }
 
@@ -108,10 +112,11 @@ export class AuthManager {
 
     const id = crypto.randomUUID();
     const isFirst = this.users.size === 0;
+    const hpResult = hashPassword(password) as { hash: string; salt: string };
     const user: AuthUser = {
       id,
       username,
-      passwordHash: hashPassword(password),
+      passwordHash: hpResult.hash + ":" + hpResult.salt,
       role: isFirst ? "admin" : "user",
       createdAt: Date.now(),
     };
@@ -128,14 +133,37 @@ export class AuthManager {
   // ---------------------------------------------------------------------------
 
   login(username: string, password: string): { token: string; user: UserSafe } | null {
-    const hashed = hashPassword(password);
     for (const u of this.users.values()) {
-      if (u.username === username && u.passwordHash === hashed) {
+      if (u.username !== username) continue;
+      const [storedHash, saltHex] = u.passwordHash.split(":");
+      if (!storedHash || !saltHex) continue;
+      const computed = hashPassword(password, Buffer.from(saltHex, "hex")) as string;
+      if (computed === storedHash) {
         const token = this.signToken({ userId: u.id, username: u.username, role: u.role });
         return { token, user: { id: u.id, username: u.username, role: u.role } };
       }
     }
     return null;
+  }
+
+  // ---------------------------------------------------------------------------
+  // 修改密码
+  // ---------------------------------------------------------------------------
+
+  changePassword(userId: string, oldPassword: string, newPassword: string): boolean {
+    const user = this.users.get(userId);
+    if (!user) return false;
+    // verify old password
+    const [storedHash, saltHex] = user.passwordHash.split(":");
+    const computed = hashPassword(oldPassword, Buffer.from(saltHex, "hex")) as string;
+    if (computed !== storedHash) return false;
+    // validate new password
+    if (!newPassword || newPassword.length < 8) return false;
+    // hash new password
+    const result = hashPassword(newPassword) as { hash: string; salt: string };
+    user.passwordHash = result.hash + ":" + result.salt;
+    this.save();
+    return true;
   }
 
   // ---------------------------------------------------------------------------
@@ -149,7 +177,7 @@ export class AuthManager {
 
       // 验签
       const signatureInput = `${parts[0]}.${parts[1]}`;
-      const expectedSig = hmacSign(signatureInput);
+      const expectedSig = this.hmacSign(signatureInput);
       if (parts[2] !== expectedSig) return null;
 
       // 解码 payload
@@ -185,6 +213,11 @@ export class AuthManager {
   // 内部方法
   // ---------------------------------------------------------------------------
 
+  /** HMAC-SHA256 签名 */
+  private hmacSign(payload: string): string {
+    return crypto.createHmac("sha256", this.SECRET_KEY).update(payload).digest("base64url");
+  }
+
   /** 签发 JWT */
   private signToken(payload: Omit<AuthToken, "exp">): string {
     const fullPayload: AuthToken = {
@@ -194,7 +227,7 @@ export class AuthManager {
     const headerB64 = b64Encode(JSON.stringify(JWT_HEADER));
     const payloadB64 = b64Encode(JSON.stringify(fullPayload));
     const signatureInput = `${headerB64}.${payloadB64}`;
-    const signature = hmacSign(signatureInput);
+    const signature = this.hmacSign(signatureInput);
     return `${headerB64}.${payloadB64}.${signature}`;
   }
 

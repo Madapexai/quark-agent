@@ -95,6 +95,22 @@ export type { LangfuseConfig, LangfuseTrace, LangfuseSpan, LangfuseGeneration } 
 // tools
 export { CodeExecTool, MemoryRecallTool, HttpGetTool, builtinTools } from "./tools/builtin.js";
 export { TextToImageTool, TextToVideoTool, MakeSlidesTool, multimodalTools } from "./tools/multimodal.js";
+
+// function calling standardization: OpenAI-compatible tool format + executor
+export { toolsToOpenAIFormat, executeToolCalls, formatToolResults } from "./tools/function_calling.js";
+export type { OpenAIFunctionDef, FunctionCallResult } from "./tools/function_calling.js";
+
+// OpenAI-compatible HTTP API handler
+export { OpenAICompatHandler } from "./api/openai_compat.js";
+export type {
+  ChatCompletionRequest,
+  ChatCompletionResponse,
+  ChatCompletionChunk,
+  OpenAITool,
+  ToolCall as OpenAIToolCall,
+  AgentRunner,
+  AgentRunnerResult,
+} from "./api/openai_compat.js";
 export type { ImageGenConfig, MultimodalProvider } from "./tools/multimodal.js";
 export { StrReplaceTool, FileReadTool, FileWriteTool, editTools } from "./tools/edit.js";
 export { BrowserOpenTool, BrowserSearchTool, BrowserClickTool, browserTools } from "./tools/browser.js";
@@ -181,6 +197,9 @@ export { logPlugin, metricPlugin, loopGuardPlugin, feedbackPlugin } from "./plug
 // mcp
 export { mcpPlugin } from "./mcp/client.js";
 export type { McpServerConfig } from "./mcp/client.js";
+export { MCPServer, createQuarkMCPServer } from "./mcp/server.js";
+export { MCPRegistry } from "./mcp/registry.js";
+export type { MCPServerConfig, MCPTool } from "./mcp/registry.js";
 
 // hub
 export { clawHubPlugin } from "./hub/index.js";
@@ -195,6 +214,13 @@ export type { ScoreInput } from "./skills/score.js";
 // skills installer（npm/GitHub/本地/URL 多来源 skill 安装器）
 export { SkillInstaller } from "./skills/installer.js";
 export type { SkillManifest, InstallResult, SkillInstallerOptions, SkillSource } from "./skills/installer.js";
+// skills hot reload（插件热重载：监视 plugins 目录变更）
+export { PluginHotReloader } from "./skills/hot_reload.js";
+export type { HotReloadEvent } from "./skills/hot_reload.js";
+
+// voice（STT/TTS 语音能力：OpenAI / whisper-local / edge-tts / browser）
+export { VoiceManager, voiceManager } from "./voice/index.js";
+export type { STTResult, TTSResult } from "./voice/index.js";
 
 // core extensions
 export { SubAgentTool } from "./core/subagent.js";
@@ -353,3 +379,15 @@ export async function createAgent(opts: CreateAgentOptions): Promise<{
     },
   };
 }
+
+// RAG / Knowledge Base：文档分块、向量化检索、为 LLM 注入上下文
+export { KnowledgeBase, knowledgeBase } from "./rag/index.js";
+export type { Document, TextChunk, SearchResult } from "./rag/index.js";
+
+// Cron Scheduler：定时任务调度（5 字段 cron 表达式）
+export { Scheduler, scheduler } from "./scheduler/index.js";
+export type { ScheduledTask, TaskRunResult } from "./scheduler/index.js";
+
+// Workflow Orchestration：可视化 DAG 工作流编排
+export { WorkflowEngine, workflowEngine } from "./workflow/index.js";
+export type { Workflow, WorkflowNode, WorkflowEdge, WorkflowRunResult, NodeType } from "./workflow/index.js";

@@ -27,7 +27,152 @@ import { promisify } from "node:util";
 const execAsync = promisify(exec);
 
 // ============================================================================
+// CDP WebSocket 适配（Node 22+ 原生 WebSocket；不再依赖 curl）
+// ============================================================================
+
+/** Node 22+ 全局提供原生 WebSocket；Node 18+ 也可通过 undici 提供 */
+const NativeWebSocket: typeof WebSocket | undefined = (
+  globalThis as unknown as { WebSocket?: typeof WebSocket }
+).WebSocket;
+
+/** WebSocket.OPEN 常量值 */
+const WS_OPEN = 1;
+
+// ============================================================================
+// CDPConnection —— Chrome DevTools Protocol 的持久 WebSocket 连接
+// ============================================================================
+
+/**
+ * 管理 Chrome DevTools Protocol 的 WebSocket 连接。
+ *
+ * - 单条连接复用多次 CDP 调用，避免每条命令重新握手
+ * - 连接断开时清空状态，下次 connect 自动重连
+ * - send(method, params) 返回 Promise，按 id 匹配响应
+ */
+class CDPConnection {
+  private ws: WebSocket | null = null;
+  private readonly wsUrl: string;
+  private ready: Promise<void> | null = null;
+  private msgId = 0;
+  private readonly pending = new Map<
+    number,
+    { resolve: (v: unknown) => void; reject: (e: Error) => void }
+  >();
+
+  constructor(wsUrl: string) {
+    this.wsUrl = wsUrl;
+  }
+
+  /** 建立连接；已连接则立即返回，正在建立则复用同一 Promise */
+  async connect(): Promise<void> {
+    if (this.ws && this.ws.readyState === WS_OPEN) return;
+    if (this.ready) return this.ready;
+    this.ready = new Promise<void>((resolve, reject) => {
+      if (!NativeWebSocket) {
+        reject(new Error("当前 Node 运行时未提供原生 WebSocket（请使用 Node 22+ 或加载 undici）"));
+        return;
+      }
+      const ws = new NativeWebSocket(this.wsUrl);
+      this.ws = ws;
+      ws.addEventListener("open", () => resolve());
+      ws.addEventListener("error", () => {
+        this.reset();
+        reject(new Error("CDP WebSocket 连接失败"));
+      });
+      ws.addEventListener("close", () => {
+        this.reset();
+      });
+      ws.addEventListener("message", (event: MessageEvent) => {
+        const raw = CDPConnection.toText(event.data);
+        if (raw === null) return;
+        let msg: { id?: number; result?: unknown; error?: { message?: string } };
+        try {
+          msg = JSON.parse(raw);
+        } catch {
+          return; // 忽略非 JSON 帧
+        }
+        if (typeof msg.id !== "number") return;
+        const p = this.pending.get(msg.id);
+        if (!p) return;
+        this.pending.delete(msg.id);
+        if (msg.error) {
+          p.reject(new Error(msg.error.message ?? "CDP 错误"));
+        } else {
+          p.resolve(msg.result);
+        }
+      });
+    });
+    return this.ready;
+  }
+
+  /** 发送 CDP 命令并等待响应 */
+  async send(
+    method: string,
+    params: Record<string, unknown> = {},
+    timeoutMs = 10000,
+  ): Promise<unknown> {
+    await this.connect();
+    if (!this.ws || this.ws.readyState !== WS_OPEN) {
+      throw new Error("CDP WebSocket 未就绪");
+    }
+    const id = ++this.msgId;
+    return new Promise<unknown>((resolve, reject) => {
+      const timer = setTimeout(() => {
+        if (this.pending.has(id)) {
+          this.pending.delete(id);
+          reject(new Error(`CDP 命令超时: ${method}`));
+        }
+      }, timeoutMs);
+      this.pending.set(id, {
+        resolve: (v: unknown) => {
+          clearTimeout(timer);
+          resolve(v);
+        },
+        reject: (e: Error) => {
+          clearTimeout(timer);
+          reject(e);
+        },
+      });
+      this.ws!.send(JSON.stringify({ id, method, params }));
+    });
+  }
+
+  /** 关闭连接并清空 pending */
+  close(): void {
+    if (this.ws) {
+      try {
+        this.ws.close();
+      } catch {
+        /* 忽略 */
+      }
+    }
+    this.reset();
+  }
+
+  private reset(): void {
+    this.ws = null;
+    this.ready = null;
+    for (const { reject } of this.pending.values()) {
+      reject(new Error("CDP WebSocket 连接已关闭"));
+    }
+    this.pending.clear();
+  }
+
+  private static toText(data: unknown): string | null {
+    if (typeof data === "string") return data;
+    if (Buffer.isBuffer(data)) return data.toString();
+    if (data instanceof ArrayBuffer) return Buffer.from(data).toString();
+    if (ArrayBuffer.isView(data)) {
+      const view = data as ArrayBufferView;
+      return Buffer.from(view.buffer, view.byteOffset, view.byteLength).toString();
+    }
+    return null;
+  }
+}
+
+// ============================================================================
 // 类型定义
+// ============================================================================
 // ============================================================================
 
 /** 截屏结果 */
@@ -101,9 +246,9 @@ export class ComputerService {
   private readonly platform: NodeJS.Platform;
   private readonly opts: Required<Pick<ComputerServiceOptions, "actionDelayMs" | "trace" | "screenshotFormat" | "screenshotQuality">>;
   private history: HistoryEntry[] = [];
-  /** CDP 消息 ID（自增） */
-  private cdpMsgId = 0;
   private cdpPort = 9222;
+  /** CDP WebSocket 连接缓存（按 wsUrl 复用） */
+  private cdpConnections = new Map<string, CDPConnection>();
 
   constructor(opts?: ComputerServiceOptions) {
     this.platform = process.platform;
@@ -801,11 +946,15 @@ export class ComputerService {
       const result = await this.cdpSend(wsUrl, "Page.captureScreenshot", {
         format: this.opts.screenshotFormat,
         quality: this.opts.screenshotFormat === "jpeg" ? this.opts.screenshotQuality : undefined,
-      }) as { data: string };
+      }) as { data?: string };
+      if (!result?.data) return null;
+      // CDP 不直接返回宽高，从 base64 解码后解析图片头
+      const buf = Buffer.from(result.data, "base64");
+      const { width, height } = this.parseImageDimensions(buf);
       return {
         data: result.data,
-        width: 0, // CDP 不直接返回宽高，从图片头解析
-        height: 0,
+        width,
+        height,
         timestamp: Date.now(),
       };
     } catch {
@@ -834,28 +983,32 @@ export class ComputerService {
     });
   }
 
-  /** 通过 CDP WebSocket 发送命令（简易实现） */
-  private async cdpSend(wsUrl: string, method: string, params: Record<string, unknown>): Promise<unknown> {
-    // 使用 Node 内置 http + 手动 WebSocket 握手太复杂
-    // 改用简易方案：通过 HTTP 接口（部分 CDP 操作可通过 /json 协议完成）
-    // 对于 Runtime.evaluate，用 Chrome 的 HTTP 端点
-    // 完整 CDP WebSocket 需要依赖 ws 模块，此处用 execSync 调 curl 替代
-    const msgId = ++this.cdpMsgId;
-    const message = JSON.stringify({ id: msgId, method, params });
-
-    // 用 Node http 做 WebSocket 连接过于复杂，用简化的 HTTP 方案
-    // 这里用子进程调 curl（大多数系统预装）
-    const result = await execAsync(
-      `curl -s -N -H "Content-Type: application/json" --max-time 5 -X POST "${wsUrl}" -d '${message.replace(/'/g, "'\\''")}'`,
-      { timeout: 10000 },
-    ).catch(() => ({ stdout: "", stderr: "" }));
-
-    if (!result.stdout.trim()) return null;
-    try {
-      const parsed = JSON.parse(result.stdout) as { result?: unknown };
-      return parsed.result;
-    } catch {
-      return null;
+  /** 获取或复用 CDP WebSocket 连接 */
+  private async getCDPConnection(wsUrl: string): Promise<CDPConnection> {
+    let conn = this.cdpConnections.get(wsUrl);
+    if (!conn) {
+      conn = new CDPConnection(wsUrl);
+      this.cdpConnections.set(wsUrl, conn);
     }
+    await conn.connect();
+    return conn;
+  }
+
+  /** 关闭所有 CDP 连接（资源清理） */
+  closeCDP(): void {
+    for (const conn of this.cdpConnections.values()) {
+      conn.close();
+    }
+    this.cdpConnections.clear();
+  }
+
+  /** 通过 CDP WebSocket 发送命令（原生 WebSocket 实现） */
+  private async cdpSend(
+    wsUrl: string,
+    method: string,
+    params: Record<string, unknown> = {},
+  ): Promise<unknown> {
+    const conn = await this.getCDPConnection(wsUrl);
+    return conn.send(method, params);
   }
 }

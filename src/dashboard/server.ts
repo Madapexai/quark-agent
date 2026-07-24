@@ -43,6 +43,14 @@ import { ModelManager } from "../config/model-manager.js";
 import { ChatRoomManager } from "../chatroom/index.js";
 import { DreamingEngine, type DreamingConfig } from "../dreaming/index.js";
 import { AuthManager, AuthError } from "../auth/index.js";
+import { multimodalManager } from "../multimodal/index.js";
+import { MCPServer, createQuarkMCPServer } from "../mcp/server.js";
+import { MCPRegistry } from "../mcp/registry.js";
+import { knowledgeBase } from "../rag/index.js";
+import { scheduler } from "../scheduler/index.js";
+import { workflowEngine } from "../workflow/index.js";
+import { voiceManager } from "../voice/index.js";
+import { PluginHotReloader } from "../skills/hot_reload.js";
 
 // ============================================================================
 // 常量
@@ -170,16 +178,24 @@ class ChatSessionStore {
   private dirty = false;
   private readonly dataDir: string;
   private readonly dbPath: string;
+  private _saveTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
     this.dataDir = path.join(process.cwd(), ".data");
     this.dbPath = path.join(this.dataDir, "sessions.json");
     this.load();
     // 每 30 秒写盘一次（保持引用防止 GC）
-    const _saveTimer = setInterval(() => this.flush(), 30_000);
-    void _saveTimer;
+    this._saveTimer = setInterval(() => this.flush(), 30_000);
     // 进程退出前写盘
     process.on("beforeExit", () => this.flush());
+  }
+
+  /** 清理定时器，防止泄漏 */
+  destroy(): void {
+    if (this._saveTimer) {
+      clearInterval(this._saveTimer);
+      this._saveTimer = null;
+    }
   }
 
   /** 列出指定用户的会话 */
@@ -316,7 +332,7 @@ class ChatSessionStore {
       fs.writeFileSync(this.dbPath, JSON.stringify({ sessions, messages: msgObj }), "utf8");
       this.dirty = false;
     } catch (err) {
-      console.error("[dashboard] 写入会话数据失败:", err);
+      logger.error("server", "写入会话数据失败", { error: err instanceof Error ? err.message : String(err) });
     }
   }
 }
@@ -1033,6 +1049,7 @@ export class DashboardServer {
   private readonly configPath: string;
   private server?: http.Server;
   private agentInstance: AgentInstance | null = null;
+  private agentCreatePromise: Promise<AgentInstance> | null = null;
   private readonly bus = new EventBus();
   private readonly sseServer = new SSEServer(this.bus);
   /** 环境变量管理器 */
@@ -1053,8 +1070,14 @@ export class DashboardServer {
   private chatroomManager: ChatRoomManager | null = null;
   /** 自进化引擎 */
   private dreamingEngine: DreamingEngine | null = null;
-  /** 用户认证管理器 */
-  private readonly authManager = new AuthManager();
+  /** 用户认证管理器（在 start() 中初始化） */
+  private authManager!: AuthManager;
+  /** 登录频率限制 */
+  private rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+  private readonly RATE_LIMIT_MAX = 10;
+  private readonly RATE_LIMIT_WINDOW = 60_000;
+  /** Token 黑名单（登出后失效） */
+  private tokenBlacklist = new Set<string>();
   /** 聊天会话存储（持久化 .data/sessions.json） */
   private readonly chatSessionStore = new ChatSessionStore();
   /** 用量分析数据 */
@@ -1067,12 +1090,17 @@ export class DashboardServer {
     modelUsage: {},
     dailyTrend: [],
   };
+  private mcpServer: MCPServer | null = null;
+  private mcpRegistry = new MCPRegistry();
+  private hotReloader: PluginHotReloader | null = null;
 
   constructor(opts: DashboardServerOptions = {}) {
     this.port = opts.port ?? 8788;
     this.host = opts.host ?? "127.0.0.1";
     this.open = opts.open ?? true;
     this.configPath = opts.configPath ?? path.join(process.cwd(), ".quark-agent.json");
+    // 每小时清理一次 token 黑名单
+    setInterval(() => this.tokenBlacklist.clear(), 3600_000);
   }
 
   // ===========================================================================
@@ -1087,10 +1115,10 @@ export class DashboardServer {
       this.server!.on("error", reject);
     });
     const addr = `http://${this.host}:${this.port}`;
-    console.log(`[dashboard] 服务已启动：${addr}`);
-    console.log(`[dashboard] 配置文件：${this.configPath}`);
-    console.log(`[dashboard] 插件目录：${PLUGINS_DIR}`);
-    console.log(`[dashboard] 静态文件：${WEB_DIR}`);
+    logger.info("server", `服务已启动：${addr}`);
+    logger.info("server", `配置文件：${this.configPath}`);
+    logger.info("server", `插件目录：${PLUGINS_DIR}`);
+    logger.info("server", `静态文件：${WEB_DIR}`);
 
     // 初始化新模块实例
     this.modelManager = new ModelManager();
@@ -1108,10 +1136,31 @@ export class DashboardServer {
       });
     }
 
-    // 首次启动：自动创建 admin 用户（密码 admin）并提示修改
+    // 首次启动：初始化 AuthManager（持久化 JWT 密钥）
+    const jwtSecret = this.ensureJwtSecret();
+    this.authManager = new AuthManager(undefined, jwtSecret);
+    // 首次启动：自动创建 admin 用户（随机密码）
     this.ensureDefaultAdmin();
-    // 首次启动：自动生成 jwtSecret
-    this.ensureJwtSecret();
+
+    // Initialize MCP server
+    this.mcpServer = await createQuarkMCPServer();
+    // Initialize hot reloader
+    this.hotReloader = new PluginHotReloader(path.join(process.cwd(), ".quark-plugins"));
+    this.hotReloader.start();
+    // Set scheduler runner
+    scheduler.setRunner(async (prompt) => {
+      const instance = await this.getAgent();
+      const result = await instance.agent.run(prompt);
+      return result.reply;
+    });
+    scheduler.start();
+    // Set workflow runners
+    workflowEngine.setLLMRunner(async (prompt, context) => {
+      const instance = await this.getAgent();
+      const ctxStr = Object.entries(context).map(([k,v]) => `${k}: ${JSON.stringify(v)}`).join("\n");
+      const result = await instance.agent.run(`${prompt}\n\nContext:\n${ctxStr}`);
+      return result.reply;
+    });
 
     // 优雅关闭
     const shutdown = async () => {
@@ -1131,20 +1180,36 @@ export class DashboardServer {
   async stop(): Promise<void> {
     await this.resetAgent();
     this.sseServer.close();
+    await this.chatSessionStore.flush();
+    this.chatSessionStore.destroy();
+    scheduler.stop();
+    this.hotReloader?.stop();
+    await this.mcpRegistry.disconnectAll();
     if (this.server) {
       await new Promise<void>((resolve) => this.server!.close(() => resolve()));
       this.server = undefined;
     }
-    console.log("[dashboard] 服务已停止");
+    logger.info("server", "服务已停止");
   }
 
   // ===========================================================================
   // Agent 单例管理
   // ===========================================================================
 
-  /** 获取 agent 单例。配置变更后调用 resetAgent 重建 */
+  /** 获取 agent 单例。配置变更后调用 resetAgent 重建（promise-lock 防竞态） */
   private async getAgent(): Promise<AgentInstance> {
     if (this.agentInstance) return this.agentInstance;
+    if (this.agentCreatePromise) return this.agentCreatePromise;
+    this.agentCreatePromise = this._createAgent();
+    try {
+      this.agentInstance = await this.agentCreatePromise;
+      return this.agentInstance;
+    } finally {
+      this.agentCreatePromise = null;
+    }
+  }
+
+  private async _createAgent(): Promise<AgentInstance> {
     const cfg = loadConfig();
     if (!cfg.apiKey) {
       throw new Error("No API key configured");
@@ -1193,6 +1258,8 @@ export class DashboardServer {
       }
       this.agentInstance = null;
     }
+    this.agentCreatePromise = null;
+    this.teamFactory = null;
   }
 
   // ===========================================================================
@@ -1290,9 +1357,85 @@ export class DashboardServer {
         return;
       }
       if (pathname === "/api/chat/stream" && method === "GET") {
-        await this.handleChatStream(url, res);
+        await this.handleChatStream(req, url, res);
         return;
       }
+      // ---- Multimodal upload ----
+      if (pathname === "/api/upload" && method === "POST") {
+        const contentType = req.headers["content-type"] ?? "";
+        if (contentType.startsWith("multipart/form-data")) {
+          const boundary = contentType.split("boundary=")[1];
+          if (!boundary) { this.writeJSON(res, 400, { error: "Missing boundary" }); return; }
+          const chunks: Buffer[] = [];
+          req.on("data", (c: Buffer) => chunks.push(c));
+          req.on("end", () => {
+            const buffer = Buffer.concat(chunks);
+            const sep = Buffer.from(`--${boundary}`);
+            let cursor = 0;
+            let found: { filename: string; mimeType: string; body: Buffer } | null = null;
+            while (cursor < buffer.length) {
+              const idx = buffer.indexOf(sep, cursor);
+              if (idx === -1) break;
+              cursor = idx + sep.length;
+              // 检查是否为结束标记 --\r\n
+              if (buffer[cursor] === 0x2d /* '-' */ && buffer[cursor + 1] === 0x2d) break;
+              // 每个分片以 \r\n 开头（boundary 行后的换行）
+              let pStart = cursor;
+              if (buffer[pStart] === 0x0d && buffer[pStart + 1] === 0x0a) pStart += 2;
+              // 定位 headers / body 分界 \r\n\r\n
+              const headerEnd = buffer.indexOf(Buffer.from("\r\n\r\n"), pStart);
+              if (headerEnd === -1) continue;
+              const headers = buffer.slice(pStart, headerEnd).toString("latin1");
+              const bodyStart = headerEnd + 4;
+              // body 末尾的 \r\n 属于下一个 boundary 前缀，需去掉
+              let bodyEnd = buffer.indexOf(sep, bodyStart);
+              if (bodyEnd === -1) bodyEnd = buffer.length;
+              if (bodyEnd >= 2 && buffer[bodyEnd - 2] === 0x0d && buffer[bodyEnd - 1] === 0x0a) bodyEnd -= 2;
+              const body = buffer.slice(bodyStart, bodyEnd);
+              const filenameMatch = headers.match(/filename="(.+?)"/);
+              const contentTypeMatch = headers.match(/Content-Type:\s*(.+)/i);
+              if (filenameMatch && body.length > 0) {
+                found = {
+                  filename: filenameMatch[1],
+                  mimeType: (contentTypeMatch?.[1] ?? "application/octet-stream").trim(),
+                  body,
+                };
+                break;
+              }
+            }
+            if (found) {
+              const attachment = multimodalManager.saveAttachment(found.filename, found.mimeType, found.body);
+              this.writeJSON(res, 200, { ok: true, attachment });
+            } else {
+              this.writeJSON(res, 400, { error: "No file found in upload" });
+            }
+          });
+          req.on("error", () => { try { this.writeJSON(res, 400, { error: "Upload stream error" }); } catch { /* ignore */ } });
+          return;
+        }
+        // Base64 JSON upload
+        const body = await this.readJSON(req);
+        if (body?.data && body?.filename) {
+          const buffer = Buffer.from(body.data as string, "base64");
+          const mimeType = (body.mimeType as string) ?? "application/octet-stream";
+          const attachment = multimodalManager.saveAttachment(body.filename as string, mimeType, buffer);
+          this.writeJSON(res, 200, { ok: true, attachment });
+          return;
+        }
+        this.writeJSON(res, 400, { error: "Invalid upload format" });
+        return;
+      }
+
+      // Get uploaded file
+      if (pathname.startsWith("/api/uploads/") && method === "GET") {
+        const fileId = pathname.slice("/api/uploads/".length);
+        const buf = multimodalManager.getAttachment(fileId);
+        if (!buf) { this.writeJSON(res, 404, { error: "File not found" }); return; }
+        res.writeHead(200, { "Content-Type": "application/octet-stream" });
+        res.end(buf);
+        return;
+      }
+
 
       // ---- Trace ----
       if (pathname === "/api/trace" && method === "GET") {
@@ -1634,11 +1777,15 @@ export class DashboardServer {
         return;
       }
       if (pathname === "/api/auth/logout" && method === "POST") {
-        this.writeJSON(res, 200, { ok: true });
+        await this.handleAuthLogout(req, res);
         return;
       }
       if (pathname === "/api/auth/me" && method === "GET") {
         await this.handleAuthMe(req, res);
+        return;
+      }
+      if (pathname === "/api/auth/password" && method === "PUT") {
+        await this.handleAuthChangePassword(req, res);
         return;
       }
       if (pathname === "/api/auth/users" && method === "GET") {
@@ -1704,6 +1851,198 @@ export class DashboardServer {
         return;
       }
 
+      // ---- OpenAI compatible API ----
+      if (pathname === "/v1/chat/completions" && method === "POST") {
+        await this.handleOpenAICompat(req, res);
+        return;
+      }
+      if (pathname === "/v1/models" && method === "GET") {
+        await this.handleOpenAIModels(res);
+        return;
+      }
+
+      // ---- MCP ----
+      if (pathname === "/api/mcp/tools" && method === "GET") {
+        const tools = this.mcpServer ? [
+          { name: "web_search", description: "Search the web" },
+          { name: "web_fetch", description: "Fetch a URL" },
+          { name: "computer_screenshot", description: "Take a screenshot" },
+        ] : [];
+        const externalTools = this.mcpRegistry.listAllTools();
+        this.writeJSON(res, 200, { tools, externalTools });
+        return;
+      }
+      if (pathname === "/api/mcp/servers" && method === "GET") {
+        this.writeJSON(res, 200, { servers: this.mcpRegistry.listServers() });
+        return;
+      }
+      if (pathname === "/api/mcp/connect" && method === "POST") {
+        const body = await this.readJSON(req);
+        if (!body?.name) { this.writeJSON(res, 400, { error: "Missing server name" }); return; }
+        await this.mcpRegistry.connect({
+          name: body.name as string,
+          command: body.command as string | undefined,
+          args: body.args as string[] | undefined,
+          url: body.url as string | undefined,
+          env: body.env as Record<string, string> | undefined,
+        });
+        this.writeJSON(res, 200, { ok: true, tools: this.mcpRegistry.listTools(body.name as string) });
+        return;
+      }
+      if (pathname === "/api/mcp/disconnect" && method === "POST") {
+        const body = await this.readJSON(req);
+        if (!body?.name) { this.writeJSON(res, 400, { error: "Missing server name" }); return; }
+        await this.mcpRegistry.disconnect(body.name as string);
+        this.writeJSON(res, 200, { ok: true });
+        return;
+      }
+
+      // ---- Knowledge Base / RAG ----
+      if (pathname === "/api/kb/documents" && method === "GET") {
+        this.writeJSON(res, 200, { documents: knowledgeBase.listDocuments() });
+        return;
+      }
+      if (pathname === "/api/kb/documents" && method === "POST") {
+        const body = await this.readJSON(req);
+        if (!body?.content) { this.writeJSON(res, 400, { error: "Missing content" }); return; }
+        const doc = await knowledgeBase.addDocument(
+          (body.filename as string) ?? "untitled.txt",
+          body.content as string,
+          body.mimeType as string | undefined,
+        );
+        this.writeJSON(res, 200, { ok: true, document: { id: doc.id, filename: doc.filename, chunks: doc.chunks.length } });
+        return;
+      }
+      if (pathname.startsWith("/api/kb/documents/") && method === "DELETE") {
+        const id = pathname.slice("/api/kb/documents/".length);
+        const deleted = knowledgeBase.deleteDocument(id);
+        this.writeJSON(res, deleted ? 200 : 404, deleted ? { ok: true } : { error: "Not found" });
+        return;
+      }
+      if (pathname === "/api/kb/search" && method === "POST") {
+        const body = await this.readJSON(req);
+        if (!body?.query) { this.writeJSON(res, 400, { error: "Missing query" }); return; }
+        const results = await knowledgeBase.search(body.query as string, (body.topK as number) ?? 5);
+        this.writeJSON(res, 200, { results });
+        return;
+      }
+      if (pathname === "/api/kb/clear" && method === "DELETE") {
+        knowledgeBase.clear();
+        this.writeJSON(res, 200, { ok: true });
+        return;
+      }
+
+      // ---- Scheduler ----
+      if (pathname === "/api/scheduler/tasks" && method === "GET") {
+        this.writeJSON(res, 200, { tasks: scheduler.listTasks() });
+        return;
+      }
+      if (pathname === "/api/scheduler/tasks" && method === "POST") {
+        const body = await this.readJSON(req);
+        if (!body?.name || !body?.cron || !body?.prompt) {
+          this.writeJSON(res, 400, { error: "Missing name, cron, or prompt" }); return;
+        }
+        const task = scheduler.addTask(body.name as string, body.cron as string, body.prompt as string, body.model as string | undefined);
+        this.writeJSON(res, 200, { ok: true, task });
+        return;
+      }
+      if (pathname.startsWith("/api/scheduler/tasks/") && method === "PUT") {
+        const id = pathname.slice("/api/scheduler/tasks/".length);
+        const body = await this.readJSON(req);
+        const updated = scheduler.updateTask(id, body ?? {});
+        this.writeJSON(res, updated ? 200 : 404, updated ? { ok: true } : { error: "Not found" });
+        return;
+      }
+      if (pathname.startsWith("/api/scheduler/tasks/") && method === "DELETE") {
+        const id = pathname.slice("/api/scheduler/tasks/".length);
+        const deleted = scheduler.deleteTask(id);
+        this.writeJSON(res, deleted ? 200 : 404, deleted ? { ok: true } : { error: "Not found" });
+        return;
+      }
+      if (pathname.startsWith("/api/scheduler/run/") && method === "POST") {
+        const id = pathname.slice("/api/scheduler/run/".length);
+        const result = await scheduler.runTask(id);
+        this.writeJSON(res, 200, { result });
+        return;
+      }
+      if (pathname === "/api/scheduler/history" && method === "GET") {
+        this.writeJSON(res, 200, { history: scheduler.getHistory() });
+        return;
+      }
+
+      // ---- Workflow ----
+      if (pathname === "/api/workflows" && method === "GET") {
+        this.writeJSON(res, 200, { workflows: workflowEngine.listWorkflows() });
+        return;
+      }
+      if (pathname === "/api/workflows" && method === "POST") {
+        const body = await this.readJSON(req);
+        if (!body?.name) { this.writeJSON(res, 400, { error: "Missing name" }); return; }
+        const wf = workflowEngine.createWorkflow(body.name as string, (body.description as string) ?? "");
+        this.writeJSON(res, 200, { ok: true, workflow: wf });
+        return;
+      }
+      if (pathname.startsWith("/api/workflows/") && method === "GET") {
+        const id = pathname.slice("/api/workflows/".length);
+        const wf = workflowEngine.getWorkflow(id);
+        if (!wf) { this.writeJSON(res, 404, { error: "Not found" }); return; }
+        this.writeJSON(res, 200, { workflow: wf });
+        return;
+      }
+      if (pathname.startsWith("/api/workflows/") && method === "PUT") {
+        const id = pathname.slice("/api/workflows/".length);
+        const body = await this.readJSON(req);
+        const updated = workflowEngine.updateWorkflow(id, body ?? {});
+        this.writeJSON(res, updated ? 200 : 404, updated ? { ok: true } : { error: "Not found" });
+        return;
+      }
+      if (pathname.startsWith("/api/workflows/") && method === "DELETE") {
+        const id = pathname.slice("/api/workflows/".length);
+        const deleted = workflowEngine.deleteWorkflow(id);
+        this.writeJSON(res, deleted ? 200 : 404, deleted ? { ok: true } : { error: "Not found" });
+        return;
+      }
+      if (pathname.startsWith("/api/workflows/") && pathname.endsWith("/run") && method === "POST") {
+        const id = pathname.slice("/api/workflows/".length, -"/run".length);
+        const body = await this.readJSON(req);
+        const result = await workflowEngine.run(id, (body?.input as string) ?? "");
+        this.writeJSON(res, 200, { result });
+        return;
+      }
+      if (pathname.startsWith("/api/workflows/") && pathname.endsWith("/nodes") && method === "POST") {
+        const id = pathname.slice("/api/workflows/".length, -"/nodes".length);
+        const body = await this.readJSON(req);
+        const node = workflowEngine.addNode(id, body as any);
+        if (!node) { this.writeJSON(res, 404, { error: "Workflow not found" }); return; }
+        this.writeJSON(res, 200, { ok: true, node });
+        return;
+      }
+
+      // ---- Voice ----
+      if (pathname === "/api/voices" && method === "GET") {
+        this.writeJSON(res, 200, { voices: voiceManager.listVoices() });
+        return;
+      }
+      if (pathname === "/api/voice/stt" && method === "POST") {
+        const body = await this.readJSON(req);
+        if (!body?.data) { this.writeJSON(res, 400, { error: "Missing audio data" }); return; }
+        const buffer = Buffer.from(body.data as string, "base64");
+        const result = await voiceManager.transcribe(buffer, (body.format as "wav" | "mp3" | "ogg" | "webm") ?? "wav", body.language as string | undefined);
+        this.writeJSON(res, 200, { result });
+        return;
+      }
+      if (pathname === "/api/voice/tts" && method === "POST") {
+        const body = await this.readJSON(req);
+        if (!body?.text) { this.writeJSON(res, 400, { error: "Missing text" }); return; }
+        const result = await voiceManager.synthesize(body.text as string, {
+          voice: body.voice as string | undefined,
+          speed: body.speed as number | undefined,
+          format: body.format as "mp3" | "wav" | "ogg" | undefined,
+        });
+        this.writeJSON(res, 200, { ok: true, audio: result.audioBuffer.toString("base64"), format: result.format });
+        return;
+      }
+
       // ---- 静态文件 ----
       if (method === "GET") {
         this.serveStatic(pathname, res);
@@ -1713,7 +2052,7 @@ export class DashboardServer {
       this.writeJSON(res, 404, { error: "Not Found", path: pathname });
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      console.error("[dashboard] handler error:", msg);
+      logger.error("server", "handler error", { message: msg });
       if (!res.headersSent) {
         this.writeJSON(res, 500, { error: "Internal Error", message: msg });
       }
@@ -1732,13 +2071,26 @@ export class DashboardServer {
 
   /** POST /api/config → 合并写入 */
   private async handlePostConfig(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const ALLOWED_CONFIG_KEYS = new Set([
+      "model", "temperature", "maxTokens", "maxToolRounds",
+      "contextTokenBudget", "workingMemoryRounds", "baseURL",
+      "apiKey", "profile", "trace", "hub", "checkpoint",
+      "computer", "browser", "langfuse", "dreaming",
+    ]);
     const body = await this.readJSON(req);
     if (body === null) {
       this.writeJSON(res, 400, { error: "Invalid JSON body" });
       return;
     }
+    // 只保留白名单字段
+    const filtered: Record<string, unknown> = {};
+    for (const key of Object.keys(body)) {
+      if (ALLOWED_CONFIG_KEYS.has(key)) {
+        filtered[key] = body[key];
+      }
+    }
     const existing = (findConfigFile() ?? {}) as Record<string, unknown>;
-    const merged = deepMergeConfig(existing, body);
+    const merged = deepMergeConfig(existing, filtered);
     writeConfigFile(merged as Partial<QuarkConfig>);
     // 配置变更后重建 agent
     await this.resetAgent();
@@ -1886,6 +2238,10 @@ export class DashboardServer {
       this.writeJSON(res, 400, { error: "Missing 'text' in body" });
       return;
     }
+    if ((body.text as string).length > 32000) {
+      this.writeJSON(res, 400, { error: "输入文本过长，请限制在 32000 字符以内" });
+      return;
+    }
     const text: string = body.text;
     const sessionId: string | undefined = typeof body.sessionId === "string" ? body.sessionId : undefined;
     const userId: string | undefined = typeof body.userId === "string" ? body.userId : undefined;
@@ -1913,7 +2269,7 @@ export class DashboardServer {
   }
 
   /** GET /api/chat/stream?text=...&sessionId=...&userId=... → SSE 流式对话 */
-  private async handleChatStream(url: URL, res: ServerResponse): Promise<void> {
+  private async handleChatStream(req: IncomingMessage, url: URL, res: ServerResponse): Promise<void> {
     const text = url.searchParams.get("text") ?? "";
     const sessionId = url.searchParams.get("sessionId") ?? undefined;
     const userId = url.searchParams.get("userId") ?? undefined;
@@ -1943,6 +2299,9 @@ export class DashboardServer {
     // SSE 注释行，用于刷新缓冲区
     res.write(": connected\n\n");
 
+    let cancelled = false;
+    req.on("close", () => { cancelled = true; });
+
     // 注册 SSE 客户端，EventBus 事件自动转发
     const client = this.sseServer.addClient({
       res: {
@@ -1971,6 +2330,7 @@ export class DashboardServer {
         userId,
         channel: "dashboard",
       });
+      if (cancelled) return;
       // 推送最终结果
       res.write(
         `event: done\ndata: ${JSON.stringify({
@@ -2221,6 +2581,10 @@ export class DashboardServer {
     const body = await this.readJSON(req);
     if (!body || !body.config || typeof body.input !== "string") {
       this.writeJSON(res, 400, { error: "Missing 'config' or 'input' in body" });
+      return;
+    }
+    if ((body.input as string).length > 32000) {
+      this.writeJSON(res, 400, { error: "输入文本过长，请限制在 32000 字符以内" });
       return;
     }
     try {
@@ -3226,6 +3590,7 @@ export class DashboardServer {
     const auth = req.headers.authorization;
     if (!auth || !auth.startsWith("Bearer ")) return null;
     const token = auth.slice(7);
+    if (this.tokenBlacklist.has(token)) return null;
     return this.authManager.verify(token);
   }
 
@@ -3244,7 +3609,7 @@ export class DashboardServer {
   /** 判断路径是否需要认证保护 */
   private isProtectedPath(pathname: string): boolean {
     // /api/config、/api/catalog、/api/auth/* 不需要认证
-    if (pathname.startsWith("/api/config")) return false;
+    if (pathname.startsWith("/api/config")) return true;
     if (pathname.startsWith("/api/catalog")) return false;
     if (pathname.startsWith("/api/auth/")) return false;
     if (pathname === "/api/providers") return false;
@@ -3256,6 +3621,7 @@ export class DashboardServer {
     if (pathname.startsWith("/api/skills")) return false;
     if (pathname.startsWith("/api/i18n/")) return false;
     // 受保护端点
+    if (pathname.startsWith("/api/upload")) return true;
     if (pathname.startsWith("/api/chat")) return true;
     if (pathname.startsWith("/api/chatrooms")) return true;
     if (pathname.startsWith("/api/computer/")) return true;
@@ -3269,42 +3635,57 @@ export class DashboardServer {
     if (pathname.startsWith("/api/trace")) return true;
     if (pathname.startsWith("/api/analytics/")) return true;
     if (pathname.startsWith("/api/probe")) return true;
+    if (pathname.startsWith("/api/mcp/")) return true;
+    if (pathname.startsWith("/api/kb/")) return true;
+    if (pathname.startsWith("/api/scheduler/")) return true;
+    if (pathname.startsWith("/api/workflows")) return true;
+    if (pathname.startsWith("/api/voice/")) return true;
     // 其他路径默认不保护
     return false;
   }
 
-  /** 首次启动时自动创建 admin 用户（密码 admin） */
+  /** 首次启动时自动创建 admin 用户（随机密码） */
   private ensureDefaultAdmin(): void {
     const users = this.authManager.listUsers();
     if (users.length === 0) {
       try {
-        this.authManager.register("admin", "admin");
-        console.warn("[dashboard] 已自动创建默认管理员用户（用户名: admin, 密码: admin），请尽快修改密码");
+        const randomPwd = crypto.randomBytes(12).toString("base64url").slice(0, 16);
+        this.authManager.register("admin", randomPwd);
+        console.warn("=".repeat(60));
+        console.warn("[dashboard] 首次启动 — 管理员账号已创建");
+        console.warn(`  用户名: admin`);
+        console.warn(`  密码:   ${randomPwd}`);
+        console.warn("  请妥善保存此密码，登录后立即修改！");
+        console.warn("=".repeat(60));
       } catch {
-        // 注册失败忽略（可能并发）
+        // 注册失败忽略
       }
     }
   }
 
-  /** 首次启动时自动生成 jwtSecret */
-  private ensureJwtSecret(): void {
+  /** 首次启动时自动生成 jwtSecret 并返回 */
+  private ensureJwtSecret(): string {
     try {
       const raw = findConfigFile();
-      if (!raw) return;
       const auth = (raw as Record<string, unknown>).auth as { jwtSecret?: string } | undefined;
-      if (!auth?.jwtSecret) {
+      if (raw && !auth?.jwtSecret) {
+        const secret = crypto.randomBytes(32).toString("hex");
         const existing = (raw ?? {}) as Record<string, unknown>;
         const authSection = (existing.auth ?? {}) as Record<string, unknown>;
-        authSection.jwtSecret = crypto.randomBytes(32).toString("hex");
+        authSection.jwtSecret = secret;
         authSection.enabled = authSection.enabled ?? true;
         authSection.tokenExpiry = (authSection.tokenExpiry as string) ?? "7d";
         existing.auth = authSection;
         writeConfigFile(existing as Partial<QuarkConfig>);
-        console.log("[dashboard] 已自动生成 JWT 密钥");
+        logger.info("server", "已自动生成 JWT 密钥");
+        return secret;
       }
+      if (auth?.jwtSecret) return auth.jwtSecret;
     } catch {
       // 忽略
     }
+    // fallback: let AuthManager generate its own
+    return crypto.randomBytes(32).toString("hex");
   }
 
   /** POST /api/auth/register → 注册 */
@@ -3336,8 +3717,25 @@ export class DashboardServer {
     }
   }
 
+  /** 检查 IP 登录频率限制，返回 true 表示超限 */
+  private checkRateLimit(ip: string): boolean {
+    const now = Date.now();
+    let entry = this.rateLimitMap.get(ip);
+    if (!entry || now > entry.resetAt) {
+      this.rateLimitMap.set(ip, { count: 1, resetAt: now + this.RATE_LIMIT_WINDOW });
+      return false;
+    }
+    entry.count++;
+    return entry.count > this.RATE_LIMIT_MAX;
+  }
+
   /** POST /api/auth/login → 登录 */
   private async handleAuthLogin(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const ip = req.socket.remoteAddress ?? "unknown";
+    if (this.checkRateLimit(ip)) {
+      this.writeJSON(res, 429, { error: "请求过于频繁，请稍后再试" });
+      return;
+    }
     const body = await this.readJSON(req);
     if (!body || typeof body.username !== "string" || typeof body.password !== "string") {
       this.writeJSON(res, 400, { error: "Missing 'username' or 'password'" });
@@ -3348,14 +3746,14 @@ export class DashboardServer {
       this.writeJSON(res, 401, { error: "用户名或密码错误" });
       return;
     }
-    // 如果是 admin/admin 首次登录，提示修改密码
-    const headers: Record<string, string> = {};
-    this.applyCORS(headers);
-    if (body.username === "admin" && body.password === "admin") {
-      headers["X-Warning"] = "Default password not changed, please update";
-    }
-    res.writeHead(200, { "Content-Type": "application/json; charset=utf-8", ...headers });
-    res.end(JSON.stringify(result));
+    this.writeJSON(res, 200, result);
+  }
+
+  /** POST /api/auth/logout → 登出（token 加入黑名单） */
+  private async handleAuthLogout(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const token = req.headers.authorization?.replace("Bearer ", "");
+    if (token) this.tokenBlacklist.add(token);
+    this.writeJSON(res, 200, { ok: true });
   }
 
   /** GET /api/auth/me → 当前用户信息 */
@@ -3380,6 +3778,27 @@ export class DashboardServer {
       return;
     }
     this.writeJSON(res, 200, this.authManager.listUsers());
+  }
+
+  /** PUT /api/auth/password → 修改密码 */
+  private async handleAuthChangePassword(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const user = this.authenticateRequest(req);
+    if (!user) { this.writeJSON(res, 401, { error: "未认证" }); return; }
+    const body = await this.readJSON(req);
+    if (!body || typeof body.oldPassword !== "string" || typeof body.newPassword !== "string") {
+      this.writeJSON(res, 400, { error: "缺少 oldPassword 或 newPassword" });
+      return;
+    }
+    if ((body.newPassword as string).length < 8) {
+      this.writeJSON(res, 400, { error: "新密码至少 8 个字符" });
+      return;
+    }
+    const ok = this.authManager.changePassword(user.id, body.oldPassword as string, body.newPassword as string);
+    if (!ok) {
+      this.writeJSON(res, 400, { error: "原密码错误" });
+      return;
+    }
+    this.writeJSON(res, 200, { ok: true });
   }
 
   // ===========================================================================
@@ -3493,6 +3912,10 @@ export class DashboardServer {
       this.writeJSON(res, 400, { error: "Missing 'text' in body" });
       return;
     }
+    if ((body.text as string).length > 32000) {
+      this.writeJSON(res, 400, { error: "输入文本过长，请限制在 32000 字符以内" });
+      return;
+    }
 
     // 记录用户消息
     this.chatSessionStore.addMessage(id, "user", body.text as string);
@@ -3517,12 +3940,38 @@ export class DashboardServer {
     res.writeHead(200, headers);
     res.write(": connected\n\n");
 
+    let cancelled = false;
+    req.on("close", () => { cancelled = true; });
+
+    // 注册 SSE 客户端，EventBus 事件（chunk/tool_call/tool_result 等）自动转发给前端
+    const client = this.sseServer.addClient({
+      res: {
+        write: (c: string) => {
+          try {
+            res.write(c);
+          } catch {
+            /* client 已断开 */
+          }
+        },
+        end: () => {
+          try {
+            res.end();
+          } catch {
+            /* already ended */
+          }
+        },
+      },
+      userId,
+      sessionId: id,
+    });
+
     try {
       const result = await instance.agent.run(body.text as string, {
         sessionId: id,
         userId,
         channel: "dashboard",
       });
+      if (cancelled) return;
       // 记录助手回复
       this.chatSessionStore.addMessage(id, "assistant", result.reply, result.contextTokens);
       // 累计用量
@@ -3545,6 +3994,7 @@ export class DashboardServer {
       const msg = err instanceof Error ? err.message : String(err);
       res.write(`event: error\ndata: ${JSON.stringify({ error: msg })}\n\n`);
     } finally {
+      this.sseServer.removeClient(client.id);
       try { res.end(); } catch { /* already ended */ }
     }
   }
@@ -3621,14 +4071,144 @@ export class DashboardServer {
   }
 
   // ===========================================================================
+  // OpenAI 兼容 API
+  // ===========================================================================
+
+  /** POST /v1/chat/completions — OpenAI 兼容对话端点（支持 stream） */
+  private async handleOpenAICompat(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readJSON(req);
+    if (!body) {
+      this.writeJSON(res, 400, { error: { message: "Invalid body" } });
+      return;
+    }
+    const messages = (body.messages as { role: string; content: unknown }[]) ?? [];
+    const lastUser = messages.filter((m) => m.role === "user").pop();
+    if (!lastUser) {
+      this.writeJSON(res, 400, { error: { message: "No user message" } });
+      return;
+    }
+    const text =
+      typeof lastUser.content === "string" ? lastUser.content : JSON.stringify(lastUser.content);
+
+    let instance: AgentInstance;
+    try {
+      instance = await this.getAgent();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.writeJSON(res, 400, { error: { message: msg } });
+      return;
+    }
+
+    const modelName = typeof body.model === "string" ? body.model : "quark-agent";
+
+    try {
+      if (body.stream === true) {
+        // SSE streaming
+        const headers: Record<string, string> = {
+          "Content-Type": "text/event-stream",
+          "Cache-Control": "no-cache",
+          Connection: "keep-alive",
+          "X-Accel-Buffering": "no",
+        };
+        this.applyCORS(headers);
+        res.writeHead(200, headers);
+
+        const result = await instance.agent.run(text, { channel: "dashboard" });
+        const id = `chatcmpl-${Date.now()}`;
+        const created = Math.floor(Date.now() / 1000);
+        const words = result.reply.split(/(\s+)/);
+        for (const word of words) {
+          res.write(
+            `data: ${JSON.stringify({
+              id,
+              object: "chat.completion.chunk",
+              created,
+              model: modelName,
+              choices: [{ index: 0, delta: { content: word }, finish_reason: null }],
+            })}\n\n`,
+          );
+        }
+        res.write(
+          `data: ${JSON.stringify({
+            id,
+            object: "chat.completion.chunk",
+            created,
+            model: modelName,
+            choices: [{ index: 0, delta: {}, finish_reason: "stop" }],
+          })}\n\n`,
+        );
+        res.write("data: [DONE]\n\n");
+        res.end();
+      } else {
+        const result = await instance.agent.run(text, { channel: "dashboard" });
+        const completionTokens = Math.ceil(result.reply.length / 4);
+        this.writeJSON(res, 200, {
+          id: `chatcmpl-${Date.now()}`,
+          object: "chat.completion",
+          created: Math.floor(Date.now() / 1000),
+          model: modelName,
+          choices: [
+            {
+              index: 0,
+              message: { role: "assistant", content: result.reply },
+              finish_reason: "stop",
+            },
+          ],
+          usage: {
+            prompt_tokens: result.contextTokens,
+            completion_tokens: completionTokens,
+            total_tokens: result.contextTokens + completionTokens,
+          },
+        });
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      logger.error("server", "openai-compat error", { message: msg });
+      if (!res.headersSent) {
+        this.writeJSON(res, 500, { error: { message: msg } });
+      } else {
+        try {
+          res.end();
+        } catch {
+          /* already ended */
+        }
+      }
+    }
+  }
+
+  /** GET /v1/models — OpenAI 兼容模型列表 */
+  private async handleOpenAIModels(res: ServerResponse): Promise<void> {
+    this.writeJSON(res, 200, {
+      object: "list",
+      data: [
+        {
+          id: "quark-agent",
+          object: "model",
+          created: Math.floor(Date.now() / 1000),
+          owned_by: "quark-agent",
+        },
+      ],
+    });
+  }
+
+  // ===========================================================================
   // 工具方法
   // ===========================================================================
 
   /** 读取并解析 JSON body，失败返回 null */
-  private readJSON(req: IncomingMessage): Promise<Record<string, unknown> | null> {
+  private readJSON(req: IncomingMessage, maxSize = 10 * 1024 * 1024): Promise<Record<string, unknown> | null> {
     return new Promise((resolve) => {
       const chunks: Buffer[] = [];
-      req.on("data", (c: Buffer) => chunks.push(c));
+      let totalSize = 0;
+      req.on("data", (c: Buffer) => {
+        totalSize += c.length;
+        if (totalSize > maxSize) {
+          req.destroy();
+          resolve(null);
+          return;
+        }
+        chunks.push(c);
+      });
       req.on("end", () => {
         const raw = Buffer.concat(chunks).toString("utf8");
         if (!raw) {
@@ -3645,10 +4225,13 @@ export class DashboardServer {
     });
   }
 
-  /** 写 JSON 响应，附带 CORS 头 */
+  /** 写 JSON 响应，附带 CORS 头和安全头 */
   private writeJSON(res: ServerResponse, status: number, body: unknown): void {
     const headers: Record<string, string> = { "Content-Type": "application/json; charset=utf-8" };
     this.applyCORS(headers);
+    headers["X-Content-Type-Options"] = "nosniff";
+    headers["X-Frame-Options"] = "DENY";
+    headers["X-XSS-Protection"] = "1; mode=block";
     res.writeHead(status, headers);
     res.end(JSON.stringify(body));
   }
@@ -3656,8 +4239,8 @@ export class DashboardServer {
   /** 只写 CORS 头（用于 OPTIONS 预检） */
   private writeCORS(res: ServerResponse, status = 204): void {
     res.writeHead(status, {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
+      "Access-Control-Allow-Origin": "http://localhost:8788",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
       "Access-Control-Max-Age": "86400",
     });
@@ -3665,8 +4248,8 @@ export class DashboardServer {
 
   /** 把 CORS 头追加到给定 headers */
   private applyCORS(headers: Record<string, string>): void {
-    headers["Access-Control-Allow-Origin"] = "*";
-    headers["Access-Control-Allow-Methods"] = "GET, POST, DELETE, OPTIONS";
+    headers["Access-Control-Allow-Origin"] = "http://localhost:8788";
+    headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS";
     headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization";
   }
 
@@ -3680,8 +4263,8 @@ export class DashboardServer {
           : `xdg-open ${addr}`;
     exec(cmd, (err) => {
       if (err) {
-        console.warn(`[dashboard] 无法自动打开浏览器：${err.message}`);
-        console.warn(`[dashboard] 请手动访问 ${addr}`);
+        logger.warn("server", `无法自动打开浏览器：${err.message}`);
+        logger.warn("server", `请手动访问 ${addr}`);
       }
     });
   }
