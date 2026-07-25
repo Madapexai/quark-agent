@@ -1,6 +1,6 @@
 site_name: Quark Agent
 site_url: https://madapexai.github.io/quark-agent
-site_description: A 5KB agent kernel that composes everything you need.
+site_description: A zero-dependency agentic framework with 22 LLM providers, 17 channels, and multi-agent orchestration.
 site_author: Madapexai
 repo_url: https://github.com/Madapexai/quark-agent
 repo_name: Madapexai/quark-agent
@@ -42,6 +42,18 @@ theme:
 nav:
   - Home: index.md
   - Quick Start: quickstart.md
+  - What's New: changelog.md
+  - Features:
+      - MCP Protocol: features/mcp.md
+      - RAG / Knowledge Base: features/rag.md
+      - OpenAI Compatible API: features/openai-api.md
+      - Workflow DAG Engine: features/workflow.md
+      - Voice STT/TTS: features/voice.md
+      - Cron Scheduler: features/scheduler.md
+      - Multimodal Input: features/multimodal.md
+      - Computer Use: features/computer-use.md
+      - Function Calling: features/function-calling.md
+      - Plugin Hot Reload: features/hot-reload.md
   - Concepts:
       - Kernel & Layers: concepts/kernel.md
       - Tools & Skills: concepts/tools.md
@@ -53,10 +65,12 @@ nav:
       - Checkpoint & Long-Running: concepts/checkpoint.md
       - Sandbox Policy: concepts/sandbox-policy.md
   - Reference:
-      - 16 Tools: reference/tools.md
-      - 7 Channels: reference/channels.md
+      - 22 Providers: reference/providers.md
+      - 17 Channels: reference/channels.md
+      - Tools: reference/tools.md
       - defineAction API: reference/define-action.md
       - Configuration: reference/config.md
+      - API Endpoints: reference/api-endpoints.md
   - Benchmark:
       - Overview: benchmark/index.md
       - GAIA Results: benchmark/gaia.md
@@ -65,6 +79,7 @@ nav:
   - Community:
       - Contributing: community/contributing.md
       - Roadmap: community/roadmap.md
+      - Rust Roadmap: community/rust-roadmap.md
 
 markdown_extensions:
   - admonition

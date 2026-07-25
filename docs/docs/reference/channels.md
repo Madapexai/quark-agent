@@ -1,18 +1,28 @@
-# 7 Channels
+# 17 Channels
 
-The same Agent instance can be exposed through 7 different channels. Pick one (or several) — they all share the same runtime, tools, and skills.
+The same Agent instance can be exposed through 17 different channels. All have real API implementations - no stubs.
 
 ## Channel Matrix
 
-| Channel | Use Case | Two-way? |
-|---|---|:---:|
-| `CliChannel` | Local terminal REPL | ✅ |
-| `HttpChannel` | Web UI, REST API, SSE streaming | ✅ |
-| `FeishuChannel` | Feishu / Lark bot | ✅ |
-| `WeComChannel` | WeCom (企业微信) bot | ✅ |
-| `TelegramChannel` | Telegram bot | ✅ |
-| `GithubChannel` | GitHub issue / PR comments | ✅ |
-| `WebhookChannel` | Generic incoming webhook | inbound |
+| # | Channel | Use Case | Protocol |
+|---|---------|----------|----------|
+| 1 | `CliChannel` | Local terminal REPL | stdin/stdout |
+| 2 | `HttpChannel` | Web UI, REST API, SSE | HTTP + SSE |
+| 3 | `DiscordChannel` | Discord bot | Gateway WebSocket |
+| 4 | `SlackChannel` | Slack bot | Events API |
+| 5 | `TelegramChannel` | Telegram bot | Bot API polling |
+| 6 | `FeishuChannel` | Feishu / Lark bot | Event subscription |
+| 7 | `WeChatChannel` | WeChat bot | HTTP callback |
+| 8 | `WhatsAppChannel` | WhatsApp Cloud API | Webhook + Graph API |
+| 9 | `SignalChannel` | Signal messenger | signal-cli-rest-api |
+| 10 | `EmailChannel` | Email bot | IMAP + SMTP |
+| 11 | `SmsChannel` | SMS via Twilio | Webhook + REST |
+| 12 | `MatrixChannel` | Matrix client | Client-Server API |
+| 13 | `MattermostChannel` | Mattermost bot | REST + WebSocket |
+| 14 | `DingTalkChannel` | DingTalk bot | Outgoing webhook |
+| 15 | `WeComChannel` | Enterprise WeChat | Callback + AES decrypt |
+| 16 | `RelayChannel` | Cross-channel routing | Config-based |
+| 17 | `WebUI` | Dashboard | HTTP + SSE + JWT |
 
 ## Common API
 
@@ -21,75 +31,37 @@ Every channel implements the same contract:
 ```ts
 import { createAgent, CliChannel, HttpChannel } from "quark-agent";
 
-const { agent } = await createAgent({ apiKey: process.env.ARK_API_KEY!, profile: "full" });
+const { agent } = await createAgent({ apiKey: process.env.GLM_API_KEY!, profile: "full" });
 
-// Pick your entrypoint — same agent, different surface
+// Pick your entrypoint - same agent, different surface
 new CliChannel({ agent }).start();
 // or
 new HttpChannel({ agent, port: 3456 }).start();
 ```
 
-## HTTP + SSE
+## Channel-Specific Features
 
-The `HttpChannel` exposes:
+### WhatsApp
+- HMAC-SHA256 signature verification
+- Cloud API message sending
+- Supports text, image, template messages
 
-- `POST /api/chat/stream` — SSE streaming chat (the main entrypoint)
-- `POST /api/chat` — non-streaming chat (returns full JSON)
-- `GET /api/status` — health check
+### Email
+- Self-built IMAP/SMTP (zero npm dependencies)
+- TLS support (ports 465/993)
+- Auto-fetch unread emails
 
-SSE event types:
+### WeCom
+- AES-256-CBC message decryption
+- EncodingAESKey support
+- Access token caching
 
-| Event | Payload | When |
-|---|---|---|
-| `thinking` | `{ content }` | Agent is reasoning |
-| `tool_call` | `{ name, args }` | About to invoke a tool |
-| `tool_result` | `{ name, result }` | Tool returned |
-| `text_delta` | `{ content }` | Streamed token |
-| `text` | `{ content }` | Full final text (non-streaming fallback) |
-| `done` | `{}` | Stream complete |
-| `error` | `{ message }` | Something broke |
+### Matrix
+- `/sync` long-polling with incremental sync
+- Room filtering
+- Auto-reconnect
 
-## Feishu / WeCom / Telegram
-
-Each chat channel expects a bot token in `.env`:
-
-```env
-FEISHU_APP_ID=
-FEISHU_APP_SECRET=
-FEISHU_VERIFICATION_TOKEN=
-
-# WeCom
-WECOM_CORP_ID=
-WECOM_AGENT_ID=
-WECOM_SECRET=
-
-# Telegram
-TELEGRAM_BOT_TOKEN=
-```
-
-Then start the channel:
-
-```ts
-new FeishuChannel({ agent }).start();
-new WeComChannel({ agent }).start();
-new TelegramChannel({ agent }).start();
-```
-
-## GitHub
-
-The `GithubChannel` listens for webhook events (issue comments, PR comments) and replies in-thread. Set:
-
-```env
-GITHUB_WEBHOOK_SECRET=
-GITHUB_TOKEN=        # PAT with repo:comment permission
-```
-
-## Webhook
-
-The most flexible — accepts any POST with a `message` field. Useful for Zapier, n8n, custom integrations.
-
-```bash
-curl -X POST http://localhost:3456/webhook \
-  -H "Content-Type: application/json" \
-  -d '{"message": "What is 2+2?"}'
-```
+### Mattermost
+- WebSocket event streaming
+- Bot authentication challenge
+- Posted event handling

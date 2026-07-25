@@ -1,6 +1,6 @@
-# 16 Built-in Tools
+# Built-in Tools
 
-Quark Agent ships with 16 tools across 7 categories. You don't load them all — the `profile` parameter decides.
+Quark Agent ships with a composable toolset across 10 categories. You don't load them all - the `profile` parameter decides.
 
 ## Category × Profile Matrix
 
@@ -14,6 +14,8 @@ Quark Agent ships with 16 tools across 7 categories. You don't load them all —
 | Image | `generate_image` | | | | ✅ |
 | Task | `todo_write` `task_list` | | | ✅ | ✅ |
 | Memory | `memory_save` `memory_search` | | | ✅ | ✅ |
+| Computer Use | `screenshot` `click` `type` | | | | ✅ |
+| Multimodal | `upload_file` `image_input` | | | | ✅ |
 
 ## Tool Reference
 
