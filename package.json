@@ -2,9 +2,17 @@
   "name": "quark-agent",
   "version": "1.0.0",
   "description": "Quark Agent — A 5KB agent kernel that composes everything you need. Model-agnostic, tool-composable, channel-pluggable.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Madapexai/quark-agent.git"
+  },
+  "homepage": "https://github.com/Madapexai/quark-agent#readme",
+  "bugs": {
+    "url": "https://github.com/Madapexai/quark-agent/issues"
+  },
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
   "bin": {
     "quark-agent": "./bin/run-cli.cjs"
   },
@@ -22,12 +30,15 @@
     "build": "tsc -p tsconfig.json",
     "dev": "tsx bin/cli.ts",
     "start": "node bin/run-cli.cjs",
+    "test": "npm run typecheck && node e2e/test-workflows.mjs && node --test scripts/run-workflow-e2e.test.mjs && npm run test:workflow-e2e",
+    "test:workflow-e2e": "node scripts/run-workflow-e2e.mjs",
     "typecheck": "tsc --noEmit",
+    "verify:package": "npm run build && node scripts/verify-package.mjs && npm pack --dry-run",
     "example": "tsx examples/basic.ts",
     "prepublishOnly": "npm run build"
   },
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=22.12.0"
   },
   "dependencies": {
     "better-sqlite3": "^12.11.1",
