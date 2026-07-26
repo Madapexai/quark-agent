@@ -1,14 +1,15 @@
-name: Release Package
+name: CI
 
 on:
-  release:
-    types: [published]
+  push:
+    branches: [master]
+  pull_request:
 
 permissions:
   contents: read
 
 jobs:
-  package:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,9 +20,3 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run verify:package
-      - run: npm pack
-      - uses: actions/upload-artifact@v4
-        with:
-          name: quark-agent-${{ github.event.release.tag_name }}
-          path: quark-agent-*.tgz
-          if-no-files-found: error
