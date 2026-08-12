@@ -23,6 +23,16 @@ export type { SqliteMemoryOptions } from "./memory/sqlite.js";
 export { Compressor, estimateTokens } from "./memory/compress.js";
 export type { CompressorOptions } from "./memory/compress.js";
 
+// daily notes（P0: 对标 AgentMore 精房日志双层结构）
+export { DailyNoteStore, CuratedMemory, MemoryMaintenance, todayStr } from "./memory/daily-notes.js";
+export type { DailyNote, DailyNoteQuery, DistillOptions } from "./memory/daily-notes.js";
+
+// relay（跨 session / 跨平台 / 跨 harness 上下文中继）
+export { RelayService, createRelayTool } from "./relay/index.js";
+export type { RelaySource, RelayTarget, RelayPolicy, RelayRequest, RelayResult, RelayEventBus, RelayToolOptions } from "./relay/index.js";
+export { QuarkAgentAdapter, FileBasedAdapter, ClaudeCodeAdapter, CodexAdapter, HermesAdapter, createHarnessAdapter } from "./relay/harness-adapter.js";
+export type { HarnessType, HarnessAdapter, ContextBlock, ExportFilter, ImportOptions } from "./relay/harness-adapter.js";
+
 // sandbox
 export { VmSandbox } from "./sandbox/vm.js";
 export type { VmSandboxOptions } from "./sandbox/vm.js";
@@ -68,6 +78,10 @@ export { SqliteSkillStore } from "./skills/store.js";
 export { SoulStore, createSoul, renderSoul } from "./soul/index.js";
 export type { SoulSpec } from "./soul/index.js";
 
+// workspace files（P0: 对标 Hermes SOUL.md + OpenClaw 工作区文件栈）
+export { WorkspaceFilesLoader, FileBasedSoulProvider } from "./soul/workspace-files.js";
+export type { WorkspaceFileConfig, ParsedIdentity, ParsedUser, ParsedAgents, ParsedTools, WorkspaceSoulConfig } from "./soul/workspace-files.js";
+
 // env
 export { collectEnv, renderEnv, fullScope, lightweightScope, readOnlyScope } from "./env/index.js";
 export type { CollectEnvOptions } from "./env/index.js";
@@ -80,6 +94,10 @@ export { AuthError, canUseTool, canUseModel, canReadDomain, filterTools, filterS
 // session
 export { SqliteSessionManager } from "./session/manager.js";
 export type { SqliteSessionManagerOptions } from "./session/manager.js";
+
+// context isolation（P0: 对标 OpenClaw dmScope 的上下文隔离策略）
+export { SessionRouter, filterByVisibility, createIsolatedRouter, createSharedRouter, createPerPeerRouter } from "./session/isolation.js";
+export type { IsolationMode, SessionScopeConfig, SessionRouteResult, InboundContext, VisibilityPolicy } from "./session/isolation.js";
 
 // evolve
 export { Evolver } from "./evolve/gepa.js";
